@@ -1,5 +1,6 @@
 export const SAVE_KEY = "neathbound.save.v3";
-export const LEGACY_SAVE_KEY = "neathbound.save.v1";\nexport const LEGACY_SAVE_KEYS = ["neathbound.save.v2", LEGACY_SAVE_KEY];
+export const LEGACY_SAVE_KEY = "neathbound.save.v1";
+export const LEGACY_SAVE_KEYS = ["neathbound.save.v2", LEGACY_SAVE_KEY];
 const MENACE_IDS = ["dread", "scandal", "wounds", "suspicion"];
 
 export function initialState() {
@@ -14,12 +15,13 @@ export function initialState() {
     items: { "salted-map": 1, "brass-key": 1 },
     unlockedLocations: ["lantern-quay", "velvet-market", "hollow-archive"],
     acquaintances: [],
-    flags: {},
+    equipment: { coat: null, tool: null, charm: null },
+    flags: { "__revision": 0, "__equipment": { coat: null, tool: null, charm: null }, "__events": [] },
     journal: ["You woke beneath a sky made of stone, with a brass key in your hand."],
     events: [],
     hand: [],
     discard: [],
-    lastDraw: "bell-under-water"
+    lastDraw: null
   };
 }
 
@@ -31,12 +33,10 @@ export function normaliseState(input = {}) {
   const base = initialState();
   const legacyItems = Array.isArray(input.items)
     ? Object.fromEntries(input.items.map((item) => [item, 1]))
-    : (input.items ?? {});
+    : { ...(input.items ?? {}) };
   const qualities = { ...base.qualities, ...(input.qualities ?? {}) };
   const menaces = { ...base.menaces, ...(input.menaces ?? {}) };
 
-  // Older saves accidentally stored menaces as qualities. Reconcile by taking
-  // the larger value so a duplicated historical value is never double-counted.
   for (const id of MENACE_IDS) {
     if (qualities[id] !== undefined) {
       menaces[id] = Math.max(Number(menaces[id] ?? 0), Number(qualities[id] ?? 0));
@@ -44,36 +44,40 @@ export function normaliseState(input = {}) {
     }
   }
 
+  const revision = Number.isInteger(input.revision)
+    ? input.revision
+    : Number(input.flags?.["__revision"] ?? 0);
+  const equipment = {
+    ...base.equipment,
+    ...(input.flags?.["__equipment"] ?? {}),
+    ...(input.equipment ?? {})
+  };
+  const events = Array.isArray(input.events)
+    ? input.events.slice(0, 250)
+    : (Array.isArray(input.flags?.["__events"]) ? input.flags["__events"].slice(0, 250) : []);
+
   return {
     ...base,
     ...input,
     version: 3,
-    revision: Number.isInteger(input.revision) ? input.revision : Number(input.flags?.["__revision"] ?? 0),
+    revision,
     qualities,
     menaces,
-    items: { ...legacyItems },
+    items: legacyItems,
     unlockedLocations: [...new Set(input.unlockedLocations ?? base.unlockedLocations)],
     acquaintances: [...new Set(input.acquaintances ?? base.acquaintances)],
+    equipment,
     flags: {
       ...(input.flags ?? {}),
-      "__revision": Number.isInteger(input.revision) ? input.revision : Number(input.flags?.["__revision"] ?? 0),
-      "__equipment": {
-        ...base.equipment,
-        ...(input.flags?.["__equipment"] ?? {}),
-        ...(input.equipment ?? {})
-      }
+      "__revision": revision,
+      "__equipment": equipment,
+      "__events": events
     },
     journal: Array.isArray(input.journal) ? input.journal.slice(0, 100) : base.journal,
-    events: Array.isArray(input.events)
-      ? input.events.slice(0, 250)
-      : (Array.isArray(input.flags?.["__events"]) ? input.flags["__events"].slice(0, 250) : []),
-    equipment: {
-      ...base.equipment,
-      ...(input.flags?.["__equipment"] ?? {}),
-      ...(input.equipment ?? {})
-    },
+    events,
     hand: Array.isArray(input.hand) ? [...new Set(input.hand)] : [],
-    discard: Array.isArray(input.discard) ? [...new Set(input.discard)] : []
+    discard: Array.isArray(input.discard) ? [...new Set(input.discard)] : [],
+    lastDraw: input.lastDraw ?? null
   };
 }
 
