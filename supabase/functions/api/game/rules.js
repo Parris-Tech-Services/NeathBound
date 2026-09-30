@@ -59,6 +59,14 @@ export function applyEffect(state, effect) {
     case "location":
       state.locationId = effect.id;
       break;
+    case "menace":
+      state.menaces ??= {};
+      state.menaces[effect.id] = Math.max(0, (state.menaces[effect.id] ?? 0) + Number(effect.amount ?? 0));
+      break;
+    case "unlock-location":
+      state.unlockedLocations ??= [];
+      if (!state.unlockedLocations.includes(effect.id)) state.unlockedLocations.push(effect.id);
+      break;
     default:
       throw new Error(`Unknown effect type: ${effect.type}`);
   }

@@ -1,4 +1,6 @@
 import { availableChoices, availableStories, currentLocation } from "../game/engine.js?v=20260930-6";
+import { locations } from "../game/content.js?v=20260930-5";
+import { loadPreferences } from "./preferences.js?v=20260930-1";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
 
@@ -6,6 +8,10 @@ export function render(app, state, handlers) {
   const location = currentLocation(state);
   const stories = availableStories(state);
   const inventory = Object.entries(state.items ?? {}).filter(([, quantity]) => quantity > 0);
+  const preferences = loadPreferences();
+  const unlockedLocations = (state.unlockedLocations ?? []).map((id) => ({ id, location: locations[id] })).filter((entry) => entry.location);
+  const locationNote = preferences.notes[`location:${state.locationId}`] ?? location.atmosphere;
+  const glossaryNote = preferences.notes.glossary ?? "A quality is anything the city remembers about you: a talent, a rumour, an item, or a consequence.";
 
   const qualitiesHtml = Object.entries(state.qualities).map(([key, value]) => {
     const width = Math.min(100, Math.max(8, value * 10));
@@ -45,7 +51,7 @@ export function render(app, state, handlers) {
       '<article class="storylet">',
       '<div class="story-art art-', (storyIndex % 5) + 1, '" aria-hidden="true"><span></span></div>',
       '<div class="story-body">',
-      '<button class="bookmark" type="button" aria-label="Bookmark story">◆</button>',
+      '<button class="bookmark', preferences.bookmarks.includes(story.id) ? ' is-bookmarked' : '', '" type="button" data-action="bookmark" data-story="', story.id, '" aria-label="', preferences.bookmarks.includes(story.id) ? 'Remove bookmark' : 'Bookmark story', '" aria-pressed="', preferences.bookmarks.includes(story.id), '">◆</button>',
       '<h3>', escapeHtml(story.title), '</h3>',
       '<p>', escapeHtml(story.text), '</p>',
       '<div class="story-choices">', choicesHtml, '</div>',
@@ -59,7 +65,7 @@ export function render(app, state, handlers) {
     : "<small>Nothing of note.</small>";
 
   app.innerHTML = [
-    '<div class="game-shell">',
+        '<div class="game-shell outfit-', escapeClass(preferences.outfit), '">',
       '<header class="topbar">',
         '<div class="brand">NEATH<span>◆</span>BOUND</div>',
         '<nav class="account-nav" aria-label="Account">',
@@ -88,8 +94,8 @@ export function render(app, state, handlers) {
         '<a href="#journal">MESSAGES</a>',
         '<a href="#character">MYSELF</a>',
         '<a href="#possessions">POSSESSIONS</a>',
-        '<a href="#stories">BAZAAR</a>',
-        '<a href="#stories">FATE</a>',
+        '<a href="#possessions">BAZAAR</a>',
+        '<a href="#character">FATE</a>',
         '<a href="#journal">PLANS</a>',
       '</nav>',
 
@@ -112,7 +118,11 @@ export function render(app, state, handlers) {
 
           '<section class="outfit">',
             '<label for="outfit">Outfit</label>',
-            '<select id="outfit" aria-label="Outfit"><option>Morning Outfit</option></select>',
+            '<select id="outfit" aria-label="Outfit" data-action="outfit">',
+              '<option value="morning-outfit"', preferences.outfit === "morning-outfit" ? ' selected' : '', '>Morning Outfit</option>',
+              '<option value="dock-coat"', preferences.outfit === "dock-coat" ? ' selected' : '', '>Dockworker&apos;s Coat</option>',
+              '<option value="archive-linen"', preferences.outfit === "archive-linen" ? ' selected' : '', '>Archive Linen</option>',
+            '</select>',
           '</section>',
 
           '<section class="qualities-list">', qualitiesHtml, '</section>',
@@ -124,10 +134,10 @@ export function render(app, state, handlers) {
               '<section class="featured-story">',
                 '<div class="feature-art" aria-hidden="true"><span>⌕</span></div>',
                 '<div class="feature-copy">',
-                  '<button class="edit-dot" type="button" aria-label="Edit location note">✎</button>',
+                  '<button class="edit-dot" type="button" data-action="edit-note" data-note-key="location:', state.locationId, '" aria-label="Edit location note">✎</button>',
                   '<h2>', escapeHtml(location.name), '</h2>',
                   '<p>', escapeHtml(location.subtitle), '</p>',
-                  '<p class="feature-note"><strong>', escapeHtml(location.atmosphere), '</strong></p>',
+                  '<p class="feature-note"><strong>', escapeHtml(locationNote), '</strong></p>',
                 '</div>',
               '</section>',
               '<section class="story-stack">', storiesHtml, '</section>',
@@ -146,7 +156,11 @@ export function render(app, state, handlers) {
             '<h2>Welcome to</h2>',
             '<h3>', escapeHtml(location.name), '.</h3>',
             '<p class="welcome-tail">delicious stranger!</p>',
-            '<button class="travel-button" disabled>TRAVEL</button>',
+            '<label class="travel-label" for="travel-location">Travel to</label>',
+            '<select id="travel-location" aria-label="Travel destination">',
+              unlockedLocations.map(({ id, location: destination }) => ['<option value="', id, '"', id === state.locationId ? ' selected' : '', '>', escapeHtml(destination.name), '</option>'].join('')).join(""),
+            '</select>',
+            '<button class="travel-button" data-action="travel"', unlockedLocations.length <= 1 ? ' disabled' : '', '>TRAVEL</button>',
           '</section>',
 
           '<section class="promo-card">',
@@ -156,9 +170,9 @@ export function render(app, state, handlers) {
           '</section>',
 
           '<section class="glossary parchment">',
-            '<button class="edit-dot" type="button" aria-label="Edit note">✎</button>',
+            '<button class="edit-dot" type="button" data-action="edit-note" data-note-key="glossary" aria-label="Edit quality note">✎</button>',
             '<h3>What is a quality?</h3>',
-            '<p>A quality is anything the city remembers about you: a talent, a rumour, an item, or a consequence.</p>',
+            '<p>', escapeHtml(glossaryNote), '</p>',
           '</section>',
 
           '<section class="satchel" id="possessions">',
@@ -176,6 +190,10 @@ export function render(app, state, handlers) {
   ].join("");
 
   app.querySelectorAll("[data-choice]").forEach((button) => button.addEventListener("click", () => handlers.choose(button.dataset.story, button.dataset.choice)));
+  app.querySelectorAll("[data-action=bookmark]").forEach((button) => button.addEventListener("click", () => handlers.bookmark(button.dataset.story)));
+  app.querySelector("[data-action=outfit]").addEventListener("change", (event) => handlers.outfit(event.target.value));
+  app.querySelector("[data-action=travel]").addEventListener("click", () => handlers.travel(app.querySelector("#travel-location").value));
+  app.querySelectorAll("[data-action=edit-note]").forEach((button) => button.addEventListener("click", () => handlers.editNote(button.dataset.noteKey)));
   app.querySelector("[data-action=reset]").addEventListener("click", handlers.reset);
 }
 

@@ -39,6 +39,10 @@ export class FallbackGameService {
     return this.active.choose(storyId, choiceId);
   }
 
+  travel(locationId) {
+    return this.active.travel(locationId);
+  }
+
   reset() {
     return this.active.reset();
   }

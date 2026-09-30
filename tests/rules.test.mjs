@@ -46,3 +46,22 @@ test("challenge resolution is deterministic when random is injected", () => {
   assert.equal(result.total, 5);
   assert.equal(result.success, true);
 });
+
+test("menace effects adjust menaces and never go below zero", () => {
+  const state = initialState();
+  applyEffects(state, [{ type: "menace", id: "suspicion", amount: 2 }]);
+  assert.equal(state.menaces.suspicion, 2);
+  assert.equal(state.qualities.suspicion, undefined, "menaces are not qualities");
+  applyEffects(state, [{ type: "menace", id: "suspicion", amount: -5 }]);
+  assert.equal(state.menaces.suspicion, 0);
+});
+
+test("unlock-location effects add a travel destination once", () => {
+  const state = initialState();
+  applyEffects(state, [
+    { type: "unlock-location", id: "clockwork-gardens" },
+    { type: "unlock-location", id: "clockwork-gardens" }
+  ]);
+  assert.equal(state.unlockedLocations.filter((id) => id === "clockwork-gardens").length, 1);
+  assert.equal(state.locationId, "lantern-quay", "unlocking does not move the player");
+});
