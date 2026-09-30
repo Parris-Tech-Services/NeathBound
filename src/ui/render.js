@@ -176,25 +176,26 @@ export function render(app, state, handlers, outcome = null, activeTab = "story"
                 : [
                     renderOpportunityPanel(state),
                     '<section class="story-board">',
-                  '<div class="board-inner">',
-                    '<section class="featured-story">',
-                      '<div class="feature-art feature-art-', escapeClass(state.locationId), '" aria-hidden="true">', locationArtSvg(state.locationId), '</div>',
-                      '<div class="feature-copy">',
-                        '<button class="edit-dot" type="button" data-action="edit-note" data-note-key="location:', state.locationId, '" aria-label="Edit location note">✎</button>',
-                        '<h2>', escapeHtml(location.name), '</h2>',
-                        '<p>', escapeHtml(location.subtitle), '</p>',
-                        '<p class="feature-note"><strong>', escapeHtml(locationNote), '</strong></p>',
+                      '<div class="board-inner">',
+                        '<section class="featured-story">',
+                          '<div class="feature-art feature-art-', escapeClass(state.locationId), '" aria-hidden="true">', locationArtSvg(state.locationId), '</div>',
+                          '<div class="feature-copy">',
+                            '<button class="edit-dot" type="button" data-action="edit-note" data-note-key="location:', state.locationId, '" aria-label="Edit location note">✎</button>',
+                            '<h2>', escapeHtml(location.name), '</h2>',
+                            '<p>', escapeHtml(location.subtitle), '</p>',
+                            '<p class="feature-note"><strong>', escapeHtml(locationNote), '</strong></p>',
+                          '</div>',
+                        '</section>',
+                        '<section class="story-stack">', storiesHtml, '</section>',
                       '</div>',
                     '</section>',
-                    '<section class="story-stack">', storiesHtml, '</section>',
-                  '</div>',
-                '</section>'
-              ].join(""),
-
-          '<section class="journal parchment" id="journal">',
-
+                    '<section class="journal parchment" id="journal">',
+                      '<h3>What the city remembers</h3>',
+                      '<ol>', journalHtml, '</ol>',
+                    '</section>'
+                  ].join(""))
+            : renderScreen(activeTab, state, preferences),
         '</main>',
-
         '<aside class="right-rail">',
           '<section class="welcome-panel">',
             '<p>It&apos;s <strong class="user-name">', escapeHtml(state.name), '</strong>!</p>',
