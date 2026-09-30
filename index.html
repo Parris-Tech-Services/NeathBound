@@ -3,14 +3,152 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#232323" />
+    <meta name="theme-color" content="#171b19" />
     <meta name="description" content="NeathBound — an original story-driven browser RPG." />
     <title>NeathBound | A City Beneath</title>
     <link rel="icon" href="data:," />
+    <style>
+      #boot-screen {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: grid;
+        place-items: center;
+        min-width: 320px;
+        overflow: hidden;
+        background:
+          radial-gradient(ellipse at 50% 64%, rgba(104,135,92,.2), transparent 34%),
+          linear-gradient(180deg, #171b19 0%, #202720 48%, #111513 100%);
+        color: #eee8dc;
+        font-family: Georgia, "Times New Roman", serif;
+        opacity: 1;
+        visibility: visible;
+        transition: opacity .32s ease, visibility .32s ease;
+      }
+      #boot-screen::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto;
+        height: 38vh;
+        min-height: 170px;
+        background: #101210;
+        clip-path: polygon(0 0,100% 0,100% 61%,96% 52%,93% 67%,89% 48%,85% 64%,81% 43%,77% 65%,72% 47%,68% 72%,63% 50%,58% 66%,53% 45%,48% 71%,43% 51%,38% 68%,33% 46%,28% 72%,23% 49%,18% 67%,13% 44%,8% 70%,4% 51%,0 64%);
+        opacity: .92;
+      }
+      #boot-screen::after {
+        content: "";
+        position: absolute;
+        left: -10%;
+        right: -10%;
+        bottom: 9%;
+        height: 22vh;
+        min-height: 110px;
+        background: rgba(44,63,48,.42);
+        clip-path: polygon(0 88%,8% 61%,17% 79%,27% 45%,37% 73%,49% 36%,60% 70%,72% 47%,84% 76%,93% 54%,100% 82%,100% 100%,0 100%);
+        filter: blur(2px);
+      }
+      #boot-screen.is-ready {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .boot-card {
+        position: relative;
+        z-index: 2;
+        width: min(440px, calc(100vw - 42px));
+        padding: 34px 28px 28px;
+        text-align: center;
+      }
+      .boot-lantern {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 72px;
+        height: 88px;
+        margin: 0 auto 22px;
+        border: 3px solid #9d7d38;
+        border-radius: 34px 34px 24px 24px;
+        background: radial-gradient(circle at 50% 48%, #fff3b0 0 7%, #e4bd54 9% 18%, rgba(91,128,103,.7) 20% 50%, #25362e 70%);
+        box-shadow: 0 0 34px rgba(213,188,89,.2), inset 0 0 20px rgba(236,215,142,.16);
+        animation: boot-lantern 2.4s ease-in-out infinite;
+      }
+      .boot-lantern::before {
+        content: "";
+        position: absolute;
+        top: -14px;
+        width: 28px;
+        height: 16px;
+        border: 3px solid #9d7d38;
+        border-bottom: 0;
+        border-radius: 14px 14px 0 0;
+      }
+      .boot-lantern::after {
+        content: "◆";
+        color: #f0d46f;
+        font-size: 1.25rem;
+        text-shadow: 0 0 14px rgba(255,222,107,.7);
+      }
+      .boot-title {
+        color: #d8cd47;
+        font-size: clamp(2rem, 8vw, 3.1rem);
+        font-weight: 700;
+        letter-spacing: .075em;
+        text-shadow: 0 2px 3px #000;
+      }
+      .boot-title span { color: #a92b78; }
+      .boot-tagline {
+        margin: 7px 0 25px;
+        color: #82c2bc;
+        font: 700 .72rem Arial, sans-serif;
+        letter-spacing: .24em;
+      }
+      .boot-meter {
+        height: 3px;
+        overflow: hidden;
+        background: rgba(226,220,199,.12);
+      }
+      .boot-meter span {
+        display: block;
+        width: 42%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, #d8cd47, #62bac1, transparent);
+        animation: boot-progress 1.35s ease-in-out infinite;
+      }
+      .boot-status {
+        margin: 13px 0 0;
+        color: #b7b0a2;
+        font-size: .84rem;
+        font-style: italic;
+      }
+      @keyframes boot-progress {
+        from { transform: translateX(-125%); }
+        to { transform: translateX(330%); }
+      }
+      @keyframes boot-lantern {
+        0%,100% { transform: translateY(0); filter: brightness(.92); }
+        50% { transform: translateY(-4px); filter: brightness(1.12); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .boot-lantern, .boot-meter span { animation: none; }
+        .boot-meter span { width: 100%; transform: none; }
+      }
+    </style>
     <link rel="stylesheet" href="./src/styles.css?v=20260930-10" />
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="./src/main.js?v=20260930-15"></script>
+    <div id="boot-screen" role="status" aria-live="polite" aria-label="Loading NeathBound">
+      <div class="boot-card">
+        <div class="boot-lantern" aria-hidden="true"></div>
+        <div class="boot-title">NEATH<span>◆</span>BOUND</div>
+        <p class="boot-tagline">DESCENDING BENEATH THE CITY</p>
+        <div class="boot-meter" aria-hidden="true"><span></span></div>
+        <p class="boot-status">Waking the lamps beneath the city…</p>
+      </div>
+    </div>
+    <div id="app" aria-busy="true"></div>
+    <noscript>
+      <p style="margin:2rem;color:#eee8dc;font-family:Georgia,serif;text-align:center">NeathBound needs JavaScript enabled to enter the city.</p>
+    </noscript>
+    <script type="module" src="./src/main.js?v=20260930-16"></script>
   </body>
 </html>
