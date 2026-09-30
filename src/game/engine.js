@@ -1,6 +1,6 @@
 import { locations, stories } from "./content.js?v=20260930-9";
 import { cloneState, initialState } from "./state.js?v=20260930-9";
-import { applyEffects, requirementsMet, resolveChallenge } from "./rules.js?v=20260930-9";
+import { applyEffects, requirementsMet, resolveChallenge } from "./rules.js?v=20260930-9";\nimport { bazaarStock, itemDefinition } from "./items.js?v=20260930-9";
 
 export function currentLocation(state) {
   return locations[state.locationId] ?? locations["lantern-quay"];
@@ -140,4 +140,80 @@ export function describeChanges(before, after) {
 
 function title(value) {
   return String(value).split("-").map((part) => part ? part[0].toUpperCase() + part.slice(1) : "").join(" ");
+}
+
+
+export function buyItem(state, itemId) {
+  const next = cloneState(state);
+  if (!bazaarStock.includes(itemId)) return { state: next, error: "That item is not sold here." };
+  const item = itemDefinition(itemId);
+  const price = Number(item.price ?? 0);
+  if (price <= 0) return { state: next, error: "That item has no purchase price." };
+  if ((next.echoes ?? 0) < price) return { state: next, error: `You need ${price} Echoes to buy ${item.name}.` };
+  const before = cloneState(next);
+  next.echoes -= price;
+  next.items[itemId] = (next.items[itemId] ?? 0) + 1;
+  advanceRevision(next);
+  return transactionalResult(before, next, `Bought ${item.name}`, `You purchase ${item.name} for ${price} Echoes.`);
+}
+
+export function sellItem(state, itemId) {
+  const next = cloneState(state);
+  const quantity = Number(next.items?.[itemId] ?? 0);
+  const item = itemDefinition(itemId);
+  const value = Number(item.sellValue ?? 0);
+  if (quantity < 1) return { state: next, error: `You do not have ${item.name}.` };
+  if (value <= 0) return { state: next, error: `${item.name} cannot be sold.` };
+  const before = cloneState(next);
+  next.items[itemId] = quantity - 1;
+  if (next.items[itemId] <= 0) delete next.items[itemId];
+  for (const [slot, equippedId] of Object.entries(next.equipment ?? {})) {
+    if (equippedId === itemId && !next.items[itemId]) next.equipment[slot] = null;
+  }
+  next.echoes += value;
+  syncEquipment(next);
+  advanceRevision(next);
+  return transactionalResult(before, next, `Sold ${item.name}`, `You sell ${item.name} for ${value} Echoes.`);
+}
+
+export function equipItem(state, itemId) {
+  const next = cloneState(state);
+  const item = itemDefinition(itemId);
+  if ((next.items?.[itemId] ?? 0) < 1) return { state: next, error: `You do not own ${item.name}.` };
+  if (!item.equipSlot) return { state: next, error: `${item.name} cannot be equipped.` };
+  const before = cloneState(next);
+  next.equipment[item.equipSlot] = next.equipment[item.equipSlot] === itemId ? null : itemId;
+  syncEquipment(next);
+  advanceRevision(next);
+  return transactionalResult(
+    before,
+    next,
+    next.equipment[item.equipSlot] ? `Equipped ${item.name}` : `Unequipped ${item.name}`,
+    next.equipment[item.equipSlot] ? `${item.name} is now equipped.` : `${item.name} has been removed.`
+  );
+}
+
+function transactionalResult(before, next, titleText, resultText) {
+  const changes = describeChanges(before, next);
+  next.events = [{
+    id: `${Date.now()}-transaction-${next.revision}`,
+    at: new Date().toISOString(),
+    storyId: null,
+    choiceId: null,
+    title: titleText,
+    outcome: "success",
+    text: resultText,
+    changes
+  }, ...(next.events ?? [])].slice(0, 250);
+  next.flags["__events"] = next.events;
+  return { state: next, title: titleText, result: resultText, success: true, changes };
+}
+
+function syncEquipment(state) {
+  state.flags["__equipment"] = { ...(state.equipment ?? {}) };
+}
+
+function advanceRevision(state) {
+  state.revision = Number(state.revision ?? 0) + 1;
+  state.flags["__revision"] = state.revision;
 }
