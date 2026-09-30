@@ -9,8 +9,9 @@ export const stripVersions = (source) => source.replace(/(from\s+["'][^"'?]+\.js
 
 const src = new URL("../src/game/", import.meta.url);
 const dest = new URL("../supabase/functions/api/game/", import.meta.url);
+import { pathToFileURL } from "node:url";
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   await mkdir(dest, { recursive: true });
   for (const name of SHARED_MODULES) {
     await writeFile(new URL(name, dest), stripVersions(await readFile(new URL(name, src), "utf8")));

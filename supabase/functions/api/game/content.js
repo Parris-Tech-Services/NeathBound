@@ -69,28 +69,28 @@ export const locations = {
     region: "The Lower City",
     subtitle: "Where the tide carries messages in sealed bottles.",
     atmosphere: "Wet brass, coal smoke, and a bell that rings beneath the water.",
-    stories: ["bell-under-water", "cartographer-at-dusk", "tea-for-the-tide", "salt-on-the-map", "return-the-darkness", "the-cartographer-returns", "the-submerged-door"]
+    stories: ["bell-under-water", "cartographer-at-dusk", "tea-for-the-tide", "salt-on-the-map", "return-the-darkness", "the-cartographer-returns", "the-submerged-door", "lie-low-on-the-barges"]
   },
   "velvet-market": {
     name: "The Velvet Market",
     region: "The Lower City",
     subtitle: "A bazaar for memories, rumours, and perfectly ordinary knives.",
     atmosphere: "Every stall has a curtain. Every curtain has a shadow behind it.",
-    stories: ["borrowed-face", "red-thread", "market-gossip", "market-exchange", "circle-diplomacy", "the-sand-reader", "unwritten-ink", "the-debt-collector", "the-loose-end"]
+    stories: ["borrowed-face", "red-thread", "market-gossip", "market-exchange", "circle-diplomacy", "the-sand-reader", "unwritten-ink", "the-debt-collector", "the-loose-end", "a-fresher-scandal"]
   },
   "hollow-archive": {
     name: "The Hollow Archive",
     region: "The Lower City",
     subtitle: "A library where the books remember who borrowed them.",
     atmosphere: "Dust hangs in the air like a second, slower snowfall.",
-    stories: ["index-of-lost-things", "the-quiet-librarian", "catalogue-the-dark", "the-locked-stacks", "finish-the-page", "an-entry-in-the-index", "the-margin-note"]
+    stories: ["index-of-lost-things", "the-quiet-librarian", "catalogue-the-dark", "the-locked-stacks", "finish-the-page", "an-entry-in-the-index", "the-margin-note", "the-quiet-carrel"]
   },
   "clockwork-gardens": {
     name: "The Clockwork Gardens",
     region: "The High Galleries",
     subtitle: "A greenhouse where the flowers keep appointments.",
     atmosphere: "Brass leaves click together in the warm, artificial wind.",
-    stories: ["garden-appointment", "borrowed-sunlight", "plant-the-sun-seed", "the-seedling-dawn", "the-memory-graft", "the-gardeners-thanks"]
+    stories: ["garden-appointment", "borrowed-sunlight", "plant-the-sun-seed", "the-seedling-dawn", "the-memory-graft", "the-gardeners-thanks", "the-gardeners-salve"]
   },
   "glass-observatory": {
     name: "The Glass Observatory",
@@ -105,7 +105,7 @@ export const locations = {
     subtitle: "Where the city keeps people it has questions for.",
     atmosphere: "Numbered doors, a patient clerk, and the drip of somebody else's patience running out.",
     consequenceOf: "suspicion",
-    stories: ["vaults-release"]
+    stories: ["vaults-release", "the-clerks-file", "a-fellow-detainee"]
   },
   "the-pale-rooms": {
     name: "The Pale Rooms",
@@ -113,7 +113,7 @@ export const locations = {
     subtitle: "Quiet wards for those who have seen too much of the dark.",
     atmosphere: "White sheets, low lamps, and a nurse who hums the same four notes.",
     consequenceOf: "dread",
-    stories: ["pale-rooms-recovery"]
+    stories: ["pale-rooms-recovery", "the-dreaming-patient", "the-night-nurse"]
   },
   "the-stitchery": {
     name: "The Stitchery",
@@ -121,7 +121,7 @@ export const locations = {
     subtitle: "Where the badly hurt are sewn back into shape.",
     atmosphere: "Thread, carbolic, and a surgeon who counts every stitch aloud.",
     consequenceOf: "wounds",
-    stories: ["stitchery-mending"]
+    stories: ["stitchery-mending", "the-surgeons-apprentice", "the-back-stair"]
   },
   "the-whisper-court": {
     name: "The Whisper Court",
@@ -129,7 +129,7 @@ export const locations = {
     subtitle: "Where reputations are tried in absentia and sentenced to silence.",
     atmosphere: "A gallery of fans, a judge nobody has seen, and gossip passed like evidence.",
     consequenceOf: "scandal",
-    stories: ["whisper-court-appeal"]
+    stories: ["whisper-court-appeal", "the-fan-maker", "a-rivals-brief"]
   }
 };
 
@@ -699,6 +699,7 @@ export const stories = {
         ],
         failureEffects: [
           { type: "item", id: "black-sand", amount: -1 },
+          { type: "menace", id: "dread", amount: 1 },
           { type: "location", id: "velvet-market" }
         ]
       },
@@ -736,7 +737,10 @@ export const stories = {
           { type: "flag", id: "read-the-debt-ledgers", value: true },
           { type: "location", id: "hollow-archive" }
         ],
-        failureEffects: [{ type: "location", id: "hollow-archive" }]
+        failureEffects: [
+          { type: "menace", id: "suspicion", amount: 1 },
+          { type: "location", id: "hollow-archive" }
+        ]
       },
       {
         id: "return-key",
@@ -861,6 +865,7 @@ export const stories = {
         ],
         failureEffects: [
           { type: "item", id: "sun-seed", amount: -1 },
+          { type: "menace", id: "wounds", amount: 1 },
           { type: "location", id: "clockwork-gardens" }
         ]
       }
@@ -1042,6 +1047,7 @@ export const stories = {
           { type: "location", id: "velvet-market" }
         ],
         failureEffects: [
+          { type: "menace", id: "suspicion", amount: 2 },
           { type: "flag", id: "collector-answered", value: true },
           { type: "location", id: "velvet-market" }
         ]
@@ -1203,7 +1209,10 @@ export const stories = {
           { type: "obols", amount: 12 },
           { type: "location", id: "glass-observatory" }
         ],
-        failureEffects: [{ type: "location", id: "glass-observatory" }]
+        failureEffects: [
+          { type: "menace", id: "wounds", amount: 2 },
+          { type: "location", id: "glass-observatory" }
+        ]
       },
       {
         id: "leave-lamp",
@@ -1280,7 +1289,10 @@ export const stories = {
           { type: "flag", id: "returned-the-brass-key", value: true },
           { type: "location", id: "lantern-quay" }
         ],
-        failureEffects: [{ type: "location", id: "lantern-quay" }]
+        failureEffects: [
+          { type: "menace", id: "wounds", amount: 1 },
+          { type: "location", id: "lantern-quay" }
+        ]
       },
       {
         id: "keep-key",
@@ -1501,6 +1513,371 @@ export const stories = {
           { type: "obols", amount: -15 },
           { type: "menace", id: "scandal", amount: -6 },
           { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
+  "the-clerks-file": {
+    title: "Your File",
+    kicker: "The clerk is not unkind",
+    text: "The clerk of the Holding Vaults slides a folder across the desk. It is thicker than you expected, and most of it is wrong. \"You may read it,\" he says. \"Nobody ever reads it.\"",
+    requirements: [],
+    choices: [
+      {
+        id: "correct-file",
+        label: "Correct the errors in your own file",
+        requirements: [],
+        challenge: { quality: "shadow", difficulty: 5 },
+        success: "You amend dates, strike out a sighting and replace an alias with a duller one. The clerk initials each change without reading it. Your file is now slimmer and considerably less interesting.",
+        failure: "The clerk notices you are correcting the file and adds a note to the file about that.",
+        successEffects: [
+          { type: "menace", id: "suspicion", amount: -2 },
+          { type: "quality", id: "shadow", amount: 1 }
+        ],
+        failureEffects: [{ type: "menace", id: "suspicion", amount: 1 }]
+      },
+      {
+        id: "read-file",
+        label: "Simply read it, to know what they think they know",
+        requirements: [],
+        success: "Somebody has been following you for weeks and is very bad at spelling. You learn the name of the watcher, and resolve to be more boring in their presence.",
+        successEffects: [
+          { type: "menace", id: "suspicion", amount: -1 },
+          { type: "quality", id: "insight", amount: 1 }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
+  "a-fellow-detainee": {
+    title: "A Fellow Detainee",
+    kicker: "The cell next door is occupied",
+    text: "Through the grating between cells, a woman called Wren Halloway introduces herself as a locksmith of no fixed loyalties. She has been here a long time. She would like some of your bread.",
+    requirements: [],
+    choices: [
+      {
+        id: "share-bread",
+        label: "Share your bread",
+        requirements: [],
+        success: "She eats like a professional and thanks you like a friend. \"I'll remember that,\" she says, and taps the lock of her door thoughtfully.",
+        successEffects: [
+          { type: "acquaintance", id: "wren-halloway" },
+          { type: "quality", id: "poise", amount: 1 }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "escape-together",
+        label: "Take Wren up on her offer of a quiet way out",
+        requirements: [{ type: "flag", id: "a-fellow-detainee:share-bread", op: "==", value: true }],
+        challenge: { quality: "nerve", difficulty: 7 },
+        success: "At the change of shift, both doors open at once. You follow Wren through a drainage culvert that smells of the whole city, and come up on the quay at dawn. When you turn to thank her, she has already gone.",
+        failure: "The culvert floods at the wrong moment. You are fished out, dripping, and returned to your cell with a fresh note in your file.",
+        successEffects: [
+          { type: "menace", id: "suspicion", amount: -4 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: [{ type: "menace", id: "suspicion", amount: 1 }]
+      }
+    ]
+  },
+  "the-dreaming-patient": {
+    title: "The Dreaming Patient",
+    kicker: "She talks in her sleep",
+    text: "The woman in the next bed has not woken in a month. She talks in her sleep, though, and what she describes is a sky that is blue and very far away.",
+    requirements: [],
+    choices: [
+      {
+        id: "listen-to-dreams",
+        label: "Listen to her dreams",
+        requirements: [],
+        success: "You fall asleep to her descriptions of weather. For the first time in weeks, your own dreams are only dreams.",
+        successEffects: [
+          { type: "menace", id: "dread", amount: -1 },
+          { type: "quality", id: "insight", amount: 1 }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "wake-her",
+        label: "Try, gently, to wake her",
+        requirements: [],
+        challenge: { quality: "nerve", difficulty: 5 },
+        success: "Her eyes open. She looks at the stone ceiling, then at you, and laughs with relief. Helping someone else back makes your own way back seem shorter.",
+        failure: "She wakes screaming about the ceiling. It takes the nurse half the night to settle her, and you do not sleep at all.",
+        successEffects: [
+          { type: "menace", id: "dread", amount: -2 },
+          { type: "obols", amount: 5 }
+        ],
+        failureEffects: [{ type: "menace", id: "dread", amount: 1 }]
+      }
+    ]
+  },
+  "the-night-nurse": {
+    title: "The Night Nurse",
+    kicker: "There is a fifth note",
+    text: "The night nurse hums the same four notes as the day nurse, but at the end she pauses, as though a fifth note belongs there and she has decided not to sing it.",
+    requirements: [],
+    choices: [
+      {
+        id: "ask-fifth-note",
+        label: "Ask her what the fifth note is",
+        requirements: [],
+        challenge: { quality: "insight", difficulty: 7 },
+        success: "She sings it once, very quietly. It is not a sound so much as the end of a sound. The dark that has followed you for weeks lies down and goes to sleep.",
+        failure: "She pretends not to hear the question, and hums the four notes a little louder.",
+        successEffects: [
+          { type: "menace", id: "dread", amount: -4 },
+          { type: "flag", id: "heard-the-fifth-note", value: true }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "keep-her-company",
+        label: "Keep her company on her rounds",
+        requirements: [],
+        success: "You carry the lamp while she checks on the sleepers. It is quiet, useful work, and you are too busy to be afraid.",
+        successEffects: [{ type: "menace", id: "dread", amount: -1 }],
+        failureEffects: []
+      }
+    ]
+  },
+  "the-surgeons-apprentice": {
+    title: "The Surgeon's Apprentice",
+    kicker: "He needs the practice",
+    text: "The surgeon's apprentice is nervous, young, and counts under his breath in imitation of his master. He asks, very politely, whether he may practise on you.",
+    requirements: [],
+    choices: [
+      {
+        id: "let-him-practise",
+        label: "Let him practise on you",
+        requirements: [],
+        success: "His stitches are uneven but sincere. He is so grateful that he slips you a few coins from the surgeon's jar.",
+        successEffects: [
+          { type: "menace", id: "wounds", amount: -2 },
+          { type: "obols", amount: 4 }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "teach-him",
+        label: "Teach him to count silently",
+        requirements: [],
+        challenge: { quality: "poise", difficulty: 5 },
+        success: "Without the counting, his hands steady. He finishes your stitches in half the time, and the surgeon, watching, says nothing, which from her is praise.",
+        failure: "He tries counting silently and loses his place. You both agree he should go back to counting aloud.",
+        successEffects: [
+          { type: "menace", id: "wounds", amount: -3 },
+          { type: "quality", id: "poise", amount: 1 }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
+  "the-back-stair": {
+    title: "The Back Stair",
+    kicker: "Not every patient leaves by the front",
+    text: "Behind the linen press there is a narrow stair that the orderlies use to fetch clean thread from the market. It is steep, unlit, and unguarded.",
+    requirements: [],
+    choices: [
+      {
+        id: "take-the-stair",
+        label: "Discharge yourself by the back stair",
+        requirements: [],
+        challenge: { quality: "nerve", difficulty: 6 },
+        success: "Every step pulls at a stitch, but none of them give. You come out behind a thread-seller's stall in the Velvet Market, sore and free.",
+        failure: "Halfway up, a stitch gives. You go back down the way you came, rather faster than you meant to.",
+        successEffects: [
+          { type: "menace", id: "wounds", amount: -2 },
+          { type: "location", id: "velvet-market" }
+        ],
+        failureEffects: [{ type: "menace", id: "wounds", amount: 1 }]
+      },
+      {
+        id: "fetch-thread",
+        label: "Offer to fetch the thread for the orderlies",
+        requirements: [],
+        success: "They are glad of the help. You carry the thread back, and on the way you walk off some of your stiffness.",
+        successEffects: [{ type: "menace", id: "wounds", amount: -1 }],
+        failureEffects: []
+      }
+    ]
+  },
+  "the-fan-maker": {
+    title: "The Fan-Maker",
+    kicker: "Every fan tells a story",
+    text: "In a corner of the Whisper Court a fan-maker paints tiny scenes on silk: the latest scandals, rendered in gold leaf, for ladies to hide behind. Yours is currently her bestseller.",
+    requirements: [],
+    choices: [
+      {
+        id: "commission-fan",
+        label: "Commission a fan that tells your version",
+        requirements: [{ type: "obols", op: ">=", value: 8 }],
+        success: "Your version is prettier and, crucially, duller. Within a week the gallery's fans all show it, and nobody can remember why they were so interested.",
+        successEffects: [
+          { type: "obols", amount: -8 },
+          { type: "menace", id: "scandal", amount: -3 }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "pose-for-fan",
+        label: "Offer to pose for her next design",
+        requirements: [],
+        challenge: { quality: "poise", difficulty: 6 },
+        success: "You pose so gracefully that the new fan makes you look wronged rather than wicked. She pays you a modelling fee and the gallery softens.",
+        failure: "You look shifty in gold leaf. The new fan sells even better than the old one.",
+        successEffects: [
+          { type: "menace", id: "scandal", amount: -2 },
+          { type: "obols", amount: 6 }
+        ],
+        failureEffects: [{ type: "menace", id: "scandal", amount: 1 }]
+      }
+    ]
+  },
+  "a-rivals-brief": {
+    title: "A Rival's Brief",
+    kicker: "Somebody has been busy",
+    text: "A brief against you is circulating the gallery, beautifully written and entirely anonymous. Whoever drafted it knows a great deal about you and has a fondness for semicolons.",
+    requirements: [],
+    choices: [
+      {
+        id: "read-brief",
+        label: "Read it carefully, and answer each point",
+        requirements: [],
+        challenge: { quality: "insight", difficulty: 5 },
+        success: "Point by point, you take it apart. By the end the gallery is more interested in who wrote it than in what it said.",
+        failure: "Every answer you give is quoted back out of context by the evening.",
+        successEffects: [{ type: "menace", id: "scandal", amount: -2 }],
+        failureEffects: [{ type: "menace", id: "scandal", amount: 1 }]
+      },
+      {
+        id: "swap-brief",
+        label: "Quietly swap it for a brief about someone else",
+        requirements: [],
+        challenge: { quality: "shadow", difficulty: 5 },
+        success: "Nobody notices the switch. The court moves on to a merchant with a much more interesting past, and you are free to leave by the public door.",
+        failure: "You are seen making the switch, which is itself a scandal.",
+        successEffects: [
+          { type: "menace", id: "scandal", amount: -3 },
+          { type: "quality", id: "shadow", amount: 1 },
+          { type: "location", id: "velvet-market" }
+        ],
+        failureEffects: [{ type: "menace", id: "scandal", amount: 2 }]
+      }
+    ]
+  },
+  "lie-low-on-the-barges": {
+    title: "Lie Low on the Barges",
+    kicker: "Someone has been asking about you",
+    text: "The coal barges tied up along the quay take lodgers who do not want to be found, and ask no questions as long as the rent is paid and the lodger does some shovelling.",
+    requirements: [{ type: "menace", id: "suspicion", op: ">=", value: 2 }],
+    choices: [
+      {
+        id: "shovel-coal",
+        label: "Spend a few days shovelling coal out of sight",
+        requirements: [],
+        success: "Black to the elbows and bored to tears, you are also, for a few days, of no interest to anyone.",
+        successEffects: [
+          { type: "menace", id: "suspicion", amount: -2 },
+          { type: "obols", amount: 2 }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "pay-the-bargemaster",
+        label: "Pay the bargemaster to say you have been aboard for weeks",
+        requirements: [{ type: "obols", op: ">=", value: 6 }],
+        success: "He tells anyone who asks that you have been aboard since last month. Several people who were asking stop.",
+        successEffects: [
+          { type: "obols", amount: -6 },
+          { type: "menace", id: "suspicion", amount: -3 }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
+  "a-fresher-scandal": {
+    title: "A Fresher Scandal",
+    kicker: "The market has a short memory",
+    text: "The Velvet Market can only gossip about one thing at a time. At the moment, unfortunately, that thing is you. It would not take much to give it something better.",
+    requirements: [{ type: "menace", id: "scandal", op: ">=", value: 2 }],
+    choices: [
+      {
+        id: "start-rumour",
+        label: "Start a fresher rumour about someone else",
+        requirements: [],
+        challenge: { quality: "shadow", difficulty: 4 },
+        success: "By nightfall the whole market is discussing a spice merchant's second family. You are yesterday's news, although somebody noticed who started it.",
+        failure: "The rumour traces straight back to you, which is a scandal of its own.",
+        successEffects: [
+          { type: "menace", id: "scandal", amount: -2 },
+          { type: "menace", id: "suspicion", amount: 1 }
+        ],
+        failureEffects: [{ type: "menace", id: "scandal", amount: 1 }]
+      },
+      {
+        id: "apologise",
+        label: "Apologise, publicly and a little too sincerely",
+        requirements: [],
+        success: "It is excruciating for everyone, and the market loses interest out of pure embarrassment.",
+        successEffects: [{ type: "menace", id: "scandal", amount: -1 }],
+        failureEffects: []
+      }
+    ]
+  },
+  "the-quiet-carrel": {
+    title: "The Quiet Carrel",
+    kicker: "Somewhere to put the dark down",
+    text: "At the far end of the reading room there is a carrel with a green lamp and a shelf of the dullest books the archive owns. The librarian keeps it for readers who have been reading the wrong things.",
+    requirements: [{ type: "menace", id: "dread", op: ">=", value: 2 }],
+    choices: [
+      {
+        id: "read-something-dull",
+        label: "Read something dull, on purpose",
+        requirements: [],
+        success: "Three hundred pages on the drainage of the Lower City. By the end your fears seem, at worst, badly drained.",
+        successEffects: [{ type: "menace", id: "dread", amount: -2 }],
+        failureEffects: []
+      },
+      {
+        id: "write-it-down",
+        label: "Write down what frightens you, and file it",
+        requirements: [],
+        challenge: { quality: "insight", difficulty: 5 },
+        success: "Catalogued and shelved, your fear is just another volume. The librarian stamps it and files it under a number you promptly forget.",
+        failure: "The act of writing it down makes it vivid. You leave the carrel faster than you meant to.",
+        successEffects: [
+          { type: "menace", id: "dread", amount: -3 },
+          { type: "quality", id: "insight", amount: 1 }
+        ],
+        failureEffects: [{ type: "menace", id: "dread", amount: 1 }]
+      }
+    ]
+  },
+  "the-gardeners-salve": {
+    title: "The Gardener's Salve",
+    kicker: "Brass leaves, crushed",
+    text: "The gardener notices you favouring one side. She crushes a handful of brass leaves into a jar of wax and says it is good for cuts, bruises, and the general wear of living underground.",
+    requirements: [{ type: "menace", id: "wounds", op: ">=", value: 2 }],
+    choices: [
+      {
+        id: "accept-salve",
+        label: "Accept the salve with thanks",
+        requirements: [],
+        success: "It smells of metal and mint, and stings exactly as much as the gardener promised. By morning you are moving freely.",
+        successEffects: [{ type: "menace", id: "wounds", amount: -2 }],
+        failureEffects: []
+      },
+      {
+        id: "work-for-salve",
+        label: "Work a shift in the glasshouse to pay for a full course",
+        requirements: [],
+        success: "Warm air, patient work, and the salve twice a day. You leave the Gardens healthier than you have been since you woke.",
+        successEffects: [
+          { type: "menace", id: "wounds", amount: -3 },
+          { type: "quality", id: "poise", amount: 1 }
         ],
         failureEffects: []
       }
