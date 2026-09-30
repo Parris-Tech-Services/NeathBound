@@ -24,6 +24,14 @@ export class SupabaseGameService {
     );
   }
 
+  drawCard(deckId, { expectedRevision } = {}) {
+    return this.#call("POST", `deck/${encodeURIComponent(deckId)}/draw`, { expectedRevision });
+  }
+
+  discard(cardId, { expectedRevision } = {}) {
+    return this.#call("POST", `deck/${encodeURIComponent(cardId)}/discard`, { expectedRevision });
+  }
+
   travel(locationId, { expectedRevision } = {}) {
     return this.#call("POST", `travel/${encodeURIComponent(locationId)}`, { expectedRevision });
   }

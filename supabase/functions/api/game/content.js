@@ -102,7 +102,7 @@ export const stories = {
           { type: "flag", id: "tutorial.story", value: true },
           { type: "flag", id: "tutorial.myself", value: true },
           { type: "flag", id: "tutorial.possessions", value: true },
-          { type: "flag", id: "tutorial.travel", value: true },
+          { type: "flag", id: "tutorial.travel", value: true }, { type: "flag", id: "tutorial.cards", value: true },
           { type: "item", id: "brass-key", amount: 1 }
         ],
         failure: "The lock is stubborn, but you're learning its weaknesses.",
@@ -120,7 +120,7 @@ export const stories = {
           { type: "flag", id: "tutorial.story", value: true },
           { type: "flag", id: "tutorial.myself", value: true },
           { type: "flag", id: "tutorial.possessions", value: true },
-          { type: "flag", id: "tutorial.travel", value: true },
+          { type: "flag", id: "tutorial.travel", value: true }, { type: "flag", id: "tutorial.cards", value: true },
           { type: "item", id: "brass-key", amount: 1 }
         ],
         failure: "You can't quite get the angle right, but it's close.",

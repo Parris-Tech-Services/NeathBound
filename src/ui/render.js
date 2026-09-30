@@ -1,5 +1,5 @@
 import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge } from "../game/engine.js?v=20260930-20";
-import { locations } from "../game/content.js?v=20260930-20";
+import { locations, cards, decks } from "../game/content.js?v=20260930-20";
 import { loadPreferences } from "./preferences.js?v=20260930-20";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
@@ -74,7 +74,37 @@ export function render(app, state, handlers, outcome = null) {
     ].join("");
   }).join("");
 
-  const storiesHtml = stories.map((story) => {
+  const renderStory = (story, isCard = false) => {
+        return [
+      '<article class="storylet', isCard ? ' opportunity-card' : '', '">',
+      isCard ? ['<div class="card-discard-header"><button class="discard-button" data-action="discard" data-card="', story.id, '" aria-label="Discard">✗</button></div>'].join("") : '',
+      '<div class="story-art story-art-', escapeClass(story.id), '" aria-hidden="true">', storyArtSvg(story.id, state.locationId), '</div>',
+      '<div class="story-body">',
+      '<button class="bookmark', preferences.bookmarks.includes(story.id) ? ' is-bookmarked' : '', '" type="button" data-action="bookmark" data-story="', story.id, '" aria-label="', preferences.bookmarks.includes(story.id) ? 'Remove bookmark' : 'Bookmark story', '" aria-pressed="', preferences.bookmarks.includes(story.id), '">◆</button>',
+      '<h3>', escapeHtml(story.title), '</h3>',
+      '<p>', escapeHtml(story.text), '</p>',
+      '<div class="story-choices">', choicesHtml, '</div>',
+      '</div></article>'
+    ].join("");
+  };
+
+  const storiesHtml = stories.map(s => renderStory(s, false)).join("");
+  
+  let deckHtml = "";
+  if (state.flags["tutorial.cards"]) {
+    const hand = state.hand || [];
+    const MAX_HAND = 3;
+    const drawButton = hand.length < MAX_HAND
+      ? `<button class="draw-card-button" data-action="draw-card" data-deck="whispers">Draw a Card (${hand.length}/${MAX_HAND})</button>`
+      : `<button class="draw-card-button disabled" disabled>Hand Full (${MAX_HAND}/${MAX_HAND})</button>`;
+      
+    const handHtml = hand.map(id => cards[id] ? renderStory({ id, ...cards[id] }, true) : "").join("");
+    deckHtml = `<section class="whispers-deck">
+      <div class="deck-controls">${drawButton}</div>
+      <div class="deck-hand">${handHtml}</div>
+    </section>`;
+  }
+
     const available = new Set(availableChoices(state, story.id).map((choice) => choice.id));
     const choicesHtml = story.choices.map((choice) => {
       const resolvedChallenge = effectiveChallenge(story, choice);
@@ -298,7 +328,7 @@ export function render(app, state, handlers, outcome = null) {
                         '<p class="feature-note"><strong>', escapeHtml(locationNote), '</strong></p>',
                       '</div>',
                     '</section>',
-                    '<section class="story-stack">', storiesHtml, '</section>',
+                    deckHtml, '<section class="story-stack">', storiesHtml, '</section>',
                   '</div>',
                 '</section>'
               ].join(""),
@@ -423,6 +453,14 @@ export function render(app, state, handlers, outcome = null) {
     button.addEventListener("click", () => handlers.choose(button.dataset.story, button.dataset.choice));
   });
   app.querySelector("[data-action=onwards]")?.addEventListener("click", handlers.onwards);
+  app.querySelectorAll("[data-action=draw-card]").forEach((button) => {
+    button.dataset.originallyDisabled = String(button.disabled);
+    button.addEventListener("click", () => handlers.drawCard(button.dataset.deck));
+  });
+  app.querySelectorAll("[data-action=discard]").forEach((button) => {
+    button.dataset.originallyDisabled = String(button.disabled);
+    button.addEventListener("click", () => handlers.discardCard(button.dataset.card));
+  });
   app.querySelectorAll("[data-action=bookmark]").forEach((button) => button.addEventListener("click", () => handlers.bookmark(button.dataset.story)));
   app.querySelectorAll("[data-action=outfit]").forEach((select) => select.addEventListener("change", (event) => handlers.outfit(event.target.value)));
   app.querySelector("[data-action=travel]")?.addEventListener("click", () => handlers.travel(app.querySelector("#travel-location")?.value));

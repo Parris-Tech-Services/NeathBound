@@ -43,6 +43,14 @@ export class FallbackGameService {
     return this.active.travel(locationId, options);
   }
 
+  drawCard(deckId, options) {
+    return this.active.drawCard(deckId, options);
+  }
+
+  discard(cardId, options) {
+    return this.active.discard(cardId, options);
+  }
+
   reset() {
     return this.active.reset();
   }

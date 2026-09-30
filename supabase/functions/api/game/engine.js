@@ -1,4 +1,5 @@
-import { locations, menaceAreas, stories } from "./content.js";
+import { locations, menaceAreas, stories, decks, cards } from "./content.js";
+import { drawCardToHand, discardCard as removeCardFromHand } from "./decks.js";
 import { cloneState, initialState } from "./state.js";
 import { applyEffects, awardProgress, describeChallenge, requirementsMet, resolveChallenge } from "./rules.js";
 
@@ -37,9 +38,9 @@ export function travelBlockedReason(state) {
 }
 
 export function storyAvailable(state, storyId, context = {}) {
-  const story = stories[storyId];
+  const story = (stories[storyId] ?? cards[storyId]);
   if (!story) return false;
-  if (!currentLocation(state).stories.includes(storyId)) return false;
+  if (!currentLocation(state).stories.includes(storyId) && !state.hand?.includes(storyId)) return false;
   if (story.once && state.flags[`story-complete:${storyId}`]) return false;
   return requirementsMet(state, requirementsFor(story), context);
 }
@@ -56,12 +57,12 @@ export function availableStories(state, context = {}) {
 
 export function choiceAvailable(state, storyId, choiceId, context = {}) {
   if (!storyAvailable(state, storyId, context)) return false;
-  const choice = stories[storyId]?.choices.find((candidate) => candidate.id === choiceId);
+  const choice =  (stories[storyId] ?? cards[storyId])?.choices.find((candidate) => candidate.id === choiceId);
   return Boolean(choice && requirementsMet(state, requirementsFor(choice), context));
 }
 
 export function availableChoices(state, storyId, context = {}) {
-  const story = stories[storyId];
+  const story =  (stories[storyId] ?? cards[storyId]);
   if (!storyAvailable(state, storyId, context) || !story) return [];
   return story.choices.filter((choice) => requirementsMet(state, requirementsFor(choice), context));
 }
@@ -69,7 +70,7 @@ export function availableChoices(state, storyId, context = {}) {
 export function resolveChoice(state, storyId, choiceId, random = Math.random, context = {}) {
   const before = cloneState(state);
   const next = cloneState(state);
-  const story = stories[storyId];
+  const story =  (stories[storyId] ?? cards[storyId]);
 
   if (!storyAvailable(next, storyId, context)) {
     return { state: next, error: "That story is no longer available. Your current state has been refreshed." };
@@ -204,4 +205,23 @@ export function describeChanges(before, after) {
 
 function title(value) {
   return String(value).split("-").map((part) => part ? part[0].toUpperCase() + part.slice(1) : "").join(" ");
+}
+
+export function drawCard(state, deckId = "whispers", random = Math.random) {
+  const next = cloneState(state);
+  const deck = decks[deckId];
+  if (!deck) return { state: next, error: "Deck not found." };
+  
+  const card = drawCardToHand(next, deck, cards, random);
+  next.flags = next.flags || {};
+  next.flags.__revision = (next.flags.__revision ?? 0) + 1;
+  return { state: next, drawn: card ? card.id : null };
+}
+
+export function discard(state, cardId) {
+  const next = cloneState(state);
+  removeCardFromHand(next, cardId);
+  next.flags = next.flags || {};
+  next.flags.__revision = (next.flags.__revision ?? 0) + 1;
+  return { state: next };
 }

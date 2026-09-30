@@ -1,4 +1,4 @@
-import { resolveChoice, resetState, travelBlockedReason } from "../game/engine.js?v=20260930-20";
+import { resolveChoice, resetState, travelBlockedReason, drawCard, discard } from "../game/engine.js?v=20260930-20";
 import { loadState, saveState } from "../game/state.js?v=20260930-20";
 
 export class LocalGameService {
@@ -39,6 +39,27 @@ export class LocalGameService {
     };
     saveState(this.state, this.storage);
     return this.state;
+  }
+
+    async drawCard(deckId, { expectedRevision } = {}) {
+    if (Number.isInteger(expectedRevision) && expectedRevision !== Number(this.state.revision ?? 0)) {
+      return { error: "This save changed in another tab.", state: this.state };
+    }
+    const outcome = drawCard(this.state, deckId);
+    if (outcome.error) return outcome;
+    this.state = outcome.state;
+    saveState(this.state, this.storage);
+    return outcome;
+  }
+
+  async discard(cardId, { expectedRevision } = {}) {
+    if (Number.isInteger(expectedRevision) && expectedRevision !== Number(this.state.revision ?? 0)) {
+      return { error: "This save changed in another tab.", state: this.state };
+    }
+    const outcome = discard(this.state, cardId);
+    this.state = outcome.state;
+    saveState(this.state, this.storage);
+    return outcome;
   }
 
   async reset() {
