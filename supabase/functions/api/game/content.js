@@ -33,7 +33,48 @@ export const locations = {
     subtitle: "Where patient astronomers study a sky made of stone.",
     atmosphere: "Lenses the size of ponds, chalk star-charts, and the slow drip of the ceiling overhead.",
     stories: ["survey-the-stone-sky", "the-lamp-that-fell-upward", "the-far-crack"]
+  },
+  "the-holding-vaults": {
+    name: "The Holding Vaults",
+    region: "Beneath the Lower City",
+    subtitle: "Where the city keeps people it has questions for.",
+    atmosphere: "Numbered doors, a patient clerk, and the drip of somebody else's patience running out.",
+    consequenceOf: "suspicion",
+    stories: ["vaults-release"]
+  },
+  "the-pale-rooms": {
+    name: "The Pale Rooms",
+    region: "Beneath the Lower City",
+    subtitle: "Quiet wards for those who have seen too much of the dark.",
+    atmosphere: "White sheets, low lamps, and a nurse who hums the same four notes.",
+    consequenceOf: "dread",
+    stories: ["pale-rooms-recovery"]
+  },
+  "the-stitchery": {
+    name: "The Stitchery",
+    region: "Beneath the Lower City",
+    subtitle: "Where the badly hurt are sewn back into shape.",
+    atmosphere: "Thread, carbolic, and a surgeon who counts every stitch aloud.",
+    consequenceOf: "wounds",
+    stories: ["stitchery-mending"]
+  },
+  "the-whisper-court": {
+    name: "The Whisper Court",
+    region: "Beneath the Lower City",
+    subtitle: "Where reputations are tried in absentia and sentenced to silence.",
+    atmosphere: "A gallery of fans, a judge nobody has seen, and gossip passed like evidence.",
+    consequenceOf: "scandal",
+    stories: ["whisper-court-appeal"]
   }
+};
+
+// Reaching 8 in a menace takes the player to its consequence area; each area's
+// storylets are the only way out (see engine.js travelBlockedReason).
+export const menaceAreas = {
+  suspicion: "the-holding-vaults",
+  dread: "the-pale-rooms",
+  wounds: "the-stitchery",
+  scandal: "the-whisper-court"
 };
 
 export const stories = {
@@ -1065,6 +1106,182 @@ export const stories = {
           { type: "item", id: "red-thread-end", amount: -1 },
           { type: "quality", id: "poise", amount: 1 },
           { type: "location", id: "velvet-market" }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
+  "vaults-release": {
+    title: "The Clerk's Questions",
+    kicker: "A ledger with your name in it",
+    text: "The clerk has a ledger, a pen, and all the time in the world. Every question is polite. None of them are simple.",
+    requirements: [],
+    choices: [
+      {
+        id: "wait",
+        label: "Answer every question, slowly and truthfully",
+        requirements: [],
+        success: "It takes days. The clerk underlines nothing, thanks you, and a door you had not noticed opens onto the quay.",
+        successEffects: [
+          { type: "menace", id: "suspicion", amount: -3 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "bold",
+        label: "Slip out during the change of lamps",
+        requirements: [],
+        challenge: { quality: "shadow", difficulty: 6 },
+        success: "Between one lamp going out and the next being lit, you are simply elsewhere. The clerk will note it in the ledger, later.",
+        failure: "A lamp is lit early. The clerk adds a line to your page and says nothing at all.",
+        successEffects: [
+          { type: "menace", id: "suspicion", amount: -5 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: [{ type: "menace", id: "suspicion", amount: -1 }]
+      },
+      {
+        id: "pay",
+        label: "Settle the matter of your 'fees'",
+        requirements: [{ type: "echoes", op: ">=", value: 15 }],
+        success: "Coins change hands. The ledger closes. Nobody says the word bribe, which is how you know it was one.",
+        successEffects: [
+          { type: "echoes", amount: -15 },
+          { type: "menace", id: "suspicion", amount: -6 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
+  "pale-rooms-recovery": {
+    title: "The Four Notes",
+    kicker: "Rest, of a kind",
+    text: "The nurse hums the same four notes over and over. At first they are unbearable. Then they are the only thing holding the dark at arm's length.",
+    requirements: [],
+    choices: [
+      {
+        id: "wait",
+        label: "Rest, and let the four notes do their work",
+        requirements: [],
+        success: "Sleep comes back to you piece by piece. When you leave, you find you can hum the notes too.",
+        successEffects: [
+          { type: "menace", id: "dread", amount: -3 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "bold",
+        label: "Work out what the notes are keeping away",
+        requirements: [],
+        challenge: { quality: "insight", difficulty: 6 },
+        success: "You follow the melody to its end and find a door there, and beyond it the ordinary noise of the quay. The dark was only ever as large as you let it be.",
+        failure: "The melody has no end. You lie awake counting it, and in the morning it is a little easier.",
+        successEffects: [
+          { type: "menace", id: "dread", amount: -5 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: [{ type: "menace", id: "dread", amount: -1 }]
+      },
+      {
+        id: "pay",
+        label: "Pay for the private room with the window",
+        requirements: [{ type: "echoes", op: ">=", value: 15 }],
+        success: "Light from the quay, a real bed, and the nurse's full attention. You are discharged within the week.",
+        successEffects: [
+          { type: "echoes", amount: -15 },
+          { type: "menace", id: "dread", amount: -6 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
+  "stitchery-mending": {
+    title: "Counted Stitches",
+    kicker: "The surgeon keeps count",
+    text: "The surgeon counts every stitch aloud. You try not to listen to the numbers, and fail, and they get higher.",
+    requirements: [],
+    choices: [
+      {
+        id: "wait",
+        label: "Lie still and let the count reach its end",
+        requirements: [],
+        success: "The count finishes on a number you will not forget. You walk out stiff, patched, and alive.",
+        successEffects: [
+          { type: "menace", id: "wounds", amount: -3 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "bold",
+        label: "Get up before you are strictly ready",
+        requirements: [],
+        challenge: { quality: "nerve", difficulty: 6 },
+        success: "You make it to the door, and the door to the street, and the street to the quay. The stitches hold. Mostly.",
+        failure: "Your legs disagree with your plan. The surgeon sighs and starts a fresh count.",
+        successEffects: [
+          { type: "menace", id: "wounds", amount: -5 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: [{ type: "menace", id: "wounds", amount: -1 }]
+      },
+      {
+        id: "pay",
+        label: "Pay for the good thread",
+        requirements: [{ type: "echoes", op: ">=", value: 15 }],
+        success: "Silk instead of twine, and a surgeon in a better mood. You heal quickly and cleanly.",
+        successEffects: [
+          { type: "echoes", amount: -15 },
+          { type: "menace", id: "wounds", amount: -6 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
+  "whisper-court-appeal": {
+    title: "Sentenced to Silence",
+    kicker: "The court never sits, and never adjourns",
+    text: "Nobody here speaks to you. They speak about you, behind fans, in a court that never quite convenes. Your reputation is on trial and you are not invited.",
+    requirements: [],
+    choices: [
+      {
+        id: "wait",
+        label: "Say nothing, and let them tire of you",
+        requirements: [],
+        success: "Gossip needs a reaction to live on. You give it none, and eventually the fans turn towards someone else.",
+        successEffects: [
+          { type: "menace", id: "scandal", amount: -3 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "bold",
+        label: "Hold an impromptu defence in the gallery",
+        requirements: [],
+        challenge: { quality: "poise", difficulty: 6 },
+        success: "You speak for exactly as long as it takes to be the most interesting person in the room. The verdict is overturned by acclamation.",
+        failure: "The gallery is amused, which is not the same as persuaded.",
+        successEffects: [
+          { type: "menace", id: "scandal", amount: -5 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: [{ type: "menace", id: "scandal", amount: -1 }]
+      },
+      {
+        id: "pay",
+        label: "Buy a better story to replace the old one",
+        requirements: [{ type: "echoes", op: ">=", value: 15 }],
+        success: "A generous dinner, a rumour placed in the right ear, and the court has a new scandal to try.",
+        successEffects: [
+          { type: "echoes", amount: -15 },
+          { type: "menace", id: "scandal", amount: -6 },
+          { type: "location", id: "lantern-quay" }
         ],
         failureEffects: []
       }

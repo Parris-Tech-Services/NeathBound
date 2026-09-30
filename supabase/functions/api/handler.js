@@ -10,7 +10,7 @@
 //   GET  /api/journal                                       journal
 //   POST /api/reset                                         new life
 //   POST /api/storylets/:storyId/branches/:choiceId/choose  resolve a choice
-import { availableChoices, availableStories, currentLocation, effectiveChallenge, resolveChoice } from "./game/engine.js";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge, resolveChoice, travelBlockedReason } from "./game/engine.js";
 import { locations } from "./game/content.js";
 import { initialState, normaliseState } from "./game/state.js";
 
@@ -57,6 +57,8 @@ export async function handle({ method, path, userId, body = {} }, { repo, random
       return { status: 409, body: { error: "This save changed in another tab.", state } };
     }
     const locationId = decodeURIComponent(travel[1]);
+    const blocked = travelBlockedReason(state);
+    if (blocked) return { status: 409, body: { error: blocked, state } };
     if (!state.unlockedLocations.includes(locationId) || !locations[locationId]) {
       return { status: 409, body: { error: "That location is not unlocked.", state } };
     }
