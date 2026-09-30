@@ -36,6 +36,11 @@ export async function loadPlayer(db, playerId) {
   });
 }
 
+export async function loadWorldQualities(db) {
+  const rows = await db.prepare("SELECT id, value FROM world_qualities").all();
+  return Object.fromEntries(rows.results.map((row) => [row.id, Number(row.value)]));
+}
+
 export async function createPlayer(db, playerId, state = initialState()) {
   const existing = await loadPlayer(db, playerId);
   if (existing) return existing;
