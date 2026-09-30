@@ -1,25 +1,25 @@
-export const SAVE_KEY = "neathbound.save.v3";
-export const LEGACY_SAVE_KEYS = ["neathbound.save.v2", "neathbound.save.v1"];
+export const SAVE_KEY = "neathbound.save.v4";
+export const LEGACY_SAVE_KEYS = ["neathbound.save.v3", "neathbound.save.v2", "neathbound.save.v1"];
 const MENACE_IDS = ["dread", "scandal", "wounds", "suspicion"];
 
 export function initialState() {
   return {
-    version: 3,
+    version: 4,
     revision: 0,
     name: "The Unmoored",
-    locationId: "lantern-quay",
-    echoes: 12,
+    locationId: "the-lair",
+    echoes: 0,
     momentum: 0,
-    qualities: { nerve: 2, insight: 2, poise: 1, shadow: 0 },
+    qualities: { nerve: 0, insight: 0, poise: 0, shadow: 0 },
     menaces: { dread: 0, scandal: 0, wounds: 0, suspicion: 0 },
-    items: { "salted-map": 1, "brass-key": 1 },
-    unlockedLocations: ["lantern-quay", "velvet-market", "hollow-archive"],
+    items: {},
+    unlockedLocations: ["the-lair"],
     acquaintances: [],
-    flags: { __revision: 0 },
+    flags: { __revision: 0, "tutorial:story": true },
     globalFlags: {},
     hand: [],
     discard: [],
-    journal: ["You woke beneath a sky made of stone, with a brass key in your hand."],
+    journal: ["You woke on cold stone beneath a lamp that refuses to go out."],
     events: [],
     lastDraw: "bell-under-water"
   };
@@ -36,6 +36,21 @@ export function normaliseState(input = {}) {
     : (input.items ?? {});
   const qualities = { ...base.qualities, ...(input.qualities ?? {}) };
   const menaces = { ...base.menaces, ...(input.menaces ?? {}) };
+  const migratedFlags = { ...(input.flags ?? {}) };
+
+  // Saves created before the guided opening already represent established
+  // characters. Keep them exactly where they are and unlock the interface so
+  // existing players are never forced back through The Lair.
+  if (Number(input.version ?? 0) < 4 && Object.keys(input).length > 0) {
+    Object.assign(migratedFlags, {
+      "tutorial:story": true,
+      "tutorial:escaped": true,
+      "tutorial:myself": true,
+      "tutorial:possessions": true,
+      "tutorial:travel": true,
+      "tutorial:complete": true
+    });
+  }
 
   // Older saves accidentally stored menaces as qualities. Reconcile by taking
   // the larger value so a duplicated historical value is never double-counted.
@@ -49,7 +64,7 @@ export function normaliseState(input = {}) {
   return {
     ...base,
     ...input,
-    version: 3,
+    version: 4,
     revision: Number.isInteger(input.revision) ? input.revision : Number(input.flags?.__revision ?? 0),
     qualities,
     menaces,
@@ -58,7 +73,7 @@ export function normaliseState(input = {}) {
     items: { ...legacyItems },
     unlockedLocations: [...new Set(input.unlockedLocations ?? base.unlockedLocations)],
     acquaintances: [...new Set(input.acquaintances ?? base.acquaintances)],
-    flags: { ...(input.flags ?? {}), __revision: Number.isInteger(input.revision) ? input.revision : Number(input.flags?.__revision ?? 0) },
+    flags: { ...migratedFlags, __revision: Number.isInteger(input.revision) ? input.revision : Number(input.flags?.__revision ?? 0) },
     journal: Array.isArray(input.journal) ? input.journal.slice(0, 100) : base.journal,
     events: Array.isArray(input.events) ? input.events.slice(0, 250) : [],
     hand: Array.isArray(input.hand) ? [...new Set(input.hand)] : [],
