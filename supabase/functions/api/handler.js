@@ -12,7 +12,7 @@
 //   POST /api/storylets/:storyId/branches/:choiceId/choose  resolve a choice
 import { availableChoices, availableStories, currentLocation, effectiveChallenge, resolveChoice } from "./game/engine.js";
 import { locations } from "./game/content.js";
-import { initialState, normaliseState } from "./game/state.js";
+import { newPlayerState, normaliseState } from "./game/state.js";
 
 export async function handle({ method, path, userId, body = {} }, { repo, random = Math.random }) {
   const route = normalise(path);
@@ -20,7 +20,7 @@ export async function handle({ method, path, userId, body = {} }, { repo, random
   const loadOrCreate = async () => {
     const existing = await repo.loadPlayer(userId);
     if (existing) return normaliseState(existing);
-    const fresh = initialState();
+    const fresh = newPlayerState();
     await repo.savePlayer(userId, fresh);
     return fresh;
   };
@@ -29,7 +29,7 @@ export async function handle({ method, path, userId, body = {} }, { repo, random
   if (method === "POST" && route === "/api/player") {
     const existing = await repo.loadPlayer(userId);
     if (existing) return ok({ playerId: userId, state: normaliseState(existing) });
-    const state = initialState();
+    const state = newPlayerState();
     await repo.savePlayer(userId, state);
     return { status: 201, body: { playerId: userId, state } };
   }
@@ -44,7 +44,7 @@ export async function handle({ method, path, userId, body = {} }, { repo, random
   }
 
   if (method === "POST" && route === "/api/reset") {
-    const state = initialState();
+    const state = newPlayerState();
     await repo.savePlayer(userId, state);
     return ok(state);
   }
