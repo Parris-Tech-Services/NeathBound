@@ -1,4 +1,4 @@
-import { buyItem, equipItem, recoverMenace, resolveChoice, resetState, sellItem } from "../game/engine.js?v=20260930-9";
+import { buyItem, discardOpportunity, drawOpportunity, equipItem, recoverMenace, resolveChoice, resetState, sellItem } from "../game/engine.js?v=20260930-9";
 import { loadState, saveState } from "../game/state.js?v=20260930-9";
 
 export class LocalGameService {
@@ -47,6 +47,14 @@ export class LocalGameService {
 
   async recover(menaceId) {
     return this.#commit(recoverMenace(this.state, menaceId));
+  }
+
+  async drawOpportunity() {
+    return this.#commit(drawOpportunity(this.state));
+  }
+
+  async discardOpportunity(storyId) {
+    return this.#commit(discardOpportunity(this.state, storyId));
   }
 
   async reset() {
