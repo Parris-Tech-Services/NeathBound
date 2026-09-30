@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import { locations, stories } from "../src/game/content.js";
 
 const operators = new Set(["==", "!=", ">", ">=", "<", "<="]);
-const requirementTypes = new Set(["quality", "item", "flag", "echoes", "location", "world-quality"]);
-const effectTypes = new Set(["quality", "set-quality", "echoes", "item", "flag", "location", "unlock-location", "menace"]);
+const requirementTypes = new Set(["quality", "menace", "item", "flag", "global-flag", "momentum", "echoes", "location", "world-quality"]);
+const effectTypes = new Set(["quality", "set-quality", "echoes", "item", "flag", "global-flag", "momentum", "location", "unlock-location", "menace", "acquaintance"]);
 
 function asRequirements(value) {
   if (!value) return [];
@@ -48,15 +48,16 @@ test("story and choice ids are unique and narrative fields are complete", () => 
   }
 });
 
-test("challenge contracts are finite and name a real quality key", () => {
+test("challenge contracts are finite at story or choice level", () => {
   for (const [storyId, story] of Object.entries(stories)) {
-    for (const choice of story.choices) {
-      if (!choice.challenge) continue;
-      const quality = choice.challenge.quality ?? choice.challenge.stat;
-      assert.equal(typeof quality, "string", `${storyId}/${choice.id} challenge needs quality`);
+    const entries = [[`story ${storyId}`, story.challenge], ...story.choices.map((choice) => [`${storyId}/${choice.id}`, choice.challenge])];
+    for (const [owner, challenge] of entries) {
+      if (!challenge || challenge === false) continue;
+      const quality = challenge.quality ?? challenge.stat;
+      assert.equal(typeof quality, "string", `${owner} challenge needs quality`);
       assert.ok(quality.length > 0);
-      assert.ok(Number.isFinite(choice.challenge.difficulty), `${storyId}/${choice.id} challenge difficulty must be finite`);
-      assert.ok(choice.challenge.difficulty > 0, `${storyId}/${choice.id} challenge difficulty must be positive`);
+      assert.ok(Number.isFinite(challenge.difficulty), `${owner} challenge difficulty must be finite`);
+      assert.ok(challenge.difficulty > 0, `${owner} challenge difficulty must be positive`);
     }
   }
 });
