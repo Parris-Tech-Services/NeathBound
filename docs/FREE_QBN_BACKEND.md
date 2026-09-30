@@ -1,5 +1,9 @@
 # Free Fallen-London-style backend architecture
 
+> **Status:** the hosting target below (Cloudflare Workers + D1) was superseded
+> on 2026-09-30 by Supabase; see `docs/DECISIONS.md` and `docs/ARCHITECTURE.md`.
+> The domain model and API shape here still describe the implemented design.
+
 NeathBound should reproduce the architectural **shape** of a mature quality-based
 narrative browser RPG while remaining original and free to host.
 
