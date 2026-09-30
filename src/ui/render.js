@@ -407,7 +407,7 @@ export function render(app, state, handlers, outcome = null) {
               '<h3>Possessions</h3>',
               '<div class="satchel-list">', inventoryHtml, '</div>',
             '</section>'
-          ].join("") : ''
+          ].join("") : '',
         '</aside>',
       '</div>',
 
