@@ -62,3 +62,18 @@ already deployed and verified.
 - Free-tier care: a scheduled workflow pings the project twice a week so it
   does not pause after 7 idle days.
 
+## Browser tests and test-only tools (2026-09-30)
+
+Playwright (Chromium) and axe-core are used only by tests. CI installs them
+with `npm install --no-save`, so they are not project dependencies and the game
+stays dependency-free. Why: static checks cannot catch a module that fails to
+load in a real browser, or a save that silently stops persisting, and several
+cache-busting fixes were needed on 2026-09-30.
+
+- Browser tests run in offline mode (`?api=local`) so they never create online
+  players. The live check verifies the API separately (CORS preflight 200,
+  unauthenticated request 401).
+- The accessibility audit and third-party asset failures are reported in the
+  run summary but do not fail the run, so they don't block other lanes.
+  `A11Y_STRICT=1` makes serious or critical accessibility issues fail.
+

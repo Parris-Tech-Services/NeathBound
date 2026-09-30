@@ -10,7 +10,7 @@ and stays inside one lane. Integration is owned by the release coordinator.
 | Interface | `src/ui/`, `index.html`, `src/styles.css` | save schema and story rules |
 | Save & accessibility | `src/game/state.js` persistence adapters, settings, keyboard/ARIA behavior, API client integration | story balance and visual restyling |
 | Backend | `supabase/` (migrations, `api` function), `src/services/`, `src/config.js`, `scripts/sync-engine.mjs`, backend workflows | story content and visual restyling |
-| QA & tooling | `tests/`, docs, fixtures, smoke scripts, release checks | production game behavior unless fixing a test contract |
+| QA & tooling | `tests/` (incl. `tests/e2e/`), docs, fixtures, smoke scripts, release checks, `.github/workflows/e2e.yml` and `live-check.yml` | production game behavior unless fixing a test contract |
 
 Suggested worktrees:
 
