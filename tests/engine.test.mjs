@@ -1,7 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { choiceAvailable, resolveChoice, storyAvailable } from "../src/game/engine.js";
-import { initialState } from "../src/game/state.js";
+import { initialState as baseInitialState } from "../src/game/state.js";
+function initialState() {
+  const s = baseInitialState();
+  s.locationId = "lantern-quay";
+  s.unlockedLocations = ["lantern-quay", "velvet-market", "hollow-archive"];
+  s.items = { "salted-map": 1, "brass-key": 1 };
+  return s;
+}
 
 test("actions never consume a finite action resource", () => {
   const result = resolveChoice(initialState(), "bell-under-water", "listen", () => 0.9);

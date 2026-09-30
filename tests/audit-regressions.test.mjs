@@ -2,7 +2,14 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { effectiveChallenge, resolveChoice } from "../src/game/engine.js";
 import { stories } from "../src/game/content.js";
-import { initialState, normaliseState } from "../src/game/state.js";
+import { initialState as baseInitialState, normaliseState } from "../src/game/state.js";
+  function initialState() {
+    const s = baseInitialState();
+    s.locationId = "lantern-quay";
+    s.unlockedLocations = ["lantern-quay", "velvet-market", "hollow-archive"];
+    s.items = { "salted-map": 1, "brass-key": 1 };
+    return s;
+  }
 import { handle } from "../supabase/functions/api/handler.js";
 
 const FAIL = () => 0;

@@ -28,12 +28,12 @@ test("POST /api/player creates once and is idempotent", async () => {
 
 test("choosing a branch resolves on the server and persists the whole state", async () => {
   const repo = fakeRepo();
-  const res = await call(repo, "POST", "/api/storylets/bell-under-water/branches/descend/choose");
+  const res = await call(repo, "POST", "/api/storylets/lair-escape/branches/force/choose");
   assert.equal(res.status, 200);
   assert.equal(res.body.success, true);
   const saved = repo.players.get("u1");
-  assert.equal(saved.locationId, "hollow-archive");
-  assert.equal(saved.items["black-sand"], 1);
+  assert.equal(saved.locationId, "lantern-quay");
+  assert.equal(saved.items["brass-key"], 1);
   assert.ok(saved.menaces && saved.unlockedLocations, "menaces and unlocked locations are part of the saved state");
 });
 
@@ -55,12 +55,13 @@ test("location, storylets, journal, world and reset routes answer", async () => 
   assert.ok(Array.isArray((await call(repo, "GET", "/api/journal")).body.journal));
   assert.equal((await call(repo, "GET", "/api/world")).body.worldQualities["city-mood"], 2);
   await call(repo, "POST", "/api/storylets/cartographer-at-dusk/branches/trade/choose");
-  assert.equal((await call(repo, "POST", "/api/reset")).body.locationId, "lantern-quay");
+  assert.equal((await call(repo, "POST", "/api/reset")).body.locationId, "the-lair");
   assert.equal((await call(repo, "GET", "/api/nope")).status, 404);
 });
 
 test("travel changes location only when the destination is unlocked", async () => {
   const repo = fakeRepo();
+  await repo.savePlayer("u1", { locationId: "the-lair", unlockedLocations: ["the-lair", "velvet-market"] });
   const moved = await call(repo, "POST", "/api/travel/velvet-market");
   assert.equal(moved.status, 200);
   assert.equal(moved.body.locationId, "velvet-market");

@@ -97,18 +97,16 @@ export const stories = {
         challenge: { quality: "nerve", difficulty: 1 },
         success: "The mechanism gives way with a screech. The door swings open.",
         successEffects: [
-          { type: "progress", id: "nerve", points: 2 },
           { type: "location", id: "lantern-quay" },
           { type: "unlock-location", id: "lantern-quay" },
           { type: "flag", id: "tutorial.story", value: true },
           { type: "flag", id: "tutorial.myself", value: true },
           { type: "flag", id: "tutorial.possessions", value: true },
           { type: "flag", id: "tutorial.travel", value: true },
-          { type: "items", id: "brass-key", delta: 1 }
+          { type: "item", id: "brass-key", amount: 1 }
         ],
         failure: "The lock is stubborn, but you're learning its weaknesses.",
         failureEffects: [
-          { type: "progress", id: "nerve", points: 1 }
         ]
       },
       {
@@ -117,18 +115,16 @@ export const stories = {
         challenge: { quality: "insight", difficulty: 1 },
         success: "You study the tumblers and slip the lock open.",
         successEffects: [
-          { type: "progress", id: "insight", points: 2 },
           { type: "location", id: "lantern-quay" },
           { type: "unlock-location", id: "lantern-quay" },
           { type: "flag", id: "tutorial.story", value: true },
           { type: "flag", id: "tutorial.myself", value: true },
           { type: "flag", id: "tutorial.possessions", value: true },
           { type: "flag", id: "tutorial.travel", value: true },
-          { type: "items", id: "brass-key", delta: 1 }
+          { type: "item", id: "brass-key", amount: 1 }
         ],
         failure: "You can't quite get the angle right, but it's close.",
         failureEffects: [
-          { type: "progress", id: "insight", points: 1 }
         ]
       }
     ]
@@ -144,11 +140,9 @@ export const stories = {
         challenge: { quality: "poise", difficulty: 1 },
         success: "You remain calm and notice a loose hinge.",
         successEffects: [
-          { type: "progress", id: "poise", points: 2 }
         ],
         failure: "The rust obscures everything.",
         failureEffects: [
-          { type: "progress", id: "poise", points: 1 }
         ]
       }
     ]
@@ -164,11 +158,9 @@ export const stories = {
         challenge: { quality: "shadow", difficulty: 1 },
         success: "You hear the sound of water dripping and distant gears.",
         successEffects: [
-          { type: "progress", id: "shadow", points: 2 }
         ],
         failure: "Your own breathing is too loud.",
         failureEffects: [
-          { type: "progress", id: "shadow", points: 1 }
         ]
       }
     ]
@@ -1397,9 +1389,7 @@ export const cards = {
         label: "Listen to them",
         challenge: { quality: "insight", difficulty: 3 },
         success: "They whisper a secret of the city.",
-        successEffects: [{ type: "progress", id: "insight", points: 2 }, { type: "echoes", delta: 1 }],
         failure: "They mutter nonsense and vanish.",
-        failureEffects: [{ type: "progress", id: "insight", points: 1 }]
       },
       {
         id: "ignore",

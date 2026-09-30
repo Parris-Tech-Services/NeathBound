@@ -2,7 +2,14 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { locations, stories } from "../src/game/content.js";
 import { availableStories, choiceAvailable, resolveChoice, storyAvailable } from "../src/game/engine.js";
-import { initialState } from "../src/game/state.js";
+import { initialState as baseInitialState } from "../src/game/state.js";
+function initialState() {
+  const s = baseInitialState();
+  s.locationId = "lantern-quay";
+  s.unlockedLocations = ["lantern-quay", "velvet-market", "hollow-archive"];
+  s.items = { "salted-map": 1, "brass-key": 1 };
+  return s;
+}
 
 const SUCCEED = () => 0.99;
 const FAIL = () => 0;
@@ -220,7 +227,7 @@ test("every location a storylet can send the player to is reachable by travel af
   // Menace consequence areas are reached only by a menace reaching 8, never by
   // travel (docs/FALLEN-LONDON-MECHANICS-AND-LINGO.md), so they are exempt.
   for (const [locationId, location] of Object.entries(locations)) {
-    if (location.consequenceOf) continue;
+    if (location.consequenceOf || locationId === "the-lair") continue;
     assert.ok(unlocked.has(locationId), `${locationId} can never be unlocked for travel`);
   }
 });

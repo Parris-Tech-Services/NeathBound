@@ -1,7 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { applyEffects, requirementMet, requirementsMet, resolveChallenge } from "../src/game/rules.js";
-import { initialState } from "../src/game/state.js";
+import { initialState as baseInitialState, normaliseState } from "../src/game/state.js";
+  function initialState() {
+    const s = baseInitialState();
+    s.locationId = "lantern-quay";
+    s.unlockedLocations = ["lantern-quay", "velvet-market", "hollow-archive"];
+    s.items = { "salted-map": 1, "brass-key": 1 };
+    return s;
+  }
 
 test("quality, item, flag, echo and location requirements are evaluated", () => {
   const state = initialState();

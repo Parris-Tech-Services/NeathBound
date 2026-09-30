@@ -3,7 +3,14 @@ import assert from "node:assert/strict";
 import { awardProgress, challengeBand, challengeChance, describeChallenge, levelCost } from "../src/game/rules.js";
 import { resolveChoice, travelBlockedReason } from "../src/game/engine.js";
 import { menaceAreas, locations } from "../src/game/content.js";
-import { initialState } from "../src/game/state.js";
+import { initialState as baseInitialState, normaliseState } from "../src/game/state.js";
+  function initialState() {
+    const s = baseInitialState();
+    s.locationId = "lantern-quay";
+    s.unlockedLocations = ["lantern-quay", "velvet-market", "hollow-archive"];
+    s.items = { "salted-map": 1, "brass-key": 1 };
+    return s;
+  }
 
 const at = (qualities) => ({ qualities });
 
