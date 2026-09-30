@@ -1,0 +1,50 @@
+[
+  {
+    "id": "ishigaki-cave",
+    "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0d/Ishigaki_Stalactite_Cave_01.jpg",
+    "sourcePage": "https://commons.wikimedia.org/wiki/File:Ishigaki_Stalactite_Cave_01.jpg",
+    "license": "CC0-1.0",
+    "author": "AsPJT",
+    "uses": ["cavern panorama", "promo art", "story-card crop"]
+  },
+  {
+    "id": "paper-texture",
+    "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/8/83/%D0%A2%D0%B5%D0%BA%D1%81%D1%82%D1%83%D1%80%D0%B0_%D0%B1%D1%83%D0%BC%D0%B0%D0%B3%D0%B8.jpg",
+    "sourcePage": "https://commons.wikimedia.org/wiki/File:%D0%A2%D0%B5%D0%BA%D1%81%D1%82%D1%83%D1%80%D0%B0_%D0%B1%D1%83%D0%BC%D0%B0%D0%B3%D0%B8.jpg",
+    "license": "CC0-1.0",
+    "author": "Iroi su",
+    "uses": ["parchment board", "story cards"]
+  },
+  {
+    "id": "magnifying-glass",
+    "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/9/90/Magnifying-glass.jpg",
+    "sourcePage": "https://commons.wikimedia.org/wiki/File:Magnifying-glass.jpg",
+    "license": "Public-Domain",
+    "author": "Endofskull",
+    "uses": ["story-card art"]
+  },
+  {
+    "id": "old-map-1807",
+    "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/4/47/Old_map_1807_plan.jpg",
+    "sourcePage": "https://commons.wikimedia.org/wiki/File:Old_map_1807_plan.jpg",
+    "license": "Public-Domain",
+    "author": "Unknown / historical work",
+    "uses": ["featured art", "story-card art"]
+  },
+  {
+    "id": "teacup",
+    "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Teacup.png",
+    "sourcePage": "https://commons.wikimedia.org/wiki/File:Teacup.png",
+    "license": "CC0-1.0",
+    "author": "Rijksmuseum source / Commons derivative",
+    "uses": ["story-card art"]
+  },
+  {
+    "id": "old-library-books",
+    "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Old_Books_in_the_library.jpg",
+    "sourcePage": "https://commons.wikimedia.org/wiki/File:Old_Books_in_the_library.jpg",
+    "license": "Public-Domain",
+    "author": "InfoSources",
+    "uses": ["story-card art"]
+  }
+]
