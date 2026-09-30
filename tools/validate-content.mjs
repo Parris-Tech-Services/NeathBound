@@ -1,7 +1,7 @@
 import { locations, stories } from "../src/game/content.js";
 
 const effectTypes = new Set(["quality", "set-quality", "echoes", "item", "flag", "location"]);
-const requirementTypes = new Set(["quality", "item", "flag", "echoes", "location"]);
+const requirementTypes = new Set(["quality", "item", "flag", "echoes", "location", "world-quality"]);
 const errors = [];
 
 for (const [locationId, location] of Object.entries(locations)) {
