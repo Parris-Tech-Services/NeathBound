@@ -101,7 +101,7 @@ test("entering the city shows the loader until the game has rendered", async () 
 
   assert.equal(await page.locator("#landing-screen").isHidden(), true, "landing page leaves immediately after Enter");
   assert.equal(await page.locator("#boot-screen").isVisible(), true, "loader covers module/game startup");
-  assert.match(await page.locator("#boot-screen").innerText(), /Waking the lamps beneath the city/i);
+  assert.match(await page.locator("#boot-screen").innerText(), /(Waking the lamps beneath the city|Opening the city from this device|Remembering your place beneath the city)/i);
 
   await page.waitForSelector("[data-choice]");
   await page.waitForFunction(() => !document.querySelector("#boot-screen"));
