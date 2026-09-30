@@ -1,6 +1,6 @@
-import { config } from "../config.js?v=20260930-13";
-import { LocalGameService } from "./local-game-service.js?v=20260930-13";
-import { SupabaseGameService } from "./supabase-game-service.js?v=20260930-13";
+import { config } from "../config.js?v=20260930-14";
+import { LocalGameService } from "./local-game-service.js?v=20260930-14";
+import { SupabaseGameService } from "./supabase-game-service.js?v=20260930-14";
 
 // Online (Supabase) by default; ?api=local forces offline play.
 export function createGameService({ settings = config, search = globalThis.location?.search ?? "", storage = globalThis.localStorage } = {}) {
@@ -35,12 +35,12 @@ export class FallbackGameService {
     return this.active.getState();
   }
 
-  choose(storyId, choiceId) {
-    return this.active.choose(storyId, choiceId);
+  choose(storyId, choiceId, options) {
+    return this.active.choose(storyId, choiceId, options);
   }
 
-  travel(locationId) {
-    return this.active.travel(locationId);
+  travel(locationId, options) {
+    return this.active.travel(locationId, options);
   }
 
   reset() {
