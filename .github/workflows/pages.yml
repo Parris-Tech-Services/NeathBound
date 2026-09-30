@@ -15,13 +15,43 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Full release checks
+        run: npm run release:check
+
+      - name: Install browser-test tools
+        run: |
+          npm install --no-save --no-audit --no-fund playwright@1 axe-core@4
+          npx playwright install --with-deps chromium
+
+      - name: Play candidate build in Chromium
+        env:
+          E2E_REPORT: e2e-report.md
+        run: npm run test:e2e
+
+      - name: Browser test report
+        if: always()
+        run: cat e2e-report.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+
   deploy:
+    needs: verify
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout verified commit
         uses: actions/checkout@v4
 
       - name: Configure Pages
