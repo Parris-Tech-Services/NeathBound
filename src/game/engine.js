@@ -38,8 +38,10 @@ export function canPlay(state, story, context = {}) {
 }
 
 export function availableStories(state, context = {}) {
+  const tutorialComplete = state.flags?.["tutorial:complete"] === true;
   return currentLocation(state).stories
     .filter((id) => storyAvailable(state, id, context))
+    .filter((id) => tutorialComplete || stories[id]?.tags?.includes("tutorial"))
     .map((id) => ({ id, ...stories[id] }));
 }
 
