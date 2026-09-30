@@ -17,7 +17,7 @@ test("legacy array inventories migrate to quantity maps", () => {
     [LEGACY_SAVE_KEYS.at(-1)]: JSON.stringify({ ...initialState(), version: 1, items: ["salted-map", "black-sand"] })
   });
   const state = loadState(storage);
-  assert.equal(state.version, 3);
+  assert.equal(state.version, 4);
   assert.equal(state.items["salted-map"], 1);
   assert.equal(state.items["black-sand"], 1);
   assert.ok(storage.getItem(SAVE_KEY));
