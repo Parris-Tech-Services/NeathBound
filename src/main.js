@@ -1,6 +1,6 @@
-import { createGameService } from "./services/index.js?v=20260930-14";
-import { render } from "./ui/render.js?v=20260930-14";
-import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20260930-14";
+import { createGameService } from "./services/index.js?v=20260930-15";
+import { render } from "./ui/render.js?v=20260930-15";
+import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20260930-15";
 
 const app = document.querySelector("#app");
 const service = createGameService();
@@ -8,6 +8,7 @@ const service = createGameService();
 let currentState = null;
 let lastOutcome = null;
 let pending = false;
+let activeTab = "story";
 
 async function draw(state) {
   const resolvedState = state ?? await service.getState();
@@ -43,6 +44,54 @@ async function draw(state) {
         pending = false;
         setPending(false);
       }
+    },
+
+    async systemAction(action, payload = {}) {
+      if (pending) return;
+      pending = true;
+      setPending(true);
+      try {
+        const outcome = await service.act(action, payload, {
+          expectedRevision: Number(currentState?.revision ?? 0)
+        });
+        if (outcome.error) {
+          lastOutcome = null;
+          await draw(outcome.state ?? await service.getState());
+          showNotice(outcome.error);
+          return;
+        }
+        lastOutcome = outcome;
+        await draw(outcome.state ?? outcome);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (error) {
+        await draw(currentState).catch(() => {});
+        showError(error);
+      } finally {
+        pending = false;
+        setPending(false);
+      }
+    },
+
+    navigate(tab) {
+      activeTab = tab;
+      lastOutcome = null;
+      draw(currentState).catch(showError);
+    },
+
+    addGoal() {
+      const text = window.prompt("Add a plan or goal");
+      if (!text?.trim()) return;
+      const preferences = loadPreferences();
+      preferences.goals = [...(preferences.goals ?? []), text.trim()];
+      savePreferences(preferences);
+      draw(currentState);
+    },
+
+    removeGoal(index) {
+      const preferences = loadPreferences();
+      preferences.goals = (preferences.goals ?? []).filter((_, i) => i !== index);
+      savePreferences(preferences);
+      draw(currentState);
     },
 
     async travel(locationId) {
@@ -119,12 +168,12 @@ async function draw(state) {
         setPending(false);
       }
     }
-  }, lastOutcome);
+  }, lastOutcome, activeTab);
 }
 
 function setPending(isPending) {
   app.setAttribute("aria-busy", String(isPending));
-  app.querySelectorAll("[data-choice], [data-action=travel], [data-action=reset]").forEach((button) => {
+  app.querySelectorAll("[data-choice], [data-system-action], [data-action=travel], [data-action=reset]").forEach((button) => {
     if (!button.dataset.originallyDisabled) button.dataset.originallyDisabled = String(button.disabled);
     button.disabled = isPending || button.dataset.originallyDisabled === "true";
   });
