@@ -12,6 +12,7 @@ import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import { chromium } from "playwright";
+import { SAVE_KEY } from "../../src/game/state.js";
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const TYPES = { ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp" };
@@ -74,7 +75,7 @@ async function openGame() {
   return { context, page, problems };
 }
 
-const readSave = (page) => page.evaluate(() => JSON.parse(localStorage.getItem("neathbound.save.v2") ?? "null"));
+const readSave = (page) => page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "null"), SAVE_KEY);
 
 test("the game loads with no errors and every asset and module resolves", async () => {
   const { context, page, problems } = await openGame();
@@ -88,7 +89,7 @@ test("a choice changes the story, and progress survives a reload", async () => {
   const before = await readSave(page);
   const firstEntry = before?.journal?.[0];
   await page.locator("[data-choice]:not([disabled])").first().click();
-  await page.waitForFunction((entry) => JSON.parse(localStorage.getItem("neathbound.save.v2") ?? "{}").journal?.[0] !== entry, firstEntry);
+  await page.waitForFunction(([key, entry]) => JSON.parse(localStorage.getItem(key) ?? "{}").journal?.[0] !== entry, [SAVE_KEY, firstEntry]);
   const played = await readSave(page);
   assert.notEqual(played.journal[0], firstEntry, "the journal records the choice");
 
@@ -103,9 +104,9 @@ test("a choice changes the story, and progress survives a reload", async () => {
 test("New life resets the character", async () => {
   const { context, page, problems } = await openGame();
   await page.locator("[data-choice]:not([disabled])").first().click();
-  await page.waitForFunction(() => (JSON.parse(localStorage.getItem("neathbound.save.v2") ?? "{}").journal ?? []).length > 1);
+  await page.waitForFunction((key) => (JSON.parse(localStorage.getItem(key) ?? "{}").journal ?? []).length > 1, SAVE_KEY);
   await page.locator("[data-action=reset]").first().click();
-  await page.waitForFunction(() => (JSON.parse(localStorage.getItem("neathbound.save.v2") ?? "{}").journal ?? []).length === 1);
+  await page.waitForFunction((key) => (JSON.parse(localStorage.getItem(key) ?? "{}").journal ?? []).length === 1, SAVE_KEY);
   const save = await readSave(page);
   assert.equal(save.journal.length, 1, "a new life starts with a single journal entry");
   assert.deepEqual(problems, []);
