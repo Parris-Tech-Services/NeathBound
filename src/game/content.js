@@ -232,8 +232,8 @@ export const stories = {
     text: "The tide has come in carrying a porcelain cup. A dockworker asks whether you will pour it back into the sea, or drink what the sea has prepared.",
     tags: ["opportunity"],
     choices: [
-      { id: "pour", label: "Pour the tea into the tide", success: "The water settles. The dockworker gives you a name to use at the market.", reward: { acquaintance: "dockworker", quality: ["poise", 1] }, target: "lantern-quay" },
-      { id: "drink", label: "Drink the impossible tea", success: "You remember a shore that has never existed.", failure: "The cup tastes of every promise you have broken.", challenge: { stat: "nerve", difficulty: 5 }, reward: { item: "tide-cup", menace: ["dread", 1] }, target: "hollow-archive" }
+      { id: "pour", label: "Pour the tea into the tide", requirements: [], success: "The water settles. The dockworker gives you a name to use at the market.", successEffects: [{ type: "flag", id: "acquaintance-dockworker", value: true }, { type: "quality", id: "poise", amount: 1 }, { type: "location", id: "lantern-quay" }], failureEffects: [] },
+      { id: "drink", label: "Drink the impossible tea", requirements: [], success: "You remember a shore that has never existed.", failure: "The cup tastes of every promise you have broken.", challenge: { quality: "nerve", difficulty: 5 }, successEffects: [{ type: "item", id: "tide-cup", amount: 1 }, { type: "quality", id: "dread", amount: 1 }, { type: "location", id: "hollow-archive" }], failureEffects: [{ type: "quality", id: "dread", amount: 1 }, { type: "location", id: "hollow-archive" }] }
     ]
   },
   "market-gossip": {
@@ -250,7 +250,7 @@ export const stories = {
     title: "Catalogue the Dark",
     kicker: "An unpaid scholarly errand",
     text: "A shelf has been filled with darkness instead of books. The archive will pay you in echoes if you assign each patch a proper title.",
-    challenge: { stat: "insight", difficulty: 7 },
+    challenge: { quality: "insight", difficulty: 7 },
     choices: [
       { id: "catalogue", label: "Give the darkness its titles", success: "The shelf becomes legible. The archive records your name with a respectful error.", failure: "The darkness gives you a title instead.", reward: { echoes: 15, item: "ink-of-absence" }, target: "hollow-archive" },
       { id: "close-shelf", label: "Close the shelf", success: "Some knowledge is safer when it remains unindexed.", reward: { menace: ["suspicion", -1] }, target: "lantern-quay" }
@@ -260,8 +260,8 @@ export const stories = {
     title: "The Garden Appointment",
     kicker: "A flower expects you",
     text: "A clockwork flower has scheduled a meeting for you at the far end of the glasshouse. It has sent three reminders and one threat.",
-    requirements: { item: "tide-cup" },
-    challenge: { stat: "poise", difficulty: 6 },
+    requirements: [{ type: "item", id: "tide-cup", op: ">=", value: 1 }],
+    challenge: { quality: "poise", difficulty: 6 },
     choices: [
       { id: "attend", label: "Attend the appointment", success: "The flower offers a seed that remembers the sun.", failure: "You arrive late. The flower makes a note of it.", reward: { item: "sun-seed", quality: ["poise", 1] }, target: "clockwork-gardens" },
       { id: "apologise", label: "Send an apology by moth", success: "The flower accepts. For now.", reward: { menace: ["scandal", -1] }, target: "velvet-market" }
