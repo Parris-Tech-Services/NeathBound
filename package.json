@@ -12,6 +12,7 @@
     "api:test": "node --test server/tests/*.test.mjs",
     "validate:content": "node tools/validate-content.mjs",
     "sync:engine": "node scripts/sync-engine.mjs",
-    "release:check": "npm test && npm run api:test && npm run validate:content && npm run smoke"
+    "release:check": "npm test && npm run api:test && npm run validate:content && npm run smoke",
+    "test:e2e": "node --test tests/e2e/play.e2e.mjs"
   }
 }

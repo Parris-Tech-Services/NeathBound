@@ -1,0 +1,43 @@
+# After each GitHub Pages deploy, checks the LIVE site the way a player would
+# (offline mode, so no online players are created) and checks the online API
+# is reachable and still refuses unauthenticated requests.
+name: Live site check
+on:
+  workflow_run:
+    workflows: ["Deploy NeathBound to GitHub Pages"]
+    types: [completed]
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  SITE: https://parris-tech-services.github.io/NeathBound/
+  API: https://ynrfskgfrgqxwjswtnka.supabase.co/functions/v1/api/player
+jobs:
+  live:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: API is up and requires sign-in
+        run: |
+          preflight=$(curl -s -o /dev/null -w "%{http_code}" -X OPTIONS "$API" -H "Origin: https://parris-tech-services.github.io" -H "Access-Control-Request-Method: GET")
+          anonymous=$(curl -s -o /dev/null -w "%{http_code}" "$API")
+          echo "CORS preflight: $preflight, unauthenticated GET: $anonymous"
+          [ "$preflight" = "200" ] || { echo "::error::API preflight returned $preflight"; exit 1; }
+          [ "$anonymous" = "401" ] || { echo "::error::API accepted an unauthenticated request ($anonymous)"; exit 1; }
+      - name: Install test-only tools
+        run: |
+          npm install --no-save --no-audit --no-fund playwright@1 axe-core@4
+          npx playwright install --with-deps chromium
+      - name: Play the live site
+        env:
+          BASE_URL: ${{ env.SITE }}
+          E2E_REPORT: e2e-report.md
+        run: npm run test:e2e
+      - name: Browser test report
+        if: always()
+        run: cat e2e-report.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
