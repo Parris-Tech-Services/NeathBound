@@ -1,7 +1,7 @@
-import { locations, menaceAreas, stories, decks, cards, refuges } from "./content.js?v=20260930-20";
-import { drawCardToHand, discardCard as removeCardFromHand } from "./decks.js?v=20260930-20";
-import { cloneState, initialState } from "./state.js?v=20260930-20";
-import { applyEffects, awardProgress, describeChallenge, requirementsMet, resolveChallenge } from "./rules.js?v=20260930-20";
+import { locations, menaceAreas, stories, decks, cards, refuges } from "./content.js?v=20260930-21";
+import { drawCardToHand, discardCard as removeCardFromHand } from "./decks.js?v=20260930-21";
+import { cloneState, initialState } from "./state.js?v=20260930-21";
+import { applyEffects, awardProgress, describeChallenge, requirementsMet, resolveChallenge } from "./rules.js?v=20260930-21";
 
 export { describeChallenge };
 
