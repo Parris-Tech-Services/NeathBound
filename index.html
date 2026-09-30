@@ -327,6 +327,7 @@
         entering = true;
         landing.hidden = true;
         boot.hidden = false;
+        window.__neathboundEntered = true;
         window.dispatchEvent(new CustomEvent("neathbound:enter"));
       }
 
