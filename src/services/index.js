@@ -54,6 +54,14 @@ export class FallbackGameService {
     return this.active.recover(menaceId, expectedRevision);
   }
 
+  drawOpportunity(expectedRevision) {
+    return this.active.drawOpportunity(expectedRevision);
+  }
+
+  discardOpportunity(storyId, expectedRevision) {
+    return this.active.discardOpportunity(storyId, expectedRevision);
+  }
+
   reset() {
     return this.active.reset();
   }
