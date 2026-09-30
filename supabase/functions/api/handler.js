@@ -1,20 +1,8 @@
-// NeathBound game API on Supabase: same routes as the former Cloudflare Worker
-// (the former Cloudflare worker/index.js), now authenticated by Supabase Auth. Pure JavaScript with
-// the repository injected, so Node tests run exactly what Deno deploys.
-//
-//   POST /api/player                                        create (idempotent)
-//   GET  /api/player                                        player state
-//   GET  /api/world                                         world qualities
-//   GET  /api/location                                      location + storylets
-//   GET  /api/storylets                                     storylets here
-//   GET  /api/journal                                       journal
-//   POST /api/reset                                         new life
-//   POST /api/storylets/:storyId/branches/:choiceId/choose  resolve a choice
-import { availableChoices, availableStories, currentLocation, resolveChoice } from "./game/engine.js";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge, resolveChoice } from "./game/engine.js";
 import { locations } from "./game/content.js";
 import { initialState, normaliseState } from "./game/state.js";
 
-export async function handle({ method, path, userId }, { repo, random = Math.random }) {
+export async function handle({ method, path, userId, body = {} }, { repo, random = Math.random }) {
   const route = normalise(path);
 
   const loadOrCreate = async () => {
@@ -39,8 +27,8 @@ export async function handle({ method, path, userId }, { repo, random = Math.ran
 
   if (method === "GET" && (route === "/api/location" || route === "/api/storylets")) {
     const [state, ctx] = await Promise.all([loadOrCreate(), context()]);
-    const stories = availableStories(state, ctx).map((story) => publicStory(story, state, ctx));
-    return ok(route === "/api/location" ? { location: currentLocation(state), stories } : stories);
+    const storylets = availableStories(state, ctx).map((story) => publicStory(story, state, ctx));
+    return ok(route === "/api/location" ? { location: currentLocation(state), stories: storylets } : storylets);
   }
 
   if (method === "POST" && route === "/api/reset") {
@@ -52,32 +40,38 @@ export async function handle({ method, path, userId }, { repo, random = Math.ran
   const travel = route.match(/^\/api\/travel\/([^/]+)$/);
   if (method === "POST" && travel) {
     const state = await loadOrCreate();
+    const stale = revisionMismatch(body, state);
+    if (stale) return ok({ error: stale, state, rejected: true });
+
     const locationId = decodeURIComponent(travel[1]);
     if (!state.unlockedLocations.includes(locationId) || !locations[locationId]) {
-      return { status: 409, body: { error: "That location is not unlocked.", state } };
+      return ok({ error: "That location is not unlocked.", state, rejected: true });
     }
     const next = {
       ...state,
+      revision: Number(state.revision ?? 0) + 1,
       locationId,
-      journal: [`Travelled to ${locationId.replaceAll("-", " ")}.`, ...state.journal].slice(0, 30)
+      journal: [`Travelled to ${locationId.replaceAll("-", " ")}.`, ...state.journal].slice(0, 100)
     };
     await repo.savePlayer(userId, next);
-    return ok(next);
+    return ok({ state: next });
   }
 
   const choose = route.match(/^\/api\/storylets\/([^/]+)\/branches\/([^/]+)\/choose$/);
   if (method === "POST" && choose) {
     const [state, ctx] = await Promise.all([loadOrCreate(), context()]);
-    const outcome = resolveChoice(state, decodeURIComponent(choose[1]), decodeURIComponent(choose[2]), random, ctx);
-    if (outcome.error) return { status: 409, body: { error: outcome.error, state } };
-    await repo.savePlayer(userId, outcome.state);
-    return ok(outcome);
+    const stale = revisionMismatch(body, state);
+    if (stale) return ok({ error: stale, state, rejected: true });
+
+    const response = resolveChoice(state, decodeURIComponent(choose[1]), decodeURIComponent(choose[2]), random, ctx);
+    if (response.error) return ok({ ...response, rejected: true });
+    await repo.savePlayer(userId, response.state);
+    return ok(response);
   }
 
   return { status: 404, body: { error: "API route not found." } };
 }
 
-// Supabase delivers "/api/..." in production and "/functions/v1/api/..." locally.
 export function normalise(path) {
   const at = path.indexOf("/api");
   return (at >= 0 ? path.slice(at) : path).replace(/\/+$/, "");
@@ -94,9 +88,15 @@ function publicStory(story, state, context) {
       id: choice.id,
       label: choice.label,
       available: available.has(choice.id),
-      challenge: choice.challenge ?? null
+      challenge: effectiveChallenge(story, choice)
     }))
   };
+}
+
+function revisionMismatch(body, state) {
+  if (!Number.isInteger(body?.expectedRevision)) return null;
+  if (body.expectedRevision === Number(state.revision ?? 0)) return null;
+  return "Your character changed before that action completed. The latest state has been loaded; please choose again.";
 }
 
 function ok(body) {
