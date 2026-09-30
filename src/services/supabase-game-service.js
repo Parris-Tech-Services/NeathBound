@@ -1,6 +1,3 @@
-// Online play against the Supabase `api` Edge Function. Same interface as
-// LocalGameService. Each browser gets an anonymous Supabase account (no
-// sign-up form), and the server is authoritative for the player's state.
 const SESSION_KEY = "neathbound.session.v1";
 
 export class SupabaseGameService {
@@ -16,16 +13,23 @@ export class SupabaseGameService {
     return this.#call("GET", "player");
   }
 
-  choose(storyId, choiceId) {
-    return this.#call("POST", `storylets/${encodeURIComponent(storyId)}/branches/${encodeURIComponent(choiceId)}/choose`);
+  choose(storyId, choiceId, expectedRevision = 0) {
+    return this.#call(
+      "POST",
+      `storylets/${encodeURIComponent(storyId)}/branches/${encodeURIComponent(choiceId)}/choose`,
+      { requestId: crypto.randomUUID(), expectedRevision }
+    );
   }
 
-  travel(locationId) {
-    return this.#call("POST", `travel/${encodeURIComponent(locationId)}`);
+  travel(locationId, expectedRevision = 0) {
+    return this.#call("POST", `travel/${encodeURIComponent(locationId)}`, {
+      requestId: crypto.randomUUID(),
+      expectedRevision
+    });
   }
 
   reset() {
-    return this.#call("POST", "reset");
+    return this.#call("POST", "reset", { requestId: crypto.randomUUID() });
   }
 
   async #call(method, route, requestBody = {}) {
@@ -40,8 +44,7 @@ export class SupabaseGameService {
       body: method === "POST" ? JSON.stringify(requestBody) : undefined
     });
     const payload = await response.json().catch(() => ({}));
-    // 409 = the rules refused the choice; the body carries { error, state }.
-    if (response.ok || response.status === 409) return payload;
+    if (response.ok) return payload;
     throw new Error(payload.error ?? `Request failed: ${response.status}`);
   }
 
