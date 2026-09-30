@@ -79,7 +79,7 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
   applyEffects(next, success ? (choice.successEffects ?? []) : (choice.failureEffects ?? []));
   next.flags[`${storyId}:${choiceId}`] = true;
   if (story.once) next.flags[`story-complete:${storyId}`] = true;
-  next.revision = Number(next.revision ?? 0) + 1;
+  next.revision = Number(next.revision ?? 0) + 1;\n  next.flags["__revision"] = next.revision;
 
   const changes = describeChanges(before, next);
   const challengeText = challenge
