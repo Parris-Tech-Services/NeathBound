@@ -1,3 +1,51 @@
+
+export const itemCategories = {
+  curiosity: "Curiosities",
+  resource: "Resources",
+  tool: "Tools",
+  clothing: "Clothing",
+  hat: "Hats",
+  boots: "Boots",
+  gloves: "Gloves",
+  weapon: "Weapons",
+  companion: "Companions",
+  lesson: "Recalled Lessons"
+};
+
+export const equipmentSlots = ["hat", "clothing", "gloves", "boots", "weapon", "companion"];
+
+export const items = {
+  "brass-key": { name: "Brass Key", description: "Heavy and cold.", category: "tool" },
+  "black-sand": { name: "Black Sand", description: "It whispers.", category: "curiosity" },
+  "silver-thimble": { name: "Silver Thimble", description: "A tarnished thimble.", category: "tool" },
+  "archive-key": { name: "Archive Key", description: "Opens doors in the Hollow Archive.", category: "tool" },
+  "red-thread-end": { name: "Loose End of Red Thread", description: "It leads somewhere.", category: "curiosity" },
+  "bright-memory": { name: "Bright Memory", description: "A recollection of the surface.", category: "curiosity" },
+  "unfinished-page": { name: "Unfinished Page", description: "Waiting for an ending.", category: "curiosity" },
+  "tide-cup": { name: "Tide Cup", description: "Tastes of the deep.", category: "curiosity" },
+  "ink-of-absence": { name: "Ink of Absence", description: "Darker than dark.", category: "curiosity" },
+  "sun-seed": { name: "Sun Seed", description: "Warm to the touch.", category: "curiosity" },
+  "small-sun": { name: "Small Sun", description: "A piece of daylight.", category: "curiosity" },
+  "salted-map": { name: "Salted Map", description: "The routes shift when you blink.", category: "tool" },
+  "lesson-nerve": { name: "Recalled Lesson: Nerve", description: "A reminder of courage.", category: "lesson" },
+  "lesson-insight": { name: "Recalled Lesson: Insight", description: "A reminder of perception.", category: "lesson" },
+  "lesson-poise": { name: "Recalled Lesson: Poise", description: "A reminder of grace.", category: "lesson" },
+  "lesson-shadow": { name: "Recalled Lesson: Shadow", description: "A reminder of subtlety.", category: "lesson" },
+
+  // Equipment
+  "workmans-boots": { name: "Workman's Boots", description: "Sturdy and quiet.", category: "clothing", slot: "boots", stats: { shadow: 1, nerve: 1 } },
+  "velvet-cloak": { name: "Velvet Cloak", description: "Blends into the gloom.", category: "clothing", slot: "clothing", stats: { shadow: 2 } },
+  "brass-knuckles": { name: "Brass Knuckles", description: "Effective in a narrow alley.", category: "weapon", slot: "weapon", stats: { nerve: 2 } },
+  "spectacles": { name: "Smoked Spectacles", description: "Protects against glare and helps you notice details.", category: "clothing", slot: "hat", stats: { insight: 2 } },
+  "silk-gloves": { name: "Silk Gloves", description: "For handling delicate situations.", category: "clothing", slot: "gloves", stats: { poise: 2 } },
+  "rat-companion": { name: "Talking Rat", description: "Knows too much, complains constantly.", category: "companion", slot: "companion", stats: { insight: 1, shadow: 1 } },
+
+  // Tiered resources
+  "glimmering-shard": { name: "Glimmering Shard", description: "A tiny fragment of light.", category: "resource", tier: 1 },
+  "radiant-crystal": { name: "Radiant Crystal", description: "A substantial source of illumination.", category: "resource", tier: 2 },
+  "blinding-gem": { name: "Blinding Gem", description: "Painful to look at.", category: "resource", tier: 3 }
+};
+
 export const locations = {
   "the-lair": {
     name: "The Lair",
@@ -18,7 +66,7 @@ export const locations = {
     region: "The Lower City",
     subtitle: "A bazaar for memories, rumours, and perfectly ordinary knives.",
     atmosphere: "Every stall has a curtain. Every curtain has a shadow behind it.",
-    stories: ["borrowed-face", "red-thread", "market-gossip", "the-sand-reader", "unwritten-ink", "the-debt-collector", "the-loose-end"]
+    stories: ["borrowed-face", "red-thread", "market-gossip", "market-exchange", "the-sand-reader", "unwritten-ink", "the-debt-collector", "the-loose-end"]
   },
   "hollow-archive": {
     name: "The Hollow Archive",
@@ -85,6 +133,57 @@ export const menaceAreas = {
 };
 
 export const stories = {
+  "market-exchange": {
+    title: "The Silent Exchange",
+    kicker: "Currencies of the Neath",
+    text: "At a secluded stall, an individual with a velvet mask deals in light, shadows, and heavier things. They offer no greetings, only a pair of scales.",
+    tags: ["always-available"],
+    choices: [
+      {
+        id: "upconvert-shards",
+        label: "Fuse Glimmering Shards into a Radiant Crystal",
+        requirements: [{ type: "item", id: "glimmering-shard", op: ">=", value: 50 }],
+        success: "The shards sing as they melt together, forming a cold, solid gem.",
+        successEffects: [{ type: "item", id: "glimmering-shard", amount: -50 }, { type: "item", id: "radiant-crystal", amount: 1 }]
+      },
+      {
+        id: "downconvert-crystal",
+        label: "Shatter a Radiant Crystal",
+        requirements: [{ type: "item", id: "radiant-crystal", op: ">=", value: 1 }],
+        success: "A sharp blow, and the crystal splinters into a dozen smaller lights.",
+        successEffects: [{ type: "item", id: "radiant-crystal", amount: -1 }, { type: "item", id: "glimmering-shard", amount: 50 }]
+      },
+      {
+        id: "upconvert-crystals",
+        label: "Refine Radiant Crystals into a Blinding Gem",
+        requirements: [{ type: "item", id: "radiant-crystal", op: ">=", value: 10 }],
+        success: "The pressure builds until the light is almost unbearable to look at.",
+        successEffects: [{ type: "item", id: "radiant-crystal", amount: -10 }, { type: "item", id: "blinding-gem", amount: 1 }]
+      },
+      {
+        id: "sell-blinding-gem",
+        label: "Sell a Blinding Gem for Echoes",
+        requirements: [{ type: "item", id: "blinding-gem", op: ">=", value: 1 }],
+        success: "The merchant weighs the gem carefully, then hands you a heavy purse of Echoes.",
+        successEffects: [{ type: "item", id: "blinding-gem", amount: -1 }, { type: "echoes", amount: 12 }]
+      },
+      {
+        id: "buy-velvet-cloak",
+        label: "Purchase a Velvet Cloak",
+        requirements: [{ type: "echoes", op: ">=", value: 20 }],
+        success: "It is heavy, soft, and smells faintly of smoke. It will serve you well in the dark.",
+        successEffects: [{ type: "echoes", amount: -20 }, { type: "item", id: "velvet-cloak", amount: 1 }]
+      },
+      {
+        id: "buy-spectacles",
+        label: "Purchase Smoked Spectacles",
+        requirements: [{ type: "echoes", op: ">=", value: 15 }],
+        success: "They adjust your vision to the gloom.",
+        successEffects: [{ type: "echoes", amount: -15 }, { type: "item", id: "spectacles", amount: 1 }]
+      }
+    ]
+  },
+
   "lair-escape": {
     id: "lair-escape",
     title: "A Way Out",

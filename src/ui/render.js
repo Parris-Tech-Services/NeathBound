@@ -1,5 +1,5 @@
-import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge } from "../game/engine.js?v=20260930-21";
-import { locations } from "../game/content.js?v=20260930-21";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20260930-21";
+import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories } from "../game/content.js?v=20260930-21";
 import { loadPreferences } from "./preferences.js?v=20260930-21";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
@@ -57,60 +57,30 @@ export function render(app, state, handlers, outcome = null) {
   const location = currentLocation(state);
   const stories = availableStories(state);
   const inventory = Object.entries(state.items ?? {}).filter(([, quantity]) => quantity > 0);
-  const preferences = loadPreferences();
-  const unlockedLocations = (state.unlockedLocations ?? []).map((id) => ({ id, location: locations[id] })).filter((entry) => entry.location);
-  const locationNote = preferences.notes[`location:${state.locationId}`] ?? location.atmosphere;
-  const glossaryNote = preferences.notes.glossary ?? "A quality is anything the city remembers about you: a talent, a rumour, an item, or a consequence.";
+  
+  // Categorize inventory
+  const categorizedInventory = {};
+  for (const [id, amount] of inventory) {
+    const item = items[id] || { name: formatName(id), description: "", category: "curiosity" };
+    const category = item.category || "curiosity";
+    categorizedInventory[category] = categorizedInventory[category] || [];
+    categorizedInventory[category].push({ id, amount, item });
+  }
 
-  const qualitiesHtml = Object.entries(state.qualities).map(([key, value]) => {
-    const width = Math.min(100, Math.max(8, value * 10));
-    return [
-      '<div class="quality-row quality-', escapeClass(key), '">',
-      '<div class="quality-icon"><span>', icon[key] ?? "•", '</span></div>',
-      '<div class="quality-main">',
-      '<div class="quality-title"><strong>', formatName(key), '</strong><span>', value, '</span></div>',
-      '<div class="quality-track"><span style="width:', width, '%"></span></div>',
-      '</div></div>'
-    ].join("");
-  }).join("");
-
-  const storiesHtml = stories.map((story) => {
-    const available = new Set(availableChoices(state, story.id).map((choice) => choice.id));
-    const choicesHtml = story.choices.map((choice) => {
-      const resolvedChallenge = effectiveChallenge(story, choice);
-      const challengeQuality = resolvedChallenge?.quality ?? resolvedChallenge?.stat;
-      const challenge = resolvedChallenge
-        ? [
-            '<div class="challenge-line">',
-            '<span class="challenge-icon">', icon[challengeQuality] ?? "•", '</span>',
-            '<span><strong>', formatName(challengeQuality), ' challenge</strong>',
-            '<small>', escapeHtml(challengeSummary(state, resolvedChallenge)), '</small></span></div>'
-          ].join("")
-        : '<div class="challenge-line simple"><span class="challenge-icon">◆</span><span><strong>A straightforward choice</strong><small>No challenge roll</small></span></div>';
-
-      return [
-        '<div class="choice-row">',
-        '<div class="choice-copy"><strong>', escapeHtml(choice.label), '</strong>', challenge, '</div>',
-        '<button class="go-button" data-story="', story.id, '" data-choice="', choice.id, '" ',
-        available.has(choice.id) ? "" : "disabled",
-        '>GO</button></div>'
-      ].join("");
-    }).join("");
-
-    return [
-      '<article class="storylet">',
-      '<div class="story-art story-art-', escapeClass(story.id), '" aria-hidden="true">', storyArtSvg(story.id, state.locationId), '</div>',
-      '<div class="story-body">',
-      '<button class="bookmark', preferences.bookmarks.includes(story.id) ? ' is-bookmarked' : '', '" type="button" data-action="bookmark" data-story="', story.id, '" aria-label="', preferences.bookmarks.includes(story.id) ? 'Remove bookmark' : 'Bookmark story', '" aria-pressed="', preferences.bookmarks.includes(story.id), '">◆</button>',
-      '<h3>', escapeHtml(story.title), '</h3>',
-      '<p>', escapeHtml(story.text), '</p>',
-      '<div class="story-choices">', choicesHtml, '</div>',
-      '</div></article>'
-    ].join("");
-  }).join("");
-
-  const journalHtml = state.journal.map((entry) => '<li>' + escapeHtml(entry) + '</li>').join("");
-  const inventoryHtml = inventory.length
+  const equipmentHtml = equipmentSlots.map(slot => {
+    const equippedId = state.equipment?.[slot];
+    const equippedItem = equippedId ? items[equippedId] : null;
+    
+    return `<div class="equipment-slot">
+      <h4>${formatName(slot)}</h4>
+      ${equippedItem ? 
+        `<p><strong>${escapeHtml(equippedItem.name)}</strong></p>
+         <button data-action="unequip-item" data-slot="${slot}">Unequip</button>` : 
+        `<p>Empty</p>`}
+    </div>`;
+  }).join('');
+  
+const inventoryHtml = inventory.length
     ? inventory.map(([item, quantity]) => '<span>' + formatName(item) + (quantity > 1 ? ' ×' + quantity : '') + '</span>').join("")
     : "<small>Nothing of note.</small>";
   const inventoryCount = inventory.reduce((total, [, quantity]) => total + quantity, 0);
@@ -121,7 +91,9 @@ export function render(app, state, handlers, outcome = null) {
       '<article class="character-stat quality-stat">',
         '<div class="character-stat-glyph" aria-hidden="true">', escapeHtml(details.glyph), '</div>',
         '<div class="character-stat-copy">',
-          '<div class="character-stat-heading"><h3>', escapeHtml(formatName(id)), '</h3><strong>', value, '</strong></div>',
+          '<div class="character-stat-heading"><h3>', escapeHtml(formatName(id)), '</h3><strong>',
+  (effectiveStat(state, id) !== Number(value) ? `${effectiveStat(state, id)} (${value})` : value),
+'</strong></div>',
           '<div class="character-stat-track"><span style="width:', width, '%"></span></div>',
           '<p>', escapeHtml(details.description), '</p>',
         '</div>',
@@ -158,21 +130,28 @@ export function render(app, state, handlers, outcome = null) {
 
   const exploredCount = (state.unlockedLocations ?? []).length;
 
-  const possessionCardsHtml = inventory.length
-    ? inventory.map(([item, quantity]) => {
-        const details = ITEM_DETAILS[item] ?? { glyph: "◆", category: "Curiosity", description: "Something the city has placed in your keeping. Its significance is not yet clear." };
-        return [
-          '<article class="possession-card" data-item="', escapeClass(item), '">',
-            '<div class="possession-glyph" aria-hidden="true">', escapeHtml(details.glyph), '</div>',
-            '<div class="possession-copy">',
-              '<div class="possession-heading"><h3>', escapeHtml(formatName(item)), '</h3><strong class="possession-quantity">×', quantity, '</strong></div>',
-              '<p class="possession-category">', escapeHtml(details.category), '</p>',
-              '<p>', escapeHtml(details.description), '</p>',
-            '</div>',
-          '</article>'
-        ].join("");
-      }).join("")
-    : '<div class="empty-possessions"><strong>Your pockets are empty.</strong><p>The city will remedy that soon enough.</p></div>';
+  const possessionCardsHtml = inventory.length === 0 ? '<div class="empty-possessions"><strong>Your pockets are empty.</strong></div>' :
+    Object.keys(itemCategories).map(catKey => {
+      const itemsInCategory = categorizedInventory[catKey];
+      if (!itemsInCategory || itemsInCategory.length === 0) return '';
+      return `<div class="inventory-category">
+        <h3>${itemCategories[catKey]}</h3>
+        <div class="possessions-grid">
+          ${itemsInCategory.map(({id, amount, item}) => {
+            const isEquippable = !!item.slot;
+            const isEquipped = state.equipment?.[item.slot] === id;
+            return `<article class="possession-card" data-item="${escapeClass(id)}">
+              <div class="possession-copy">
+                <div class="possession-heading"><h3>${escapeHtml(item.name)} ${isEquipped ? '(Equipped)' : ''}</h3><strong class="possession-quantity">×${amount}</strong></div>
+                <p>${escapeHtml(item.description)}</p>
+                ${item.stats ? '<p><strong>' + Object.entries(item.stats).map(([s,v]) => formatName(s) + ' +' + v).join(', ') + '</strong></p>' : ''}
+                ${isEquippable && !isEquipped ? `<button data-action="equip-item" data-slot="${item.slot}" data-item="${id}">Equip</button>` : ''}
+              </div>
+            </article>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }).join('');
 
   let outcomeHtml = "";
   if (outcome) {
@@ -298,7 +277,7 @@ export function render(app, state, handlers, outcome = null) {
                         '<p class="feature-note"><strong>', escapeHtml(locationNote), '</strong></p>',
                       '</div>',
                     '</section>',
-                    '<section class="story-stack">', storiesHtml, '</section>',
+                    deckHtml, '<section class="story-stack">', storiesHtml, '</section>',
                   '</div>',
                 '</section>'
               ].join(""),
@@ -321,7 +300,32 @@ export function render(app, state, handlers, outcome = null) {
                 '<span><strong>₠', state.echoes, '</strong> Echoes</span>',
               '</div>',
             '</div>',
-            '<div class="possessions-grid">', possessionCardsHtml, '</div>',
+            '<div class="refuges-section">',
+  '<h3>Your Refuge</h3>',
+  (function() {
+    const activeId = state.refuge ?? "camp-on-the-docks";
+    const activeRefuge = refuges[activeId];
+    
+    // Find all owned refuges based on inventory items with 'refuge-' prefix, plus the default camp
+    const owned = ["camp-on-the-docks", ...Object.keys(state.items ?? {}).filter(id => id.startsWith("refuge-") && state.items[id] > 0)];
+    
+    return owned.map(id => {
+      const ref = refuges[id] || { name: formatName(id), description: "A place to rest.", handSize: 3 };
+      const isActive = id === activeId;
+      return `<div class="refuge-card ${isActive ? 'is-active' : ''}">
+        <h4>${escapeHtml(ref.name)} ${isActive ? '(Active)' : ''}</h4>
+        <p>${escapeHtml(ref.description)}</p>
+        <p><strong>Whispers Deck size: ${ref.handSize}</strong></p>
+        ${!isActive ? `<button data-action="set-refuge" data-refuge="${id}">Move Here</button>` : ''}
+      </div>`;
+    }).join('');
+  })(),
+'</div>',
+'<div class="equipment-section">',
+  '<h3>Equipped</h3>',
+  '<div class="equipment-grid">', equipmentHtml, '</div>',
+'</div>',
+possessionCardsHtml,
           '</section>',
           '<section class="myself-page parchment" id="myself" data-view-panel="myself" hidden>',
             '<header class="myself-hero">',
@@ -420,9 +424,40 @@ export function render(app, state, handlers, outcome = null) {
 
   app.querySelectorAll("[data-choice]").forEach((button) => {
     button.dataset.originallyDisabled = String(button.disabled);
-    button.addEventListener("click", () => handlers.choose(button.dataset.story, button.dataset.choice));
+    button.addEventListener("click", () => {
+      const useLesson = app.querySelector(`input[data-lesson-for="${button.dataset.choice}"]`)?.checked ?? false;
+      handlers.choose(button.dataset.story, button.dataset.choice, { useLesson });
+    });
   });
   app.querySelector("[data-action=onwards]")?.addEventListener("click", handlers.onwards);
+  app.querySelectorAll("[data-action=draw-card]").forEach((button) => {
+    button.dataset.originallyDisabled = String(button.disabled);
+    button.addEventListener("click", () => handlers.drawCard(button.dataset.deck));
+  });
+  app.querySelectorAll("[data-action=equip-item]").forEach((button) => {
+    button.dataset.originallyDisabled = String(button.disabled);
+    button.addEventListener("click", () => handlers.equipItem(button.dataset.slot, button.dataset.item));
+  });
+  app.querySelectorAll("[data-action=unequip-item]").forEach((button) => {
+    button.dataset.originallyDisabled = String(button.disabled);
+    button.addEventListener("click", () => handlers.equipItem(button.dataset.slot, null));
+  });
+  app.querySelectorAll("[data-action=equip-item]").forEach((button) => {
+    button.dataset.originallyDisabled = String(button.disabled);
+    button.addEventListener("click", () => handlers.equipItem(button.dataset.slot, button.dataset.item));
+  });
+  app.querySelectorAll("[data-action=unequip-item]").forEach((button) => {
+    button.dataset.originallyDisabled = String(button.disabled);
+    button.addEventListener("click", () => handlers.equipItem(button.dataset.slot, null));
+  });
+  app.querySelectorAll("[data-action=set-refuge]").forEach((button) => {
+    button.dataset.originallyDisabled = String(button.disabled);
+    button.addEventListener("click", () => handlers.setRefuge(button.dataset.refuge));
+  });
+  app.querySelectorAll("[data-action=discard]").forEach((button) => {
+    button.dataset.originallyDisabled = String(button.disabled);
+    button.addEventListener("click", () => handlers.discardCard(button.dataset.card));
+  });
   app.querySelectorAll("[data-action=bookmark]").forEach((button) => button.addEventListener("click", () => handlers.bookmark(button.dataset.story)));
   app.querySelectorAll("[data-action=outfit]").forEach((select) => select.addEventListener("change", (event) => handlers.outfit(event.target.value)));
   app.querySelector("[data-action=travel]")?.addEventListener("click", () => handlers.travel(app.querySelector("#travel-location")?.value));

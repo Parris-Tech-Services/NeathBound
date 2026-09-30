@@ -113,6 +113,33 @@ async function draw(state) {
       }
     },
 
+    async equipItem(slot, itemId) {
+      if (pending) return;
+      pending = true;
+      setPending(true);
+      try {
+        const nextState = await service.equipItem(slot, itemId, {
+          expectedRevision: Number(currentState?.revision ?? 0)
+        });
+
+        if (nextState.error) {
+          lastOutcome = null;
+          await draw(nextState.state ?? await service.getState());
+          showNotice(`${nextState.error} The page has been refreshed to your current position.`);
+          return;
+        }
+
+        lastOutcome = null;
+        await draw(nextState.state ?? nextState);
+      } catch (error) {
+        await draw(currentState).catch(() => {});
+        showError(error);
+      } finally {
+        pending = false;
+        setPending(false);
+      }
+    },
+
     async setRefuge(refugeId) {
       if (pending) return;
       pending = true;
@@ -231,7 +258,7 @@ function finishBoot() {
 
 function setPending(isPending) {
   app.setAttribute("aria-busy", String(isPending));
-  app.querySelectorAll("[data-choice], [data-action=travel], [data-action=reset], [data-action=draw-card], [data-action=discard], [data-action=set-refuge]").forEach((button) => {
+  app.querySelectorAll("[data-choice], [data-action=travel], [data-action=reset], [data-action=draw-card], [data-action=discard], [data-action=set-refuge], [data-action=equip-item], [data-action=unequip-item]").forEach((button) => {
     if (!button.dataset.originallyDisabled) button.dataset.originallyDisabled = String(button.disabled);
     button.disabled = isPending || button.dataset.originallyDisabled === "true";
   });

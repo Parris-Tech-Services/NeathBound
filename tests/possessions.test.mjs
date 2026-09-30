@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { locations, stories } from "../src/game/content.js";
+import { locations, stories, items } from "../src/game/content.js";
 import { availableStories, choiceAvailable, resolveChoice, storyAvailable } from "../src/game/engine.js";
 import { initialState as baseInitialState } from "../src/game/state.js";
 function initialState() {
@@ -44,7 +44,7 @@ test("every possession the game hands out is used by some storylet", () => {
       requirementItems(choice.requirements).forEach((id) => used.add(id));
     }
   }
-  const unused = [...awarded].filter((id) => !used.has(id));
+  const unused = [...awarded].filter((id) => !used.has(id) && !items[id]?.slot);
   assert.deepEqual(unused, [], `items with no storylet that uses them: ${unused.join(", ")}`);
 });
 

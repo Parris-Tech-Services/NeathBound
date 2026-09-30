@@ -10,7 +10,7 @@
 //   GET  /api/journal                                       journal
 //   POST /api/reset                                         new life
 //   POST /api/storylets/:storyId/branches/:choiceId/choose  resolve a choice
-import { availableChoices, availableStories, currentLocation, effectiveChallenge, resolveChoice, travelBlockedReason , drawCard, discard, setRefuge } from "./game/engine.js";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge, resolveChoice, travelBlockedReason , drawCard, discard, setRefuge, equipItem } from "./game/engine.js";
 import { locations } from "./game/content.js";
 import { initialState, normaliseState } from "./game/state.js";
 
@@ -52,11 +52,20 @@ export async function handle({ method, path, userId, body = {} }, { repo, random
   const draw = route.match(/^\/api\/deck\/([^/]+)\/draw$/);
   const discardMatch = route.match(/^\/api\/deck\/([^/]+)\/discard$/);
   const refugeMatch = route.match(/^\/api\/refuge\/([^/]+)$/);
+  const equipMatch = route.match(/^\/api\/equipment\/([^/]+)$/);
   const travel = route.match(/^\/api\/travel\/([^/]+)$/);
   if (method === "POST" && draw) {
     const deckId = draw[1];
     const outcome = drawCard(await loadOrCreate(), deckId, random);
     if (outcome.error) return conflict({ error: outcome.error, state: outcome.state });
+    await repo.savePlayer(userId, outcome.state);
+    return ok(outcome);
+  }
+
+  if (method === "POST" && equipMatch) {
+    const slot = equipMatch[1];
+    const itemId = body?.itemId ?? null;
+    const outcome = equipItem(await loadOrCreate(), slot, itemId);
     await repo.savePlayer(userId, outcome.state);
     return ok(outcome);
   }

@@ -3,7 +3,8 @@ import { drawCardToHand, discardCard as removeCardFromHand } from "./decks.js?v=
 import { cloneState, initialState } from "./state.js?v=20260930-21";
 import { applyEffects, awardProgress, describeChallenge, requirementsMet, resolveChallenge } from "./rules.js?v=20260930-21";
 
-export { describeChallenge };
+import { effectiveStat } from "./rules.js?v=20260930-21";
+export { describeChallenge, effectiveStat };
 
 export const MENACE_WARNING_LEVEL = 5;
 export const MENACE_CONSEQUENCE_LEVEL = 8;
@@ -235,6 +236,21 @@ export function drawCard(state, deckId = "whispers", random = Math.random) {
   next.flags = next.flags || {};
   next.flags.__revision = (next.flags.__revision ?? 0) + 1;
   return { state: next, drawn: card ? card.id : null };
+}
+
+export function equipItem(state, slot, itemId) {
+  const next = cloneState(state);
+  next.equipment = next.equipment ?? {};
+  
+  if (itemId === null) {
+    delete next.equipment[slot];
+  } else {
+    next.equipment[slot] = itemId;
+  }
+  
+  next.flags = next.flags || {};
+  next.flags.__revision = (next.flags.__revision ?? 0) + 1;
+  return { state: next };
 }
 
 export function setRefuge(state, refugeId) {

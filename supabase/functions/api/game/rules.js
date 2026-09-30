@@ -1,3 +1,5 @@
+import { items, equipmentSlots } from "./content.js";
+
 const operators = {
   "==": (actual, expected) => actual === expected,
   "!=": (actual, expected) => actual !== expected,
@@ -116,7 +118,7 @@ const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
 //   luck:   a fixed chance (challenge.chance), unaffected by qualities.
 export function challengeChance(state, challenge) {
   if (!challenge) return 1;
-  const level = Number(state.qualities?.[challenge.quality] ?? 0);
+  const level = effectiveStat(state, challenge.quality);
   const difficulty = Math.max(1, Number(challenge.difficulty ?? 1));
   switch (challenge.mode ?? "classic") {
     case "broad":
@@ -135,6 +137,17 @@ export function challengeBand(chance) {
   return { percent, ...CHALLENGE_BANDS.find((band) => percent >= band.min) };
 }
 
+export function effectiveStat(state, stat) {
+  let value = Number(state.qualities?.[stat] ?? 0);
+  for (const slot of equipmentSlots) {
+    const itemId = state.equipment?.[slot];
+    if (itemId && items[itemId]?.stats?.[stat]) {
+      value += items[itemId].stats[stat];
+    }
+  }
+  return value;
+}
+
 export function describeChallenge(state, challenge) {
   if (!challenge) return null;
   const chance = challengeChance(state, challenge);
@@ -146,7 +159,7 @@ export function resolveChallenge(state, challenge, random = Math.random) {
   if (!challenge) return { success: true, roll: null, total: null, quality: null, chance: 1 };
   const chance = challengeChance(state, challenge);
   const band = challengeBand(chance);
-  const quality = Number(state.qualities?.[challenge.quality] ?? 0);
+  const quality = effectiveStat(state, challenge.quality);
   if ((challenge.mode ?? "classic") === "classic") {
     const die = Math.floor(random() * 10) + 1;
     const total = die + quality;

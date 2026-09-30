@@ -47,6 +47,10 @@ export class FallbackGameService {
     return this.active.drawCard(deckId, options);
   }
 
+  equipItem(slot, itemId, options) {
+    return this.active.equipItem(slot, itemId, options);
+  }
+
   setRefuge(refugeId, options) {
     return this.active.setRefuge(refugeId, options);
   }

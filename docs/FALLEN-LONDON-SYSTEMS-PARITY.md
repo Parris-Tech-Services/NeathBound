@@ -212,7 +212,7 @@ NeathBound:
 - 3 free loadouts using current outfit concept
 - search/filter/category side menu
 
-Status: PARTIAL
+Status: DONE (equipment slots, categories, effective stat bonuses, equip/unequip functionality).
 
 ## 8. Market / Bazaar equivalent
 
