@@ -1,5 +1,5 @@
 import { config } from "../config.js?v=20260930-7";
-import { LocalGameService } from "./local-game-service.js?v=20260930-5";
+import { LocalGameService } from "./local-game-service.js?v=20260930-7";
 import { SupabaseGameService } from "./supabase-game-service.js?v=20260930-7";
 
 // Online (Supabase) by default; ?api=local forces offline play.
