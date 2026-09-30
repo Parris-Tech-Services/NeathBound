@@ -269,6 +269,11 @@ function syncEquipment(state) {
   state.flags["__equipment"] = { ...(state.equipment ?? {}) };
 }
 
+function syncOpportunityState(state) {
+  state.flags["__hand"] = [...(state.hand ?? [])];
+  state.flags["__discard"] = [...(state.discard ?? [])];
+}
+
 function advanceRevision(state) {
   state.revision = Number(state.revision ?? 0) + 1;
   state.flags["__revision"] = state.revision;
