@@ -4,7 +4,7 @@ import { loadPreferences } from "./preferences.js?v=20260930-1";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
 
-export function render(app, state, handlers) {
+export function render(app, state, handlers, outcome = null) {
   const location = currentLocation(state);
   const stories = availableStories(state);
   const inventory = Object.entries(state.items ?? {}).filter(([, quantity]) => quantity > 0);
@@ -63,6 +63,33 @@ export function render(app, state, handlers) {
   const inventoryHtml = inventory.length
     ? inventory.map(([item, quantity]) => '<span>' + formatName(item) + (quantity > 1 ? ' ×' + quantity : '') + '</span>').join("")
     : "<small>Nothing of note.</small>";
+
+  let outcomeHtml = "";
+  if (outcome) {
+    const successText = outcome.challenge ? 
+      (outcome.success ? '<p style="color: var(--teal-deep); font-weight: bold; margin-bottom: 0.5rem;">You succeeded in a ' + formatName(outcome.challenge.quality) + ' challenge!</p>' 
+                       : '<p style="color: var(--purple); font-weight: bold; margin-bottom: 0.5rem;">You failed a ' + formatName(outcome.challenge.quality) + ' challenge...</p>')
+      : "";
+
+    const changesList = (outcome.changes || []).map(change => {
+      if (typeof change === "string") return '<li>' + escapeHtml(change) + '</li>';
+      if (change.message) return '<li>' + escapeHtml(change.message) + '</li>';
+      const name = formatName(change.id || change.quality || change.item);
+      const amount = change.amount || change.delta || 1;
+      if (amount > 0) return '<li>' + name + ' is increasing... You&apos;ve gained ' + amount + ' &times; ' + name + '</li>';
+      if (amount < 0) return '<li>' + name + ' is dropping... You&apos;ve lost ' + Math.abs(amount) + ' &times; ' + name + '</li>';
+      return '<li>' + name + ' has updated.</li>';
+    }).join("");
+
+    outcomeHtml = [
+      '<section class="parchment" style="margin-bottom: 2rem; padding: 1.5rem; border: 2px solid var(--paper-edge);">',
+      '<h3 style="margin-top: 0;">Outcome</h3>',
+      successText,
+      '<p>', escapeHtml(outcome.result || ""), '</p>',
+      changesList ? '<ul style="margin-top: 1rem; padding-left: 1.5rem; margin-bottom: 0;">' + changesList + '</ul>' : '',
+      '</section>'
+    ].join("");
+  }
 
   app.innerHTML = [
         '<div class="game-shell outfit-', escapeClass(preferences.outfit), '">',
@@ -129,6 +156,7 @@ export function render(app, state, handlers) {
         '</aside>',
 
         '<main class="story-column" id="stories">',
+          outcomeHtml,
           '<section class="story-board">',
             '<div class="board-inner">',
               '<section class="featured-story">',
