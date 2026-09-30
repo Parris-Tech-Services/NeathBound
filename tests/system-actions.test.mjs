@@ -74,7 +74,8 @@ test("state v4 round-trips new systems through shadow flags for online persisten
   state.items["smoked-lenses"] = 1;
   state = resolveGameAction(state, "equip", { itemId: "smoked-lenses" }).state;
   state = resolveGameAction(state, "draw-card", {}, () => 0).state;
-  state.momentum = 3;
+  state.items["bright-memory"] = 1;
+  state = resolveGameAction(state, "use", { itemId: "bright-memory" }).state;
 
   // Simulate the subset reconstructed by the Supabase repository: direct
   // system fields omitted, player_flags retained.
@@ -88,7 +89,7 @@ test("state v4 round-trips new systems through shadow flags for online persisten
   });
   assert.equal(restored.equipped.tool, "smoked-lenses");
   assert.equal(restored.hand.length, 1);
-  assert.equal(restored.momentum, 3);
+  assert.equal(restored.momentum, 2);
   assert.equal(restored.revision, state.revision);
 });
 
