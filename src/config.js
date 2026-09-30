@@ -2,6 +2,6 @@
 // browsers: Row Level Security and the API's own auth check protect the data.
 // Set `supabaseUrl` to "" to force offline (local-save) play.
 export const config = {
-  supabaseUrl: "https://gzngmgibebriovhjerpv.supabase.co",
-  publishableKey: "sb_publishable_aJ_MrbmExAysirfzBeqNuQ_sLZiPsPW"
+  supabaseUrl: "https://ynrfskgfrgqxwjswtnka.supabase.co",
+  publishableKey: "sb_publishable_Kf-_b_1FPPlPUGRTpOXyhQ_GO4Gdaqm"
 };

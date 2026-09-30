@@ -16,7 +16,7 @@ on:
 permissions:
   contents: read
 env:
-  PROJECT_REF: gzngmgibebriovhjerpv
+  PROJECT_REF: ynrfskgfrgqxwjswtnka
 jobs:
   sync:
     runs-on: ubuntu-latest
