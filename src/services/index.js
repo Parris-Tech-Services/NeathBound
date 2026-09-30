@@ -2,17 +2,12 @@ import { config } from "../config.js?v=20260930-9";
 import { LocalGameService } from "./local-game-service.js?v=20260930-9";
 import { SupabaseGameService } from "./supabase-game-service.js?v=20260930-9";
 
-// Online (Supabase) by default; ?api=local forces offline play.
 export function createGameService({ settings = config, search = globalThis.location?.search ?? "", storage = globalThis.localStorage } = {}) {
   const forceLocal = new URLSearchParams(search).get("api") === "local" || !settings.supabaseUrl;
   if (forceLocal) return new LocalGameService(storage);
   return new FallbackGameService(new SupabaseGameService(settings, storage), () => new LocalGameService(storage));
 }
 
-// Tries the online service on first contact; if the backend is unreachable
-// (or paused), the whole session switches to offline play with a local save.
-// Once online, later errors are shown to the player rather than silently
-// switching saves mid-story.
 export class FallbackGameService {
   constructor(online, makeOffline) {
     this.active = online;
@@ -35,12 +30,28 @@ export class FallbackGameService {
     return this.active.getState();
   }
 
-  choose(storyId, choiceId) {
-    return this.active.choose(storyId, choiceId);
+  choose(storyId, choiceId, expectedRevision) {
+    return this.active.choose(storyId, choiceId, expectedRevision);
   }
 
-  travel(locationId) {
-    return this.active.travel(locationId);
+  travel(locationId, expectedRevision) {
+    return this.active.travel(locationId, expectedRevision);
+  }
+
+  buy(itemId, expectedRevision) {
+    return this.active.buy(itemId, expectedRevision);
+  }
+
+  sell(itemId, expectedRevision) {
+    return this.active.sell(itemId, expectedRevision);
+  }
+
+  equip(itemId, expectedRevision) {
+    return this.active.equip(itemId, expectedRevision);
+  }
+
+  recover(menaceId, expectedRevision) {
+    return this.active.recover(menaceId, expectedRevision);
   }
 
   reset() {
