@@ -31,6 +31,7 @@ export function storyAvailable(state, storyId, context = {}) {
   if (!story) return false;
   if (!currentLocation(state).stories.includes(storyId)) return false;
   if (story.once && state.flags[`story-complete:${storyId}`]) return false;
+  if (story.tags?.includes("opportunity") && !state.hand?.includes(storyId)) return false;
   return requirementsMet(state, requirementsFor(story), context);
 }
 
@@ -78,6 +79,11 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
   applyEffects(next, success ? (choice.successEffects ?? []) : (choice.failureEffects ?? []));
   next.flags[`${storyId}:${choiceId}`] = true;
   if (story.once) next.flags[`story-complete:${storyId}`] = true;
+  if (story.tags?.includes("opportunity")) {
+    next.hand = (next.hand ?? []).filter((id) => id !== storyId);
+    if (!next.discard.includes(storyId)) next.discard.push(storyId);
+    syncOpportunityState(next);
+  }
   advanceRevision(next);
 
   const changes = describeChanges(before, next);
@@ -161,6 +167,42 @@ export function equipItem(state, itemId) {
     equipped ? `Equipped ${item.name}` : `Unequipped ${item.name}`,
     equipped ? `${item.name} is now equipped.` : `${item.name} has been removed.`
   );
+}
+
+export function drawOpportunity(state, random = Math.random, context = {}) {
+  const next = cloneState(state);
+  if ((next.hand ?? []).length >= 3) return { state: next, error: "Your opportunity hand is full." };
+
+  const candidates = currentLocation(next).stories
+    .filter((id) => stories[id]?.tags?.includes("opportunity"))
+    .filter((id) => !next.hand.includes(id))
+    .filter((id) => requirementsMet(next, requirementsFor(stories[id]), context));
+
+  let pool = candidates.filter((id) => !next.discard.includes(id));
+  if (!pool.length) {
+    next.discard = next.discard.filter((id) => !candidates.includes(id));
+    pool = candidates;
+  }
+  if (!pool.length) return { state: next, error: "There are no eligible opportunities here right now." };
+
+  const before = cloneState(next);
+  const picked = pool[Math.floor(random() * pool.length)];
+  next.hand.push(picked);
+  next.lastDraw = picked;
+  syncOpportunityState(next);
+  advanceRevision(next);
+  return transaction(before, next, "Opportunity drawn", `${stories[picked].title} has entered your hand.`);
+}
+
+export function discardOpportunity(state, storyId) {
+  const next = cloneState(state);
+  if (!next.hand.includes(storyId)) return { state: next, error: "That opportunity is not in your hand." };
+  const before = cloneState(next);
+  next.hand = next.hand.filter((id) => id !== storyId);
+  if (!next.discard.includes(storyId)) next.discard.push(storyId);
+  syncOpportunityState(next);
+  advanceRevision(next);
+  return transaction(before, next, "Opportunity discarded", `${stories[storyId]?.title ?? "The card"} has been discarded.`);
 }
 
 export function recoverMenace(state, menaceId) {
