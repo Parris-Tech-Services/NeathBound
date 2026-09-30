@@ -1,6 +1,6 @@
-import { availableChoices, availableStories, currentLocation } from "../game/engine.js";
+import { availableChoices, availableStories, currentLocation } from "../game/engine.js?v=20260930-6";
 
-const icon = { nerve: "◉", insight: "◆", poise: "✦" };
+const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
 
 export function render(app, state, handlers) {
   const location = currentLocation(state);
@@ -10,8 +10,8 @@ export function render(app, state, handlers) {
   const qualitiesHtml = Object.entries(state.qualities).map(([key, value]) => {
     const width = Math.min(100, Math.max(8, value * 10));
     return [
-      '<div class="quality-row">',
-      '<div class="quality-icon">', icon[key] ?? "•", '</div>',
+      '<div class="quality-row quality-', escapeClass(key), '">',
+      '<div class="quality-icon"><span>', icon[key] ?? "•", '</span></div>',
       '<div class="quality-main">',
       '<div class="quality-title"><strong>', formatName(key), '</strong><span>', value, '</span></div>',
       '<div class="quality-track"><span style="width:', width, '%"></span></div>',
@@ -19,7 +19,7 @@ export function render(app, state, handlers) {
     ].join("");
   }).join("");
 
-  const storiesHtml = stories.map((story) => {
+  const storiesHtml = stories.map((story, storyIndex) => {
     const available = new Set(availableChoices(state, story.id).map((choice) => choice.id));
     const choicesHtml = story.choices.map((choice) => {
       const challengeQuality = choice.challenge?.quality ?? choice.challenge?.stat;
@@ -27,14 +27,14 @@ export function render(app, state, handlers) {
         ? [
             '<div class="challenge-line">',
             '<span class="challenge-icon">', icon[challengeQuality] ?? "•", '</span>',
-            '<span><strong>', formatName(challengeQuality), ' challenge</strong><br>',
+            '<span><strong>', formatName(challengeQuality), ' challenge</strong>',
             '<small>Difficulty ', choice.challenge.difficulty, '</small></span></div>'
           ].join("")
-        : '<div class="challenge-line simple"><span class="challenge-icon">◆</span><span><strong>A straightforward choice</strong><br><small>No challenge roll</small></span></div>';
+        : '<div class="challenge-line simple"><span class="challenge-icon">◆</span><span><strong>A straightforward choice</strong><small>No challenge roll</small></span></div>';
 
       return [
         '<div class="choice-row">',
-        '<div class="choice-copy"><strong>', choice.label, '</strong>', challenge, '</div>',
+        '<div class="choice-copy"><strong>', escapeHtml(choice.label), '</strong>', challenge, '</div>',
         '<button class="go-button" data-story="', story.id, '" data-choice="', choice.id, '" ',
         available.has(choice.id) ? "" : "disabled",
         '>GO</button></div>'
@@ -42,12 +42,12 @@ export function render(app, state, handlers) {
     }).join("");
 
     return [
-      '<article class="storylet parchment">',
-      '<div class="story-art" aria-hidden="true"></div>',
+      '<article class="storylet">',
+      '<div class="story-art art-', (storyIndex % 5) + 1, '" aria-hidden="true"><span></span></div>',
       '<div class="story-body">',
       '<button class="bookmark" type="button" aria-label="Bookmark story">◆</button>',
-      '<h3>', story.title, '</h3>',
-      '<p>', story.text, '</p>',
+      '<h3>', escapeHtml(story.title), '</h3>',
+      '<p>', escapeHtml(story.text), '</p>',
       '<div class="story-choices">', choicesHtml, '</div>',
       '</div></article>'
     ].join("");
@@ -70,15 +70,15 @@ export function render(app, state, handlers) {
         '</nav>',
       '</header>',
 
-      '<section class="city-banner" aria-label="NeathBound city skyline">',
-        '<div class="cavern-ceiling"></div>',
-        '<div class="skyline-far"></div>',
-        '<div class="skyline-near"></div>',
-        '<div class="distant-towers"></div>',
-        '<div class="mist-layer"></div>',
-        '<div class="waterline"></div>',
-        '<div class="city-arch"></div>',
-        '<div class="scene-focus" aria-hidden="true">✦</div>',
+      '<section class="city-banner" aria-label="NeathBound cavern panorama">',
+        '<div class="cave-ceiling"></div>',
+        '<div class="mist mist-back"></div>',
+        '<div class="distant-ridges"></div>',
+        '<div class="distant-city"></div>',
+        '<div class="mist mist-front"></div>',
+        '<div class="water"></div>',
+        '<div class="central-spire"></div>',
+        '<div class="near-rocks"></div>',
         '<div class="city-lamp left"></div>',
         '<div class="city-lamp right"></div>',
       '</section>',
@@ -96,17 +96,17 @@ export function render(app, state, handlers) {
       '<div class="game-grid">',
         '<aside class="left-rail" id="character" aria-label="Character details">',
           '<section class="candle-block">',
-            '<div class="candle"></div>',
-            '<div><strong>Actions</strong><div>∞</div><small>Unlimited</small></div>',
+            '<div class="candle"><span class="wick"></span><span class="wax-line w1"></span><span class="wax-line w2"></span><span class="wax-line w3"></span><span class="wax-line w4"></span></div>',
+            '<div class="action-copy"><strong>Actions</strong><div>∞</div><small>Unlimited</small></div>',
           '</section>',
 
           '<section class="side-section">',
-            '<div class="side-icon">◇</div>',
+            '<div class="side-icon fate-icon">◇</div>',
             '<div><strong>Fate</strong><div>0</div><small>No waiting or payment gates.</small></div>',
           '</section>',
 
-          '<section class="side-section">',
-            '<div class="side-icon">₠</div>',
+          '<section class="side-section echoes-section">',
+            '<div class="side-icon echo-icon">₠</div>',
             '<div><strong>Echoes</strong><div>', state.echoes, '</div></div>',
           '</section>',
 
@@ -119,36 +119,38 @@ export function render(app, state, handlers) {
         '</aside>',
 
         '<main class="story-column" id="stories">',
-          '<div class="parchment-board">',
-          '<section class="featured-story parchment">',
-            '<div class="feature-art" aria-hidden="true"><span>⌕</span></div>',
-            '<div>',
-              '<h2>', location.name, '</h2>',
-              '<p>', location.subtitle, '</p>',
-              '<p class="feature-note"><strong>', location.atmosphere, '</strong></p>',
+          '<section class="story-board">',
+            '<div class="board-inner">',
+              '<section class="featured-story">',
+                '<div class="feature-art" aria-hidden="true"><span>⌕</span></div>',
+                '<div class="feature-copy">',
+                  '<button class="edit-dot" type="button" aria-label="Edit location note">✎</button>',
+                  '<h2>', escapeHtml(location.name), '</h2>',
+                  '<p>', escapeHtml(location.subtitle), '</p>',
+                  '<p class="feature-note"><strong>', escapeHtml(location.atmosphere), '</strong></p>',
+                '</div>',
+              '</section>',
+              '<section class="story-stack">', storiesHtml, '</section>',
             '</div>',
           '</section>',
-
-          '<section class="story-stack">', storiesHtml, '</section>',
 
           '<section class="journal parchment" id="journal">',
             '<h3>What the city remembers</h3>',
             '<ol>', journalHtml, '</ol>',
           '</section>',
-          '</div>',
         '</main>',
 
         '<aside class="right-rail">',
           '<section class="welcome-panel">',
             '<p>It&apos;s <strong class="user-name">', escapeHtml(state.name), '</strong>!</p>',
             '<h2>Welcome to</h2>',
-            '<h3>', location.name, '.</h3>',
+            '<h3>', escapeHtml(location.name), '.</h3>',
             '<p class="welcome-tail">delicious stranger!</p>',
             '<button class="travel-button" disabled>TRAVEL</button>',
           '</section>',
 
           '<section class="promo-card">',
-            '<div class="promo-symbol" aria-hidden="true">✦</div>',
+            '<div class="promo-scene" aria-hidden="true"><span>✦</span></div>',
             '<div class="promo-title">NEATHBOUND</div>',
             '<div class="promo-sub">DESCEND DEEPER</div>',
           '</section>',
@@ -165,7 +167,11 @@ export function render(app, state, handlers) {
           '</section>',
         '</aside>',
       '</div>',
-      '<footer class="site-footer"><span>NeathBound is original open-source fiction.</span><span>Play at your own pace · No waiting</span><nav aria-label="Footer"><a href="#stories">Help</a><a href="#journal">Journal</a><a href="#stories">Terms</a></nav></footer>',
+
+      '<footer class="game-footer">',
+        '<span>© NeathBound · Original open-source fiction</span>',
+        '<nav><a href="#stories">Story</a><span>|</span><a href="#journal">Journal</a><span>|</span><a href="#possessions">Possessions</a></nav>',
+      '</footer>',
     '</div>'
   ].join("");
 
@@ -174,9 +180,14 @@ export function render(app, state, handlers) {
 }
 
 function formatName(value) {
-  return String(value ?? "unknown").split("-").map((part) => part[0].toUpperCase() + part.slice(1)).join(" ");
+  if (value === undefined || value === null || value === "") return "Unknown";
+  return String(value).split("-").map((part) => part ? part[0].toUpperCase() + part.slice(1) : "").filter(Boolean).join(" ");
 }
 
 function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[char]);
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[char]);
+}
+
+function escapeClass(value) {
+  return String(value ?? "unknown").replace(/[^a-z0-9_-]/gi, "-").toLowerCase();
 }

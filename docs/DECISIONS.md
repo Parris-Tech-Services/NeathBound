@@ -40,3 +40,25 @@ authoring platform.
 
 Neathbound uses its own setting, names, prose, and visual identity. It is not a
 port, fan recreation, or asset replacement for another commercial game.
+
+## Online backend: Supabase (2026-09-30)
+
+Supersedes the Cloudflare Workers + D1 target above. Two agents built
+backends in parallel; the owner chose to combine them: this repository's game
+(engine, content, decks, menaces, interface) on the Supabase backend, which was
+already deployed and verified.
+
+- Static client on GitHub Pages; JSON API in the Supabase Edge Function `api`,
+  serving the same routes the Worker defined; relational player state in
+  Supabase Postgres; anonymous Supabase Auth accounts.
+- Server-authoritative: row level security lets players read only their own
+  rows, and all writes go through the API via `save_player` (service role only).
+- The Postgres schema persists the whole state, including menaces, unlocked
+  locations, acquaintances and the last card drawn (the D1 repository did not).
+- Offline play is kept: if the API is unreachable, the same engine runs in the
+  browser with a local save. `?api=local` forces it.
+- The Cloudflare worker, `wrangler.jsonc` and D1 migrations were removed so the
+  game has one backend and one source of truth.
+- Free-tier care: a scheduled workflow pings the project twice a week so it
+  does not pause after 7 idle days.
+

@@ -15,30 +15,29 @@ npm run dev
 Then open <http://localhost:4173>.
 
 Actions are deliberately unlimited. There are no energy timers, payment gates,
-accounts, or network services. Progress is saved locally in the browser.
+or payments. Progress is saved to an anonymous online account, or locally in
+the browser when the backend is unreachable (or with `?api=local`).
 
-## Backend direction
+## Backend
 
-NeathBound is moving toward a free-to-host, server-authoritative
-quality-based-narrative architecture: static browser client, JSON API,
-relational persistence, predicate-driven storylets, and server-side choice
-resolution.
+NeathBound follows Fallen London's architecture on free services
+(see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)):
 
-The implementation plan and free hosting target are documented in
-[`docs/FREE_QBN_BACKEND.md`](docs/FREE_QBN_BACKEND.md). The existing static
-game remains the working baseline while the migration is staged.
+| Fallen London | NeathBound |
+|---|---|
+| React SPA on S3 + CloudFront | Static site on GitHub Pages |
+| `api.fallenlondon.com` (C#/ASP.NET JSON API) | Supabase Edge Function `api` |
+| SQL Server via NHibernate | Supabase Postgres (relational player tables) |
+| Accounts | Supabase Auth, anonymous sign-in |
+| StoryNexus QBN engine | `src/game/` rules engine, run on the server |
 
-The optional local API runs separately:
+The server is authoritative: players can read only their own rows and every
+change goes through the API. The same engine also runs in the browser for
+offline play. Editing `src/game/` and merging to `main` redeploys the API
+(`.github/workflows/backend.yml`).
 
-```bash
-npm run api
-npm run api:test
-```
-
-It listens on `http://localhost:8787`, stores local state in
-`data/neathbound.sqlite`, and exposes JSON REST endpoints for players,
-storylets, branch resolution, and travel. The API is deliberately dependency-
-free on Node 22+ by using the built-in SQLite module.
+`server/` is an optional local Node + SQLite API from the earlier migration
+plan. The game does not use it; the Supabase function is the online backend.
 
 ## Five parallel agent lanes
 
@@ -46,6 +45,12 @@ The repository is split into five modular lanes described in
 [`docs/AGENT_LANES.md`](docs/AGENT_LANES.md): engine, narrative, interface,
 save/accessibility, and QA/tooling. Each lane has a narrow ownership boundary
 so up to five agents can work concurrently on separate branches or worktrees.
+
+## Engineering standard
+
+Engineering principles: v5.1  
+Assurance tier: 2  
+Canonical repository: https://github.com/Parris-Tech-Services/NeathBound
 
 ## License
 
