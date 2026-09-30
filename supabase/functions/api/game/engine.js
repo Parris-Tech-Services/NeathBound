@@ -93,6 +93,7 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     next.discard = [...(next.discard ?? []), storyId];
   }
   next.revision = Number(next.revision ?? 0) + 1;
+  next.flags.__revision = next.revision;
 
   const changes = describeChanges(before, next);
   const challengeText = challenge
