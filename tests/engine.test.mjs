@@ -66,10 +66,16 @@ test("choice results include explicit state deltas for immediate result UI", () 
   assert.ok(result.changes.some((change) => change.type === "location" && change.after === "hollow-archive"));
 });
 
-test("one-shot dramatic storylets retire after a choice", () => {
-  const result = resolveChoice(initialState(), "bell-under-water", "listen", SUCCEED);
-  result.state.locationId = "lantern-quay";
-  assert.equal(storyAvailable(result.state, "bell-under-water"), false);
+test("exclusive dramatic storylets retire after a choice while staged stories can continue", () => {
+  const start = initialState();
+  const listened = resolveChoice(start, "bell-under-water", "listen", SUCCEED);
+  listened.state.locationId = "lantern-quay";
+  assert.equal(storyAvailable(listened.state, "bell-under-water"), true);
+  assert.equal(listened.state.flags["bell-under-water:listen"], true);
+
+  const cartographer = resolveChoice(start, "cartographer-at-dusk", "decline", SUCCEED);
+  cartographer.state.locationId = "lantern-quay";
+  assert.equal(storyAvailable(cartographer.state, "cartographer-at-dusk"), false);
 });
 
 test("Borrowed Face failure actually charges the player and raises Scandal", () => {
