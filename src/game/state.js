@@ -1,19 +1,24 @@
-export const SAVE_KEY = "neathbound.save.v2";
-export const LEGACY_SAVE_KEY = "neathbound.save.v1";
+export const SAVE_KEY = "neathbound.save.v3";
+export const LEGACY_SAVE_KEYS = ["neathbound.save.v2", "neathbound.save.v1"];
+const MENACE_IDS = ["dread", "scandal", "wounds", "suspicion"];
 
 export function initialState() {
   return {
-    version: 2,
+    version: 3,
+    revision: 0,
     name: "The Unmoored",
     locationId: "lantern-quay",
     echoes: 12,
     qualities: { nerve: 2, insight: 2, poise: 1, shadow: 0 },
     menaces: { dread: 0, scandal: 0, wounds: 0, suspicion: 0 },
-    items: { "salted-map": 1 },
+    items: { "salted-map": 1, "brass-key": 1 },
     unlockedLocations: ["lantern-quay", "velvet-market", "hollow-archive"],
     acquaintances: [],
     flags: {},
     journal: ["You woke beneath a sky made of stone, with a brass key in your hand."],
+    events: [],
+    hand: [],
+    discard: [],
     lastDraw: "bell-under-water"
   };
 }
@@ -27,29 +32,43 @@ export function normaliseState(input = {}) {
   const legacyItems = Array.isArray(input.items)
     ? Object.fromEntries(input.items.map((item) => [item, 1]))
     : (input.items ?? {});
+  const qualities = { ...base.qualities, ...(input.qualities ?? {}) };
+  const menaces = { ...base.menaces, ...(input.menaces ?? {}) };
+
+  // Older saves accidentally stored menaces as qualities. Reconcile by taking
+  // the larger value so a duplicated historical value is never double-counted.
+  for (const id of MENACE_IDS) {
+    if (qualities[id] !== undefined) {
+      menaces[id] = Math.max(Number(menaces[id] ?? 0), Number(qualities[id] ?? 0));
+      delete qualities[id];
+    }
+  }
 
   return {
     ...base,
     ...input,
-    version: 2,
-    qualities: { ...base.qualities, ...(input.qualities ?? {}) },
+    version: 3,
+    revision: Number.isInteger(input.revision) ? input.revision : 0,
+    qualities,
+    menaces,
     items: { ...legacyItems },
-    menaces: { ...base.menaces, ...(input.menaces ?? {}) },
-    unlockedLocations: input.unlockedLocations ?? base.unlockedLocations,
-    acquaintances: input.acquaintances ?? base.acquaintances,
+    unlockedLocations: [...new Set(input.unlockedLocations ?? base.unlockedLocations)],
+    acquaintances: [...new Set(input.acquaintances ?? base.acquaintances)],
     flags: { ...(input.flags ?? {}) },
-    journal: Array.isArray(input.journal) ? input.journal.slice(0, 30) : base.journal
+    journal: Array.isArray(input.journal) ? input.journal.slice(0, 100) : base.journal,
+    events: Array.isArray(input.events) ? input.events.slice(0, 250) : [],
+    hand: Array.isArray(input.hand) ? [...new Set(input.hand)] : [],
+    discard: Array.isArray(input.discard) ? [...new Set(input.discard)] : []
   };
 }
 
 export function loadState(storage = globalThis.localStorage) {
   try {
-    const raw = storage?.getItem(SAVE_KEY) ?? storage?.getItem(LEGACY_SAVE_KEY);
+    const raw = storage?.getItem(SAVE_KEY)
+      ?? LEGACY_SAVE_KEYS.map((key) => storage?.getItem(key)).find(Boolean);
     if (!raw) return initialState();
     const state = normaliseState(JSON.parse(raw));
-    if (storage && !storage.getItem(SAVE_KEY)) {
-      storage.setItem(SAVE_KEY, JSON.stringify(state));
-    }
+    storage?.setItem(SAVE_KEY, JSON.stringify(state));
     return state;
   } catch {
     return initialState();
