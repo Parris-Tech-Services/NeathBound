@@ -1,21 +1,31 @@
 export const locations = {
   "lantern-quay": {
     name: "Lantern Quay",
+    region: "The Lower City",
     subtitle: "Where the tide carries messages in sealed bottles.",
     atmosphere: "Wet brass, coal smoke, and a bell that rings beneath the water.",
-    stories: ["bell-under-water", "cartographer-at-dusk"]
+    stories: ["bell-under-water", "cartographer-at-dusk", "tea-for-the-tide"]
   },
   "velvet-market": {
     name: "The Velvet Market",
+    region: "The Lower City",
     subtitle: "A bazaar for memories, rumours, and perfectly ordinary knives.",
     atmosphere: "Every stall has a curtain. Every curtain has a shadow behind it.",
-    stories: ["borrowed-face", "red-thread"]
+    stories: ["borrowed-face", "red-thread", "market-gossip"]
   },
   "hollow-archive": {
     name: "The Hollow Archive",
+    region: "The Lower City",
     subtitle: "A library where the books remember who borrowed them.",
     atmosphere: "Dust hangs in the air like a second, slower snowfall.",
-    stories: ["index-of-lost-things", "the-quiet-librarian"]
+    stories: ["index-of-lost-things", "the-quiet-librarian", "catalogue-the-dark"]
+  },
+  "clockwork-gardens": {
+    name: "The Clockwork Gardens",
+    region: "The High Galleries",
+    subtitle: "A greenhouse where the flowers keep appointments.",
+    atmosphere: "Brass leaves click together in the warm, artificial wind.",
+    stories: ["garden-appointment", "borrowed-sunlight"]
   }
 };
 
@@ -75,6 +85,57 @@ export const stories = {
     choices: [
       { id: "dusty", label: "Choose the dusty shelf", success: "You find a route back to the quay and a page with your handwriting.", reward: { echoes: 12, item: "unfinished-page" }, target: "lantern-quay" },
       { id: "future", label: "Choose the expected shelf", success: "The city applauds politely. You gain a title you did not request.", reward: { quality: ["poise", 1], echoes: 3 }, target: "velvet-market" }
+    ]
+  },
+  "tea-for-the-tide": {
+    title: "Tea for the Tide",
+    kicker: "A courtesy to the current",
+    text: "The tide has come in carrying a porcelain cup. A dockworker asks whether you will pour it back into the sea, or drink what the sea has prepared.",
+    tags: ["opportunity"],
+    choices: [
+      { id: "pour", label: "Pour the tea into the tide", success: "The water settles. The dockworker gives you a name to use at the market.", reward: { acquaintance: "dockworker", quality: ["poise", 1] }, target: "lantern-quay" },
+      { id: "drink", label: "Drink the impossible tea", success: "You remember a shore that has never existed.", failure: "The cup tastes of every promise you have broken.", challenge: { stat: "nerve", difficulty: 5 }, reward: { item: "tide-cup", menace: ["dread", 1] }, target: "hollow-archive" }
+    ]
+  },
+  "market-gossip": {
+    title: "Market Gossip",
+    kicker: "A rumour with clean shoes",
+    text: "Three merchants are whispering about a door that only opens for people who have been seen in the wrong place. They notice you listening.",
+    tags: ["opportunity"],
+    choices: [
+      { id: "trade-rumour", label: "Trade a rumour of your own", success: "The merchants accept the exchange and point you toward the Gardens.", reward: { echoes: 7, unlock: "clockwork-gardens", menace: ["suspicion", 1] }, target: "clockwork-gardens" },
+      { id: "leave", label: "Leave before they learn your name", success: "You leave with your name intact and your pockets lighter by one secret.", reward: { quality: ["shadow", 1] }, target: "velvet-market" }
+    ]
+  },
+  "catalogue-the-dark": {
+    title: "Catalogue the Dark",
+    kicker: "An unpaid scholarly errand",
+    text: "A shelf has been filled with darkness instead of books. The archive will pay you in echoes if you assign each patch a proper title.",
+    challenge: { stat: "insight", difficulty: 7 },
+    choices: [
+      { id: "catalogue", label: "Give the darkness its titles", success: "The shelf becomes legible. The archive records your name with a respectful error.", failure: "The darkness gives you a title instead.", reward: { echoes: 15, item: "ink-of-absence" }, target: "hollow-archive" },
+      { id: "close-shelf", label: "Close the shelf", success: "Some knowledge is safer when it remains unindexed.", reward: { menace: ["suspicion", -1] }, target: "lantern-quay" }
+    ]
+  },
+  "garden-appointment": {
+    title: "The Garden Appointment",
+    kicker: "A flower expects you",
+    text: "A clockwork flower has scheduled a meeting for you at the far end of the glasshouse. It has sent three reminders and one threat.",
+    requirements: { item: "tide-cup" },
+    challenge: { stat: "poise", difficulty: 6 },
+    choices: [
+      { id: "attend", label: "Attend the appointment", success: "The flower offers a seed that remembers the sun.", failure: "You arrive late. The flower makes a note of it.", reward: { item: "sun-seed", quality: ["poise", 1] }, target: "clockwork-gardens" },
+      { id: "apologise", label: "Send an apology by moth", success: "The flower accepts. For now.", reward: { menace: ["scandal", -1] }, target: "velvet-market" }
+    ]
+  },
+  "borrowed-sunlight": {
+    title: "Borrowed Sunlight",
+    kicker: "A dangerous luxury",
+    text: "A glass jar contains a thumb-sized sun. The gardener offers it to you for one night, provided you promise to return the darkness it displaces.",
+    tags: ["opportunity"],
+    choices: [
+      { id: "borrow", label: "Borrow the small sun", success: "The city looks almost kind in its light.", reward: { item: "small-sun", echoes: 9, menace: ["dread", 1] }, target: "lantern-quay" },
+      { id: "refuse-sun", label: "Refuse the bargain", success: "The gardener approves of your caution.", reward: { quality: ["nerve", 1] }, target: "clockwork-gardens" }
     ]
   }
 };

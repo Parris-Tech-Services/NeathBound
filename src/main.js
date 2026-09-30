@@ -15,6 +15,11 @@ function draw() {
       draw();
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
+    travel(locationId) {
+      if (!state.unlockedLocations.includes(locationId)) return;
+      state = { ...state, locationId, journal: [`Travelled to ${locationId.replaceAll("-", " ")}.`, ...state.journal].slice(0, 30) };
+      draw();
+    },
     reset() {
       if (window.confirm("Begin a new life? Your local story will be replaced.")) {
         state = resetState();

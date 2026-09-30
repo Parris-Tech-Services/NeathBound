@@ -23,3 +23,19 @@ test("challenge failure still advances the story", () => {
   assert.equal(result.state.locationId, "hollow-archive");
   assert.match(result.state.journal[0], /failure/);
 });
+
+test("required-item storylets stay locked until discovered", () => {
+  const locked = resolveChoice(initialState(), "garden-appointment", "attend", () => 0.9);
+  assert.match(locked.error, /requires/);
+  const equipped = { ...initialState(), items: [...initialState().items, "tide-cup"] };
+  const unlocked = resolveChoice(equipped, "garden-appointment", "attend", () => 0.9);
+  assert.equal(unlocked.success, true);
+  assert.ok(unlocked.state.items.includes("sun-seed"));
+});
+
+test("opportunity rewards can unlock a new region and raise a menace", () => {
+  const result = resolveChoice(initialState(), "market-gossip", "trade-rumour", () => 0.9);
+  assert.equal(result.state.locationId, "clockwork-gardens");
+  assert.ok(result.state.unlockedLocations.includes("clockwork-gardens"));
+  assert.equal(result.state.menaces.suspicion, 1);
+});
