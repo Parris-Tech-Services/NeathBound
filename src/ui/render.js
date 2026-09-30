@@ -614,6 +614,9 @@ possessionCardsHtml,
 
 
 const STORY_ART = {
+  "lair-escape": ["⚿", "the sealed iron door", "#171b1d", "#6f6049"],
+  "lair-inspect-door": ["⌘", "rusted hinges and old scratches", "#202427", "#867154"],
+  "lair-listen": ["◖", "a black tunnel beyond the wall", "#11171b", "#52626a"],
   "bell-under-water": ["♢", "submerged bell", "#173842", "#8ca49e"],
   "cartographer-at-dusk": ["⌖", "living map", "#473227", "#b68b5a"],
   "borrowed-face": ["◐", "silken mask", "#4b253f", "#c79bb7"],
@@ -643,16 +646,42 @@ const STORY_ART = {
   "the-lamp-that-fell-upward": ["♢", "ascending lamp", "#3b3426", "#d2b86d"],
   "the-far-crack": ["ϟ", "far crack", "#242c34", "#9ba7af"],
   "the-submerged-door": ["▣", "submerged door", "#18343e", "#779a9f"],
-  "the-loose-end": ["⌁", "loose red knot", "#47272c", "#bd6d73"]
+  "the-loose-end": ["⌁", "loose red knot", "#47272c", "#bd6d73"],
+  "smuggling-operations": ["⚓", "contraband beneath tarpaulin", "#1d3336", "#8c7855"],
+  "guild-hall": ["⚒", "guild ledgers and brass badges", "#342d28", "#9c825c"],
+  "circle-diplomacy": ["◎", "a table of sealed favours", "#352a3a", "#9c789f"],
+  "market-exchange": ["⚖", "the silent exchange", "#362c31", "#a88772"],
+  "vaults-release": ["▥", "numbered prison doors", "#20282c", "#6c777d"],
+  "pale-rooms-recovery": ["✧", "low lamps and white sheets", "#30383b", "#a9b1aa"],
+  "stitchery-mending": ["✚", "needle thread and lamplight", "#3e2d2d", "#a77b6d"],
+  "whisper-court-appeal": ["♢", "fans raised like evidence", "#362b39", "#9d7b9c"],
+  "the-clerks-file": ["▤", "a clerk's impossible file", "#293239", "#87969a"],
+  "a-fellow-detainee": ["⌁", "a voice through iron bars", "#242b30", "#768186"],
+  "the-dreaming-patient": ["☾", "a sleeper beneath pale linen", "#293036", "#8fa0aa"],
+  "the-night-nurse": ["✦", "a lamp carried after midnight", "#2b3337", "#a6a184"],
+  "the-surgeons-apprentice": ["✚", "bright instruments on cloth", "#382c2c", "#a98277"],
+  "the-back-stair": ["↟", "a narrow stair behind the ward", "#252c2b", "#74867b"],
+  "the-fan-maker": ["❧", "paper fans and hidden verdicts", "#382d39", "#a27c98"],
+  "a-rivals-brief": ["¶", "a folded rival's brief", "#3a3034", "#9d8586"],
+  "lie-low-on-the-barges": ["≋", "dark barges under the quay", "#173238", "#708f91"],
+  "a-fresher-scandal": ["♢", "fresh gossip behind velvet", "#432d3e", "#b17a98"],
+  "the-quiet-carrel": ["⌑", "a desk between endless shelves", "#2a302c", "#8f927b"],
+  "the-gardeners-salve": ["✿", "a brass flower and green salve", "#31402e", "#9cad75"],
+  "card-a-stranger-approaches": ["♟", "a stranger with a rusted lamp", "#283239", "#a88765"],
+  "card-lost-obols": ["¤", "coins glinting in black muck", "#2e302b", "#a59665"]
 };
 
 const LOCATION_ART = {
-  "the-lair": ["▣", "⚿", "The Lair", "#1f2528", "#66635b"],
+  "the-lair": ["▣", "⚿", "The Lair", "#14191c", "#75664e"],
   "lantern-quay": ["⚓", "♢", "Lantern Quay", "#143740", "#6d8f91"],
   "velvet-market": ["◐", "✦", "Velvet Market", "#47293f", "#9d6f8f"],
   "hollow-archive": ["▤", "⌑", "Hollow Archive", "#2e342e", "#8d947b"],
   "clockwork-gardens": ["✿", "⚙", "Clockwork Gardens", "#344128", "#9ca45c"],
-  "glass-observatory": ["⌕", "✧", "Glass Observatory", "#263743", "#758fa3"]
+  "glass-observatory": ["⌕", "✧", "Glass Observatory", "#263743", "#758fa3"],
+  "the-holding-vaults": ["▥", "⚿", "The Holding Vaults", "#1e272c", "#6b777e"],
+  "the-pale-rooms": ["✧", "☾", "The Pale Rooms", "#31383b", "#aab2ad"],
+  "the-stitchery": ["✚", "✂", "The Stitchery", "#3a2c2d", "#9f786e"],
+  "the-whisper-court": ["❧", "♢", "The Whisper Court", "#352b38", "#967995"]
 };
 
 function storyArtSvg(storyId, locationId) {
