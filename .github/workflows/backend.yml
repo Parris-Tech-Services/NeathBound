@@ -1,0 +1,51 @@
+# "GitHub as the CMS": content in /content and the API in supabase/functions
+# are pushed to Supabase whenever they change on main.
+# Needs one repository secret: SUPABASE_ACCESS_TOKEN (a Supabase personal
+# access token from https://supabase.com/dashboard/account/tokens).
+name: Sync backend
+on:
+  push:
+    branches: [main]
+    paths:
+      - "content/**"
+      - "src/game/engine.js"
+      - "src/game/content.js"
+      - "scripts/sync-content.mjs"
+      - "supabase/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  PROJECT_REF: gzngmgibebriovhjerpv
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
+      - name: Require the Supabase token
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
+            echo "::error::SUPABASE_ACCESS_TOKEN secret is not set, so content and the API were NOT synced to Supabase."
+            exit 1
+          fi
+      - name: Sync content to the database
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          node scripts/sync-content.mjs > content.sql
+          jq -n --rawfile q content.sql '{query: $q}' > body.json
+          curl --fail-with-body -sS -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/database/query" \
+            -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" -H "Content-Type: application/json" --data @body.json
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Deploy the api Edge Function
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase functions deploy api --project-ref "$PROJECT_REF" --use-api

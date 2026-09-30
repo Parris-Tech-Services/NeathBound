@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "dev": "python3 -m http.server 4173 --directory .",
-    "test": "node --test",
-    "smoke": "node tests/smoke.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "smoke": "node tests/smoke.mjs",
+    "content:check": "node scripts/sync-content.mjs > /dev/null && echo content ok",
+    "content:sql": "node scripts/sync-content.mjs",
+    "sync:engine": "node scripts/sync-engine.mjs"
   }
 }
