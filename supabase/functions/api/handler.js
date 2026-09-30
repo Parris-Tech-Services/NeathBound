@@ -107,7 +107,7 @@ export async function handle({ method, path, userId, body = {} }, { repo, random
       return { status: 409, body: { error: "This save changed in another tab.", state } };
     }
 
-    const outcome = resolveChoice(state, decodeURIComponent(choose[1]), decodeURIComponent(choose[2]), random, ctx);
+    const outcome = resolveChoice(state, decodeURIComponent(choose[1]), decodeURIComponent(choose[2]), random, ctx, { useLesson: Boolean(body?.useLesson) });
     if (outcome.error) return { status: 409, body: { error: outcome.error, state } };
 
     if (Number.isInteger(expectedRevision)) {

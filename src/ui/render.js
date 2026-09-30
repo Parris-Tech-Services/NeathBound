@@ -121,6 +121,8 @@ export function render(app, state, handlers, outcome = null) {
       return [
         '<div class="choice-row">',
         '<div class="choice-copy"><strong>', escapeHtml(choice.label), '</strong>', challenge, '</div>',
+        (resolvedChallenge && (state.items[`lesson-${challengeQuality}`] > 0)) ?
+          '<label class="second-chance-label"><input type="checkbox" data-lesson-for="' + choice.id + '"> Use Recalled Lesson: ' + formatName(challengeQuality) + '</label>' : '',
         '<button class="go-button" data-story="', story.id, '" data-choice="', choice.id, '" ',
         available.has(choice.id) ? "" : "disabled",
         '>GO</button></div>'
@@ -471,7 +473,10 @@ export function render(app, state, handlers, outcome = null) {
 
   app.querySelectorAll("[data-choice]").forEach((button) => {
     button.dataset.originallyDisabled = String(button.disabled);
-    button.addEventListener("click", () => handlers.choose(button.dataset.story, button.dataset.choice));
+    button.addEventListener("click", () => {
+      const useLesson = app.querySelector(`input[data-lesson-for="${button.dataset.choice}"]`)?.checked ?? false;
+      handlers.choose(button.dataset.story, button.dataset.choice, { useLesson });
+    });
   });
   app.querySelector("[data-action=onwards]")?.addEventListener("click", handlers.onwards);
   app.querySelectorAll("[data-action=draw-card]").forEach((button) => {

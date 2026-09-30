@@ -11,7 +11,7 @@ export class LocalGameService {
     return this.state;
   }
 
-  async choose(storyId, choiceId, { expectedRevision } = {}) {
+  async choose(storyId, choiceId, { expectedRevision, useLesson } = {}) {
     if (Number.isInteger(expectedRevision) && expectedRevision !== Number(this.state.revision ?? 0)) {
       return { error: "This save changed in another tab.", state: this.state };
     }

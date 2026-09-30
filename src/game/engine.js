@@ -67,7 +67,7 @@ export function availableChoices(state, storyId, context = {}) {
   return story.choices.filter((choice) => requirementsMet(state, requirementsFor(choice), context));
 }
 
-export function resolveChoice(state, storyId, choiceId, random = Math.random, context = {}) {
+export function resolveChoice(state, storyId, choiceId, random = Math.random, context = {}, options = {}) {
   const before = cloneState(state);
   const next = cloneState(state);
   const story =  (stories[storyId] ?? cards[storyId]);
@@ -82,8 +82,21 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
   }
 
   const challenge = effectiveChallenge(story, choice);
-  const check = resolveChallenge(next, challenge, random);
+  let check = resolveChallenge(next, challenge, random);
   let success = check.success;
+  let usedLesson = false;
+  if (options.useLesson && challenge && (next.items[`lesson-${challenge.quality}`] > 0)) {
+    next.items[`lesson-${challenge.quality}`] -= 1;
+    usedLesson = true;
+    if (!success) {
+      const secondCheck = resolveChallenge(next, challenge, random);
+      if (secondCheck.success || secondCheck.total > check.total) {
+        check = secondCheck;
+      }
+      success = check.success;
+    }
+  }
+
   // Momentum: a near miss (within 3) can be turned into a success by
   // spending one point of momentum.
   let usedMomentum = false;
@@ -127,6 +140,10 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
   next.flags.__revision = next.revision;
 
   const changes = describeChanges(before, next);
+  if (usedLesson) {
+    changes.push({ type: "item", id: `lesson-${challenge.quality}`, change: -1, message: `You spent a Recalled Lesson: ${title(challenge.quality)} for a second chance.` });
+  }
+
   if (progress?.points) {
     const name = title(challenge.quality);
     changes.push({

@@ -149,7 +149,7 @@ NeathBound:
 - add narrow checks against progress qualities for investigations/projects
 - future advanced skills: Navigation, Glasscraft, Rhetoric, Anatomy, Machinery, etc., with original names and context
 
-Status: PARTIAL
+Status: DONE (basic challenge checks, progress pyramids, and Recalled Lessons all complete).
 
 ## 5. Storylets and branches
 

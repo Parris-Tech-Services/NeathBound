@@ -25,7 +25,7 @@ async function draw(state) {
   currentState = resolvedState;
 
   render(app, resolvedState, {
-    async choose(storyId, choiceId) {
+    async choose(storyId, choiceId, { useLesson } = {}) {
       if (pending) return;
       pending = true;
       setPending(true);
@@ -33,7 +33,8 @@ async function draw(state) {
 
       try {
         const outcome = await service.choose(storyId, choiceId, {
-          expectedRevision: Number(before?.revision ?? 0)
+          expectedRevision: Number(before?.revision ?? 0),
+          useLesson
         });
 
         if (outcome.error) {

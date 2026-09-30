@@ -16,7 +16,7 @@ export class SupabaseGameService {
     return this.#call("GET", "player");
   }
 
-  choose(storyId, choiceId, { expectedRevision } = {}) {
+  choose(storyId, choiceId, { expectedRevision, useLesson } = {}) {
     return this.#call(
       "POST",
       `storylets/${encodeURIComponent(storyId)}/branches/${encodeURIComponent(choiceId)}/choose`,
