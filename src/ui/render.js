@@ -1,6 +1,6 @@
-import { availableChoices, availableStories, currentLocation, effectiveChallenge } from "../game/engine.js?v=20260930-15";
-import { locations } from "../game/content.js?v=20260930-15";
-import { loadPreferences } from "./preferences.js?v=20260930-15";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge } from "../game/engine.js?v=20260930-16";
+import { locations } from "../game/content.js?v=20260930-16";
+import { loadPreferences } from "./preferences.js?v=20260930-16";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
 

@@ -1,9 +1,19 @@
-import { createGameService } from "./services/index.js?v=20260930-15";
-import { render } from "./ui/render.js?v=20260930-15";
-import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20260930-15";
+import { createGameService } from "./services/index.js?v=20260930-16";
+import { render } from "./ui/render.js?v=20260930-16";
+import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20260930-16";
 
 const app = document.querySelector("#app");
+const bootScreen = document.querySelector("#boot-screen");
+const bootStatus = bootScreen?.querySelector(".boot-status");
 const service = createGameService();
+
+if (bootStatus) {
+  bootStatus.textContent = service.mode === "online"
+    ? "Remembering your place beneath the city…"
+    : "Opening the city from this device…";
+}
+
+let bootFinished = false;
 
 let currentState = null;
 let lastOutcome = null;
@@ -120,6 +130,20 @@ async function draw(state) {
       }
     }
   }, lastOutcome);
+
+  finishBoot();
+}
+
+function finishBoot() {
+  if (bootFinished) return;
+  bootFinished = true;
+  app.setAttribute("aria-busy", "false");
+
+  if (!bootScreen) return;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    bootScreen.classList.add("is-ready");
+    window.setTimeout(() => bootScreen.remove(), 360);
+  }));
 }
 
 function setPending(isPending) {
@@ -151,7 +175,10 @@ function showError(error) {
 
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible" && !pending && !lastOutcome) {
-    draw().catch(showError);
+    draw().catch((error) => {
+  showError(error);
+  finishBoot();
+});
   }
 });
 

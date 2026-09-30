@@ -77,6 +77,22 @@ async function openGame() {
 
 const readSave = (page) => page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "null"), SAVE_KEY);
 
+test("the loading screen is present before JavaScript runs and leaves after the game renders", async () => {
+  const staticContext = await browser.newContext({ javaScriptEnabled: false });
+  const staticPage = await staticContext.newPage();
+  await staticPage.goto(new URL("?api=local", baseUrl).href, { waitUntil: "domcontentloaded" });
+  assert.equal(await staticPage.locator("#boot-screen").isVisible(), true, "the initial HTML contains a visible loading screen");
+  assert.match(await staticPage.locator("#boot-screen").innerText(), /NEATH.*BOUND/s);
+  assert.match(await staticPage.locator("#boot-screen").innerText(), /Waking the lamps beneath the city/i);
+  await staticContext.close();
+
+  const { context, page, problems } = await openGame();
+  assert.equal(await page.locator("#boot-screen").count(), 0, "the loading screen is removed after first render");
+  assert.equal(await page.locator("#app").getAttribute("aria-busy"), "false", "the app reports that initial loading is complete");
+  assert.deepEqual(problems, []);
+  await context.close();
+});
+
 test("the game loads with no errors and every asset and module resolves", async () => {
   const { context, page, problems } = await openGame();
   assert.ok(await page.locator("[data-choice]").count() > 0, "storylet choices are rendered");
