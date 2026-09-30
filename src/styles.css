@@ -812,3 +812,114 @@ button, select { font: inherit; }
 .outcome-onwards:focus-visible{outline:3px solid #d9b45a;outline-offset:2px}
 .runtime-notice{max-width:1360px;margin:0 auto;padding:10px 16px;background:#f3e3b5;color:#3b2b10;font:700 .8rem Arial,sans-serif;border-bottom:1px solid #c5ab68}
 [aria-busy="true"] .go-button,[aria-busy="true"] .travel-button{cursor:wait}
+
+
+/* Dedicated possessions screen */
+.possessions-page {
+  padding: 18px;
+  min-height: 420px;
+}
+.possessions-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 22px;
+  align-items: flex-start;
+  padding-bottom: 15px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(74,61,42,.32);
+}
+.possessions-header h2 {
+  margin: 2px 0 5px;
+  font-size: 1.55rem;
+}
+.possessions-header p {
+  margin: 0;
+}
+.possessions-kicker {
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-size: .7rem;
+  font-weight: 700;
+  color: #6c5940;
+}
+.possessions-totals {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
+.possessions-totals span {
+  padding: 7px 9px;
+  background: rgba(72,61,44,.1);
+  border: 1px solid rgba(79,65,45,.28);
+  font-size: .76rem;
+  white-space: nowrap;
+}
+.possessions-grid {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 11px;
+}
+.possession-card {
+  display: grid;
+  grid-template-columns: 58px minmax(0,1fr);
+  gap: 11px;
+  padding: 12px;
+  background: rgba(246,239,219,.52);
+  border: 1px solid #a99e87;
+  box-shadow: inset 0 0 12px rgba(77,60,38,.07);
+}
+.possession-glyph {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  background: radial-gradient(circle at 42% 35%,#607369,#28332f 72%);
+  border: 2px solid #b69a58;
+  box-shadow: inset 0 0 0 2px rgba(29,27,22,.6);
+  color: #efe2b8;
+  font: 1.8rem Georgia,serif;
+}
+.possession-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.possession-heading h3 {
+  margin: 0;
+  font-size: 1.02rem;
+}
+.possession-quantity {
+  color: #305e59;
+  font-size: .88rem;
+}
+.possession-category {
+  margin: 2px 0 6px !important;
+  color: #735f43;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.possession-copy > p:last-child {
+  margin: 0;
+  line-height: 1.38;
+  font-size: .82rem;
+}
+.empty-possessions {
+  grid-column: 1 / -1;
+  padding: 28px;
+  text-align: center;
+  border: 1px dashed #9f927b;
+}
+.empty-possessions p { margin-bottom: 0; }
+
+@media (max-width: 700px) {
+  .possessions-page { padding: 12px; }
+  .possessions-header { flex-direction: column; }
+  .possessions-totals { justify-content: flex-start; }
+  .possessions-grid { grid-template-columns: 1fr; }
+  .possession-card { grid-template-columns: 50px minmax(0,1fr); }
+  .possession-glyph { width: 50px; height: 50px; }
+}
