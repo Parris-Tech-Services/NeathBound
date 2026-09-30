@@ -1,5 +1,5 @@
 import { createGameService } from "./services/index.js?v=20260930-7";
-import { render } from "./ui/render.js?v=20260930-6";
+import { render } from "./ui/render.js?v=20260930-7";
 
 const app = document.querySelector("#app");
 const service = createGameService();
