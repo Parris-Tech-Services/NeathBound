@@ -5,10 +5,10 @@ and stays inside one lane. Integration is owned by the release coordinator.
 
 | Lane | Owns | Avoids touching |
 |---|---|---|
-| Engine | `src/game/state.js`, `src/game/engine.js`, deterministic rules and tests | narrative prose and CSS |
-| Narrative | `src/game/content.js`, story cards, locations, item text | engine algorithms and layout |
+| Engine | `src/game/state.js`, `src/game/engine.js`, `server/src/domain.mjs`, deterministic rules and tests | narrative prose and CSS |
+| Narrative | `src/game/content.js`, `server/content/storylets.json`, story cards, locations, item text | engine algorithms and layout |
 | Interface | `src/ui/`, `index.html`, `src/styles.css` | save schema and story rules |
-| Save & accessibility | persistence adapters, settings, keyboard/ARIA behavior | story balance and visual restyling |
+| Save & accessibility | `src/game/state.js` persistence adapters, settings, keyboard/ARIA behavior, API client integration | story balance and visual restyling |
 | QA & tooling | `tests/`, docs, fixtures, smoke scripts, release checks | production game behavior unless fixing a test contract |
 
 Suggested worktrees:

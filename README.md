@@ -2,7 +2,7 @@
 
 Neathbound is an original, open-source browser RPG about a city beneath the
 world, built around strange stories, branching choices, and consequence-rich
-exploration. It takes inspiration from the *shape* of text-led browser RPGs,
+exploration. It takes inspiration from the shape of text-led browser RPGs,
 not from any protected setting, names, writing, art, or code.
 
 ## Play
@@ -14,8 +14,8 @@ npm run dev
 
 Then open <http://localhost:4173>.
 
-Actions are deliberately unlimited. There are no energy timers or payment
-gates. The current Phase 0 build stores progress locally in the browser.
+Actions are deliberately unlimited. There are no energy timers, payment gates,
+accounts, or network services. Progress is saved locally in the browser.
 
 ## Backend direction
 
@@ -27,6 +27,18 @@ resolution.
 The implementation plan and free hosting target are documented in
 [`docs/FREE_QBN_BACKEND.md`](docs/FREE_QBN_BACKEND.md). The existing static
 game remains the working baseline while the migration is staged.
+
+The optional local API runs separately:
+
+```bash
+npm run api
+npm run api:test
+```
+
+It listens on `http://localhost:8787`, stores local state in
+`data/neathbound.sqlite`, and exposes JSON REST endpoints for players,
+storylets, branch resolution, and travel. The API is deliberately dependency-
+free on Node 22+ by using the built-in SQLite module.
 
 ## Five parallel agent lanes
 

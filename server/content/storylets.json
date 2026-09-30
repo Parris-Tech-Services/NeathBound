@@ -1,0 +1,36 @@
+[
+  {
+    "id": "bell-under-water",
+    "title": "The Bell Under Water",
+    "locationId": "lantern-quay",
+    "kind": "storylet",
+    "description": "At low tide, a stairway descends into black water. A bell tolls below the last step.",
+    "branches": [
+      { "id": "descend", "label": "Descend toward the bell", "challenge": { "quality": "nerve", "difficulty": 5 }, "onSuccess": "You find a submerged door and unlock it.", "onFailure": "The water closes over your head. You return with black sand.", "effects": { "echoes": 8, "items": { "black-sand": 1 }, "locationId": "hollow-archive" } },
+      { "id": "listen", "label": "Listen for the pattern", "onSuccess": "The bell's rhythm maps a route through the city.", "effects": { "qualities": { "insight": 1 } } }
+    ]
+  },
+  {
+    "id": "market-gossip",
+    "title": "Market Gossip",
+    "locationId": "velvet-market",
+    "kind": "opportunity",
+    "description": "Three merchants whisper about a door that opens only for people seen in the wrong place.",
+    "branches": [
+      { "id": "trade-rumour", "label": "Trade a rumour of your own", "onSuccess": "The merchants point you toward the clockwork gardens.", "effects": { "echoes": 7, "menaces": { "suspicion": 1 }, "unlockLocations": ["clockwork-gardens"], "locationId": "clockwork-gardens" } },
+      { "id": "leave", "label": "Leave before they learn your name", "onSuccess": "You leave with your name intact.", "effects": { "qualities": { "shadow": 1 } } }
+    ]
+  },
+  {
+    "id": "garden-appointment",
+    "title": "The Garden Appointment",
+    "locationId": "clockwork-gardens",
+    "kind": "storylet",
+    "description": "A clockwork flower has scheduled a meeting and sent three reminders and one threat.",
+    "requirements": { "items": { "tide-cup": 1 } },
+    "branches": [
+      { "id": "attend", "label": "Attend the appointment", "challenge": { "quality": "poise", "difficulty": 6 }, "onSuccess": "The flower offers a seed that remembers the sun.", "onFailure": "You arrive late. The flower makes a note of it.", "effects": { "items": { "sun-seed": 1 }, "qualities": { "poise": 1 } } },
+      { "id": "apologise", "label": "Send an apology by moth", "onSuccess": "The flower accepts. For now.", "effects": { "menaces": { "scandal": -1 }, "locationId": "velvet-market" } }
+    ]
+  }
+]

@@ -21,12 +21,20 @@ The target online architecture is a static browser client plus a separate JSON
 API, a server-authoritative quality-based narrative rules engine, and relational
 persistence.
 
-For a genuinely free deployment, prefer Cloudflare Pages/Workers with D1 over a
-literal ASP.NET/IIS clone. The important compatibility target is architectural:
-data-driven storylets, qualities, requirements, effects, a relational
-repository layer, and server-side choice resolution.
+For a genuinely free deployment, prefer Cloudflare Pages/Workers with D1 over
+a literal ASP.NET/IIS clone. The important compatibility target is
+architectural: data-driven storylets, qualities, requirements, effects, a
+relational repository layer, and server-side choice resolution.
 
 See `docs/FREE_QBN_BACKEND.md`.
+
+## Backend shape
+
+The current local backend is a free-to-run modular monolith: Node's built-in
+HTTP server, JSON REST endpoints, SQLite persistence, and data-only storylet
+content. This mirrors the useful shape of a legacy narrative API without
+requiring Windows Server, IIS, AWS, a paid database, or a proprietary
+authoring platform.
 
 ## Original setting
 

@@ -15,3 +15,7 @@ Before changing a module:
 
 The game intentionally has unlimited actions. Any future resource system must
 not introduce real-money purchases, energy timers, or waiting requirements.
+
+The backend in `server/` is a dependency-free Node/SQLite modular monolith.
+Keep API rules deterministic and content data-driven; never put secrets or
+player data into the static frontend bundle.
