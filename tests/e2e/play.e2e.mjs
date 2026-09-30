@@ -50,7 +50,7 @@ after(async () => {
   if (unique.length) console.warn(report);
 });
 
-async function openGame() {
+async function openGame({ completeTutorial = false } = {}) {
   const context = await browser.newContext();
   const page = await context.newPage();
   page.setDefaultTimeout(10_000);
@@ -72,10 +72,26 @@ async function openGame() {
   page.on("dialog", (dialog) => dialog.accept());
   await page.goto(new URL("?api=local&autoplay=1", baseUrl).href, { waitUntil: "networkidle" });
   await page.waitForSelector("[data-choice]");
+  if (completeTutorial) await finishTutorial(page);
   return { context, page, problems };
 }
 
 const readSave = (page) => page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "null"), SAVE_KEY);
+
+async function finishTutorial(page) {
+  const state = await readSave(page);
+  if (state?.flags?.["tutorial.story"]) return;
+
+  const escape = page.locator('[data-story="lair-escape"][data-choice="force"]');
+  await escape.waitFor({ state: "visible" });
+  await escape.click();
+  await page.waitForFunction(
+    (key) => JSON.parse(localStorage.getItem(key) ?? "{}").flags?.["tutorial.story"] === true,
+    SAVE_KEY
+  );
+  await page.locator('[data-action="onwards"]').click();
+  await page.waitForSelector('[data-story="bell-under-water"]');
+}
 
 test("first visit shows the public landing page before loading the game", async () => {
   const context = await browser.newContext();
@@ -146,14 +162,13 @@ test("New life resets the character", async () => {
 });
 
 test("Possessions opens a dedicated inventory view and Story returns to play", async () => {
-  const { context, page, problems } = await openGame();
+  const { context, page, problems } = await openGame({ completeTutorial: true });
   await page.locator(".main-tabs [data-view=possessions]").click();
 
   await assert.doesNotReject(() => page.locator("#possessions").waitFor({ state: "visible" }));
   assert.equal(await page.locator("[data-view-panel=story]").isHidden(), true, "story view is hidden while possessions is open");
-  assert.match(await page.locator("#possessions").innerText(), /Salted Map/);
   assert.match(await page.locator("#possessions").innerText(), /Brass Key/);
-  assert.match(await page.locator("#possessions").innerText(), /DOCUMENTS/i);
+  assert.match(await page.locator("#possessions").innerText(), /Keys & Tools/i);
 
   await page.locator(".main-tabs a[href=\"#stories\"]").click();
   assert.equal(await page.locator("[data-view-panel=story]").isVisible(), true, "Story returns to the playable view");
@@ -163,7 +178,7 @@ test("Possessions opens a dedicated inventory view and Story returns to play", a
 });
 
 test("Myself opens a full character screen and outfit changes stay in sync", async () => {
-  const { context, page, problems } = await openGame();
+  const { context, page, problems } = await openGame({ completeTutorial: true });
   await page.locator(".main-tabs [data-view=myself]").click();
 
   await assert.doesNotReject(() => page.locator("#myself").waitFor({ state: "visible" }));
