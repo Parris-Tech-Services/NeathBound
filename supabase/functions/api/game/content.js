@@ -18,7 +18,7 @@ export const locations = {
     region: "The Lower City",
     subtitle: "A library where the books remember who borrowed them.",
     atmosphere: "Dust hangs in the air like a second, slower snowfall.",
-    stories: ["index-of-lost-things", "the-quiet-librarian", "catalogue-the-dark", "the-locked-stacks", "finish-the-page", "an-entry-in-the-index"]
+    stories: ["index-of-lost-things", "the-quiet-librarian", "catalogue-the-dark", "the-locked-stacks", "finish-the-page", "an-entry-in-the-index", "the-margin-note"]
   },
   "clockwork-gardens": {
     name: "The Clockwork Gardens",
@@ -26,6 +26,13 @@ export const locations = {
     subtitle: "A greenhouse where the flowers keep appointments.",
     atmosphere: "Brass leaves click together in the warm, artificial wind.",
     stories: ["garden-appointment", "borrowed-sunlight", "plant-the-sun-seed", "the-seedling-dawn", "the-memory-graft", "the-gardeners-thanks"]
+  },
+  "glass-observatory": {
+    name: "The Glass Observatory",
+    region: "The High Galleries",
+    subtitle: "Where patient astronomers study a sky made of stone.",
+    atmosphere: "Lenses the size of ponds, chalk star-charts, and the slow drip of the ceiling overhead.",
+    stories: ["survey-the-stone-sky", "the-lamp-that-fell-upward", "the-far-crack"]
   }
 };
 
@@ -233,7 +240,7 @@ export const stories = {
     tags: ["opportunity"],
     choices: [
       { id: "pour", label: "Pour the tea into the tide", requirements: [], success: "The water settles. The dockworker gives you a name to use at the market.", successEffects: [{ type: "flag", id: "acquaintance-dockworker", value: true }, { type: "quality", id: "poise", amount: 1 }, { type: "location", id: "lantern-quay" }], failureEffects: [] },
-      { id: "drink", label: "Drink the impossible tea", requirements: [], success: "You remember a shore that has never existed.", failure: "The cup tastes of every promise you have broken.", challenge: { quality: "nerve", difficulty: 5 }, successEffects: [{ type: "item", id: "tide-cup", amount: 1 }, { type: "quality", id: "dread", amount: 1 }, { type: "location", id: "hollow-archive" }], failureEffects: [{ type: "quality", id: "dread", amount: 1 }, { type: "location", id: "hollow-archive" }] }
+      { id: "drink", label: "Drink the impossible tea", requirements: [], success: "You remember a shore that has never existed.", failure: "The cup tastes of every promise you have broken.", challenge: { quality: "nerve", difficulty: 5 }, successEffects: [{ type: "item", id: "tide-cup", amount: 1 }, { type: "menace", id: "dread", amount: 1 }, { type: "location", id: "hollow-archive" }], failureEffects: [{ type: "menace", id: "dread", amount: 1 }, { type: "location", id: "hollow-archive" }] }
     ]
   },
   "market-gossip": {
@@ -293,6 +300,7 @@ export const stories = {
         success: "The salt lifts away in a pale cloud. Underneath, a route has been waiting: up through the lamp-stairs to the Clockwork Gardens. You follow it before the paper dries and forgets.",
         successEffects: [
           { type: "flag", id: "map-route-known", value: true },
+          { type: "unlock-location", id: "clockwork-gardens" },
           { type: "location", id: "clockwork-gardens" }
         ],
         failureEffects: []
@@ -749,6 +757,143 @@ export const stories = {
           { type: "echoes", amount: 10 },
           { type: "flag", id: "gardener-thanked", value: true },
           { type: "location", id: "clockwork-gardens" }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
+  "the-margin-note": {
+    title: "The Margin Note",
+    kicker: "Returned early. Handle kindly.",
+    text: "The note in the margin of your index entry carries a second shelf mark, written very small. It does not belong to any shelf in the archive. The librarian, asked, points silently upward.",
+    requirements: [{ type: "flag", id: "read-own-entry", op: "==", value: true }],
+    choices: [
+      {
+        id: "follow-upward",
+        label: "Follow the shelf mark up into the High Galleries",
+        requirements: [],
+        success: "A spiral stair behind the reference desk climbs past the last lamp and keeps going. At the top, under a dome of fogged glass, someone has been expecting you for years and has only just put the kettle on.",
+        successEffects: [
+          { type: "unlock-location", id: "glass-observatory" },
+          { type: "location", id: "glass-observatory" }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "copy-note",
+        label: "Copy the note into your own hand before you go anywhere",
+        requirements: [],
+        challenge: { quality: "insight", difficulty: 5 },
+        success: "Written out a second time, the shelf mark resolves into a bearing and an elevation. Whoever wrote it was describing a place in the sky, not on a shelf.",
+        failure: "Your copy smudges. The original, meanwhile, has become slightly clearer, as though it prefers being read to being reproduced.",
+        successEffects: [
+          { type: "quality", id: "insight", amount: 1 },
+          { type: "location", id: "hollow-archive" }
+        ],
+        failureEffects: [{ type: "location", id: "hollow-archive" }]
+      }
+    ]
+  },
+  "survey-the-stone-sky": {
+    title: "Survey the Stone Sky",
+    kicker: "Every crack is catalogued",
+    text: "The astronomers here do not look at stars. They look up at the vast stone ceiling over the city and chart its cracks, seepages and slow shifts with the devotion other people save for constellations.",
+    requirements: [],
+    choices: [
+      {
+        id: "take-the-lens",
+        label: "Take a turn at the great lens",
+        requirements: [],
+        challenge: { quality: "insight", difficulty: 6 },
+        success: "Through the lens the ceiling is enormous and close enough to touch. Near the eastern rim you find a crack no chart has recorded, and a thread of pale light inside it that is not lamplight.",
+        failure: "You spend an hour mapping what turns out to be a smear on the lens. The astronomers are very kind about it.",
+        successEffects: [
+          { type: "quality", id: "insight", amount: 1 },
+          { type: "echoes", amount: 9 },
+          { type: "flag", id: "found-the-far-crack", value: true },
+          { type: "location", id: "glass-observatory" }
+        ],
+        failureEffects: [{ type: "location", id: "glass-observatory" }]
+      },
+      {
+        id: "carry-plates",
+        label: "Carry photographic plates for the astronomers",
+        requirements: [],
+        success: "The plates are heavy, cold and irreplaceable. You drop none of them. The chief astronomer pays you in echoes and in the rare compliment of being asked back.",
+        successEffects: [
+          { type: "echoes", amount: 6 },
+          { type: "location", id: "glass-observatory" }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
+  "the-lamp-that-fell-upward": {
+    title: "The Lamp that Fell Upward",
+    kicker: "A small catastrophe in reverse",
+    text: "One of the city's street lamps has come loose and fallen the wrong way. It is wedged high in the observatory rafters, still burning, and the astronomers cannot read their charts for the glare.",
+    requirements: [],
+    choices: [
+      {
+        id: "climb-for-it",
+        label: "Climb the rafters and set it loose",
+        requirements: [],
+        challenge: { quality: "nerve", difficulty: 7 },
+        success: "You work it free with your coat wrapped round your hands. Released, it drifts gently back down through the dome and toward the street it came from, as if nothing had happened.",
+        failure: "The rafters are further apart than they looked from the floor. You come down the slow way, without the lamp and with a new respect for gravity.",
+        successEffects: [
+          { type: "quality", id: "nerve", amount: 1 },
+          { type: "echoes", amount: 12 },
+          { type: "location", id: "glass-observatory" }
+        ],
+        failureEffects: [{ type: "location", id: "glass-observatory" }]
+      },
+      {
+        id: "leave-lamp",
+        label: "Suggest they leave it; it seems happy up there",
+        requirements: [],
+        success: "The astronomers confer and decide that a lamp which wants to be a star should be allowed to try. They mark it on the chart with a very small, very formal asterisk.",
+        successEffects: [
+          { type: "quality", id: "poise", amount: 1 },
+          { type: "location", id: "glass-observatory" }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
+  "the-far-crack": {
+    title: "The Far Crack",
+    kicker: "Light that is not lamplight",
+    text: "You return to the uncharted crack at the eastern rim. The thread of pale light is still there, thin as a hair and utterly steady. The chief astronomer stands beside you and, for once, says nothing.",
+    requirements: [
+      { type: "flag", id: "found-the-far-crack", op: "==", value: true },
+      { type: "flag", id: "far-crack-answered", op: "!=", value: true }
+    ],
+    choices: [
+      {
+        id: "signal",
+        label: "Hold your small sun up to the crack",
+        requirements: [{ type: "item", id: "small-sun", op: ">=", value: 1 }],
+        success: "For a moment the small sun and the thin light are the same colour. Then the thread of light flickers: once, twice, three times. Someone, very far above, has seen you. The small sun goes out in your hands, entirely spent.",
+        successEffects: [
+          { type: "item", id: "small-sun", amount: -1 },
+          { type: "echoes", amount: 20 },
+          { type: "flag", id: "signalled-the-surface", value: true },
+          { type: "flag", id: "far-crack-answered", value: true },
+          { type: "location", id: "glass-observatory" }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "chart-it",
+        label: "Help the astronomers chart it properly",
+        requirements: [],
+        success: "It takes all night. When the chart is finished the crack has a name, a number, and a column of careful measurements. Your name is in the margin as its discoverer.",
+        successEffects: [
+          { type: "quality", id: "insight", amount: 1 },
+          { type: "echoes", amount: 8 },
+          { type: "flag", id: "far-crack-answered", value: true },
+          { type: "location", id: "glass-observatory" }
         ],
         failureEffects: []
       }
