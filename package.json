@@ -1,0 +1,12 @@
+{
+  "name": "neathbound",
+  "version": "0.1.0",
+  "private": false,
+  "description": "An original open-source text-led browser RPG with unlimited actions.",
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 4173 --directory .",
+    "test": "node --test",
+    "smoke": "node tests/smoke.mjs"
+  }
+}
