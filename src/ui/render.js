@@ -1,6 +1,6 @@
-import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20260930-21";
-import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions } from "../game/content.js?v=20260930-21";
-import { loadPreferences } from "./preferences.js?v=20260930-21";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20260930-22";
+import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions } from "../game/content.js?v=20260930-22";
+import { loadPreferences } from "./preferences.js?v=20260930-22";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
 
