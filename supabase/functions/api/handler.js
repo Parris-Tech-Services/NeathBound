@@ -10,7 +10,7 @@
 //   GET  /api/journal                                       journal
 //   POST /api/reset                                         new life
 //   POST /api/storylets/:storyId/branches/:choiceId/choose  resolve a choice
-import { availableChoices, availableStories, currentLocation, effectiveChallenge, resolveChoice } from "./game/engine.js";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge, resolveChoice, resolveGameAction } from "./game/engine.js";
 import { locations } from "./game/content.js";
 import { initialState, normaliseState } from "./game/state.js";
 
@@ -81,6 +81,32 @@ export async function handle({ method, path, userId, body = {} }, { repo, random
     }
 
     const outcome = resolveChoice(state, decodeURIComponent(choose[1]), decodeURIComponent(choose[2]), random, ctx);
+    if (outcome.error) return { status: 409, body: { error: outcome.error, state } };
+
+    if (Number.isInteger(expectedRevision)) {
+      const latest = normaliseState(await repo.loadPlayer(userId));
+      if (Number(latest.revision ?? 0) !== expectedRevision) {
+        return { status: 409, body: { error: "This save changed while that action was resolving.", state: latest } };
+      }
+    }
+
+    await repo.savePlayer(userId, outcome.state);
+    return ok(outcome);
+  }
+
+
+  const gameAction = route.match(/^\/api\/action\/([^/]+)$/);
+  if (method === "POST" && gameAction) {
+    const [state, ctx] = await Promise.all([loadOrCreate(), context()]);
+    const expectedRevision = Number(body?.expectedRevision);
+    if (Number.isInteger(expectedRevision) && expectedRevision !== Number(state.revision ?? 0)) {
+      return { status: 409, body: { error: "This save changed in another tab.", state } };
+    }
+
+    const action = decodeURIComponent(gameAction[1]);
+    const payload = { ...body };
+    delete payload.expectedRevision;
+    const outcome = resolveGameAction(state, action, payload, random, ctx);
     if (outcome.error) return { status: 409, body: { error: outcome.error, state } };
 
     if (Number.isInteger(expectedRevision)) {
