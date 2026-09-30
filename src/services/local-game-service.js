@@ -1,4 +1,4 @@
-import { buyItem, equipItem, resolveChoice, resetState, sellItem } from "../game/engine.js?v=20260930-9";
+import { buyItem, equipItem, recoverMenace, resolveChoice, resetState, sellItem } from "../game/engine.js?v=20260930-9";
 import { loadState, saveState } from "../game/state.js?v=20260930-9";
 
 export class LocalGameService {
@@ -21,10 +21,11 @@ export class LocalGameService {
     if (!this.state.unlockedLocations.includes(locationId)) {
       return { error: "That location is not unlocked.", state: this.state, rejected: true };
     }
+    const nextRevision = Number(this.state.revision ?? 0) + 1;
     this.state = {
       ...this.state,
-      revision: Number(this.state.revision ?? 0) + 1,
-      flags: { ...this.state.flags, "__revision": Number(this.state.revision ?? 0) + 1 },
+      revision: nextRevision,
+      flags: { ...this.state.flags, "__revision": nextRevision },
       locationId,
       journal: [`Travelled to ${locationId.replaceAll("-", " ")}.`, ...this.state.journal].slice(0, 100)
     };
@@ -42,6 +43,10 @@ export class LocalGameService {
 
   async equip(itemId) {
     return this.#commit(equipItem(this.state, itemId));
+  }
+
+  async recover(menaceId) {
+    return this.#commit(recoverMenace(this.state, menaceId));
   }
 
   async reset() {
