@@ -22,6 +22,8 @@ async function draw(state = currentState) {
     travel: (locationId) => runAction(() => service.travel(locationId, currentState.revision ?? 0), { focusResult: false }),
     transact: (kind, itemId) => runAction(() => service[kind](itemId, currentState.revision ?? 0)),
     recover: (menaceId) => runAction(() => service.recover(menaceId, currentState.revision ?? 0)),
+    drawOpportunity: () => runAction(() => service.drawOpportunity(currentState.revision ?? 0)),
+    discardOpportunity: (storyId) => runAction(() => service.discardOpportunity(storyId, currentState.revision ?? 0)),
     continue() {
       outcome = null;
       notice = null;
