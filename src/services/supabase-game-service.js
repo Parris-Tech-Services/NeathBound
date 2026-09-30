@@ -1,6 +1,3 @@
-// Online play against the Supabase `api` Edge Function. Same interface as
-// LocalGameService. Each browser gets an anonymous Supabase account (no
-// sign-up form), and the server is authoritative for the player's state.
 const SESSION_KEY = "neathbound.session.v1";
 
 export class SupabaseGameService {
@@ -12,21 +9,18 @@ export class SupabaseGameService {
     this.fetch = fetchImpl;
   }
 
-  getState() {
-    return this.#call("GET", "player");
+  getState() { return this.#call("GET", "player"); }
+  choose(storyId, choiceId, revision = 0) {
+    return this.#call("POST", `storylets/${encodeURIComponent(storyId)}/branches/${encodeURIComponent(choiceId)}/choose`, actionBody(revision));
   }
-
-  choose(storyId, choiceId) {
-    return this.#call("POST", `storylets/${encodeURIComponent(storyId)}/branches/${encodeURIComponent(choiceId)}/choose`);
-  }
-
-  travel(locationId) {
-    return this.#call("POST", `travel/${encodeURIComponent(locationId)}`);
-  }
-
-  reset() {
-    return this.#call("POST", "reset");
-  }
+  travel(locationId, revision = 0) { return this.#call("POST", `travel/${encodeURIComponent(locationId)}`, actionBody(revision)); }
+  buy(itemId, revision = 0) { return this.#call("POST", `bazaar/buy/${encodeURIComponent(itemId)}`, actionBody(revision)); }
+  sell(itemId, revision = 0) { return this.#call("POST", `bazaar/sell/${encodeURIComponent(itemId)}`, actionBody(revision)); }
+  equip(itemId, revision = 0) { return this.#call("POST", `equipment/toggle/${encodeURIComponent(itemId)}`, actionBody(revision)); }
+  recover(menaceId, revision = 0) { return this.#call("POST", `menaces/${encodeURIComponent(menaceId)}/recover`, actionBody(revision)); }
+  drawOpportunity(revision = 0) { return this.#call("POST", "opportunities/draw", actionBody(revision)); }
+  discardOpportunity(storyId, revision = 0) { return this.#call("POST", `opportunities/discard/${encodeURIComponent(storyId)}`, actionBody(revision)); }
+  reset() { return this.#call("POST", "reset", { requestId: crypto.randomUUID() }); }
 
   async #call(method, route, requestBody = {}) {
     const session = await this.#session();
@@ -40,8 +34,7 @@ export class SupabaseGameService {
       body: method === "POST" ? JSON.stringify(requestBody) : undefined
     });
     const payload = await response.json().catch(() => ({}));
-    // 409 = the rules refused the choice; the body carries { error, state }.
-    if (response.ok || response.status === 409) return payload;
+    if (response.ok) return payload;
     throw new Error(payload.error ?? `Request failed: ${response.status}`);
   }
 
@@ -68,10 +61,11 @@ export class SupabaseGameService {
   }
 }
 
+function actionBody(expectedRevision) {
+  return { requestId: crypto.randomUUID(), expectedRevision: Number(expectedRevision ?? 0) };
+}
+
 function readJson(storage, key) {
-  try {
-    return JSON.parse(storage?.getItem(key) ?? "null");
-  } catch {
-    return null;
-  }
+  try { return JSON.parse(storage?.getItem(key) ?? "null"); }
+  catch { return null; }
 }
