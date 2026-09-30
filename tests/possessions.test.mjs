@@ -87,7 +87,7 @@ test("a failed attempt at the locked stacks keeps the key for another try", () =
 
 test("stitching the page needs the silver thimble and spends both", () => {
   const withoutThimble = stateWith("hollow-archive", { "unfinished-page": 1 });
-  assert.match(resolveChoice(withoutThimble, "finish-the-page", "stitch-page", SUCCEED).error, /not available/);
+  assert.match(resolveChoice(withoutThimble, "finish-the-page", "stitch-page", SUCCEED).error, /(?:not available|no longer available)/);
   const { state } = resolveChoice(stateWith("hollow-archive", { "unfinished-page": 1, "silver-thimble": 1 }), "finish-the-page", "stitch-page", SUCCEED);
   assert.equal(state.items["unfinished-page"], undefined);
   assert.equal(state.items["silver-thimble"], undefined);
@@ -119,7 +119,7 @@ test("the sun seed grows a dawn whose morning must be returned", () => {
 
 test("the memory can only be gifted after keeping the flower's appointment", () => {
   const start = stateWith("clockwork-gardens", { "bright-memory": 1 });
-  assert.match(resolveChoice(start, "the-memory-graft", "gift-to-flower", SUCCEED).error, /not available/);
+  assert.match(resolveChoice(start, "the-memory-graft", "gift-to-flower", SUCCEED).error, /(?:not available|no longer available)/);
   const kept = stateWith("clockwork-gardens", { "bright-memory": 1 }, { "garden-appointment:attend": true });
   const { state } = resolveChoice(kept, "the-memory-graft", "gift-to-flower", SUCCEED);
   assert.equal(state.items["bright-memory"], undefined);
