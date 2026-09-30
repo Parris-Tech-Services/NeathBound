@@ -28,7 +28,10 @@ export class LocalGameService {
     }
     const blocked = travelBlockedReason(this.state);
     if (blocked) return { error: blocked, state: this.state };
-    if (!this.state.unlockedLocations.includes(locationId)) return this.state;
+    if (this.state.flags?.["tutorial:travel"] !== true) {
+      return { error: "Travel is not available yet.", state: this.state };
+    }
+    if (!this.state.unlockedLocations.includes(locationId) || locationId === "the-lair") return this.state;
     const revision = Number(this.state.revision ?? 0) + 1;
     this.state = {
       ...this.state,
