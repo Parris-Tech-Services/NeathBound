@@ -23,6 +23,7 @@ function legacyEffects(choice) {
   if (reward.quality) effects.push({ type: "quality", id: reward.quality[0], amount: reward.quality[1] });
   if (reward.menace) effects.push({ type: "menace", id: reward.menace[0], amount: reward.menace[1] });
   if (reward.unlock) effects.push({ type: "unlock", id: reward.unlock });
+  if (reward.globalFlag) effects.push({ type: "global-flag", id: reward.globalFlag[0], value: reward.globalFlag[1] });
   if (choice.target) effects.push({ type: "location", id: choice.target });
   return effects;
 }
@@ -67,11 +68,18 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     for (const effect of legacyEffects(choice)) {
       if (effect.type === "menace") next.menaces[effect.id] = Math.max(0, (next.menaces[effect.id] ?? 0) + effect.amount);
       else if (effect.type === "unlock") { if (!next.unlockedLocations.includes(effect.id)) next.unlockedLocations.push(effect.id); }
+      else if (effect.type === "global-flag") next.globalFlags[effect.id] = effect.value;
       else applyEffects(next, [effect]);
     }
   }
   if (choice.reward?.acquaintance && !next.acquaintances.includes(choice.reward.acquaintance)) next.acquaintances.push(choice.reward.acquaintance);
   next.flags[`${storyId}:${choiceId}`] = true;
+  if (next.hand?.includes(storyId)) {
+    const index = next.hand.indexOf(storyId);
+    next.hand.splice(index, 1);
+    if (!next.discard) next.discard = [];
+    next.discard.push(storyId);
+  }
   const challengeText = challenge ? ` (${success ? "success" : "failure"}: ${check.total} vs ${challenge.difficulty})` : "";
   next.journal = [`${story.title}: ${resultText}${challengeText}`, ...next.journal].slice(0, 30);
   return { state: next, result: resultText, success, roll: check.roll, total: check.total, challenge };

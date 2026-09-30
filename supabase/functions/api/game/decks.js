@@ -20,3 +20,22 @@ export function drawWeightedCard(state, deck, cards, random = Math.random, conte
   }
   return eligible.at(-1);
 }
+
+export function drawCardToHand(state, deck, cards, random = Math.random, context = {}) {
+  const card = drawWeightedCard(state, deck, cards, random, context);
+  if (card) {
+    if (!state.hand) state.hand = [];
+    state.hand.push(card.id);
+  }
+  return card;
+}
+
+export function discardCard(state, cardId) {
+  if (!state.hand) return;
+  const index = state.hand.indexOf(cardId);
+  if (index !== -1) {
+    state.hand.splice(index, 1);
+    if (!state.discard) state.discard = [];
+    state.discard.push(cardId);
+  }
+}

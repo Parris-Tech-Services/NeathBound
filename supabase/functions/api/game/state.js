@@ -13,6 +13,9 @@ export function initialState() {
     unlockedLocations: ["lantern-quay", "velvet-market", "hollow-archive"],
     acquaintances: [],
     flags: {},
+    globalFlags: {},
+    hand: [],
+    discard: [],
     journal: ["You woke beneath a sky made of stone, with a brass key in your hand."],
     lastDraw: "bell-under-water"
   };
