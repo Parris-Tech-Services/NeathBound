@@ -2,7 +2,9 @@ import { locations, stories } from "./content.js";
 import { cloneState, initialState } from "./state.js";
 import { applyEffects, requirementsMet, resolveChallenge } from "./rules.js";
 
-export function currentLocation(state) { return locations[state.locationId] ?? locations["lantern-quay"]; }
+export function currentLocation(state) {
+  return locations[state.locationId] ?? locations["lantern-quay"];
+}
 
 function asRequirements(requirements) {
   if (Array.isArray(requirements)) return requirements;
@@ -13,29 +15,32 @@ function asRequirements(requirements) {
   return normalized;
 }
 
-function requirementsFor(entry) { return asRequirements(entry?.requirements); }
+function requirementsFor(entry) {
+  return asRequirements(entry?.requirements);
+}
 
-function legacyEffects(choice) {
-  const reward = choice.reward ?? {};
-  const effects = [];
-  if (reward.echoes) effects.push({ type: "echoes", amount: reward.echoes });
-  if (reward.item) effects.push({ type: "item", id: reward.item, amount: 1 });
-  if (reward.quality) effects.push({ type: "quality", id: reward.quality[0], amount: reward.quality[1] });
-  if (reward.menace) effects.push({ type: "menace", id: reward.menace[0], amount: reward.menace[1] });
-  if (reward.unlock) effects.push({ type: "unlock", id: reward.unlock });
-  if (choice.target) effects.push({ type: "location", id: choice.target });
-  return effects;
+export function effectiveChallenge(story, choice) {
+  if (!story || !choice) return null;
+  if (choice.challenge === false || choice.challenge === null) return null;
+  return choice.challenge ?? story.challenge ?? null;
 }
 
 export function storyAvailable(state, storyId, context = {}) {
   const story = stories[storyId];
-  return Boolean(story && currentLocation(state).stories.includes(storyId) && requirementsMet(state, requirementsFor(story), context));
+  if (!story) return false;
+  if (!currentLocation(state).stories.includes(storyId)) return false;
+  if (story.once && state.flags[`story-complete:${storyId}`]) return false;
+  return requirementsMet(state, requirementsFor(story), context);
 }
 
-export function canPlay(state, story, context = {}) { return Boolean(story && requirementsMet(state, requirementsFor(story), context)); }
+export function canPlay(state, story, context = {}) {
+  return Boolean(story && requirementsMet(state, requirementsFor(story), context));
+}
 
 export function availableStories(state, context = {}) {
-  return currentLocation(state).stories.filter((id) => storyAvailable(state, id, context)).map((id) => ({ id, ...stories[id] }));
+  return currentLocation(state).stories
+    .filter((id) => storyAvailable(state, id, context))
+    .map((id) => ({ id, ...stories[id] }));
 }
 
 export function choiceAvailable(state, storyId, choiceId, context = {}) {
@@ -51,30 +56,88 @@ export function availableChoices(state, storyId, context = {}) {
 }
 
 export function resolveChoice(state, storyId, choiceId, random = Math.random, context = {}) {
+  const before = cloneState(state);
   const next = cloneState(state);
   const story = stories[storyId];
-  if (!storyAvailable(next, storyId, context)) return { state: next, error: "That story is not available here anymore." };
-  const choice = story.choices.find((candidate) => candidate.id === choiceId);
-  if (!choice || !requirementsMet(next, requirementsFor(choice), context)) return { state: next, error: "That story choice is not available anymore." };
 
-  const challenge = choice.challenge ?? story.challenge ?? null;
+  if (!storyAvailable(next, storyId, context)) {
+    return { state: next, error: "That story is no longer available. Your current state has been refreshed." };
+  }
+
+  const choice = story.choices.find((candidate) => candidate.id === choiceId);
+  if (!choice || !requirementsMet(next, requirementsFor(choice), context)) {
+    return { state: next, error: "That choice is no longer available. Your current state has been refreshed." };
+  }
+
+  const challenge = effectiveChallenge(story, choice);
   const check = resolveChallenge(next, challenge, random);
   const success = check.success;
-  const resultText = success ? choice.success : (choice.failure ?? "The city refuses to explain itself.");
-  if (choice.successEffects || choice.failureEffects) {
-    applyEffects(next, success ? choice.successEffects : choice.failureEffects);
-  } else {
-    for (const effect of legacyEffects(choice)) {
-      if (effect.type === "menace") next.menaces[effect.id] = Math.max(0, (next.menaces[effect.id] ?? 0) + effect.amount);
-      else if (effect.type === "unlock") { if (!next.unlockedLocations.includes(effect.id)) next.unlockedLocations.push(effect.id); }
-      else applyEffects(next, [effect]);
-    }
-  }
-  if (choice.reward?.acquaintance && !next.acquaintances.includes(choice.reward.acquaintance)) next.acquaintances.push(choice.reward.acquaintance);
+  const resultText = success
+    ? choice.success
+    : (choice.failure ?? "The city refuses to explain itself.");
+
+  applyEffects(next, success ? (choice.successEffects ?? []) : (choice.failureEffects ?? []));
   next.flags[`${storyId}:${choiceId}`] = true;
-  const challengeText = challenge ? ` (${success ? "success" : "failure"}: ${check.total} vs ${challenge.difficulty})` : "";
-  next.journal = [`${story.title}: ${resultText}${challengeText}`, ...next.journal].slice(0, 30);
-  return { state: next, result: resultText, success, roll: check.roll, total: check.total, challenge };
+  if (story.once) next.flags[`story-complete:${storyId}`] = true;
+  next.revision = Number(next.revision ?? 0) + 1;\n  next.flags["__revision"] = next.revision;
+
+  const changes = describeChanges(before, next);
+  const challengeText = challenge
+    ? ` (${success ? "success" : "failure"}: ${check.total} vs ${challenge.difficulty})`
+    : "";
+  const journalText = `${story.title}: ${resultText}${challengeText}`;
+  next.journal = [journalText, ...next.journal].slice(0, 100);
+  next.events = [{
+    id: `${Date.now()}-${storyId}-${choiceId}-${next.revision}`,
+    at: new Date().toISOString(),
+    storyId,
+    choiceId,
+    title: story.title,
+    outcome: success ? "success" : "failure",
+    text: resultText,
+    changes
+  }, ...(next.events ?? [])].slice(0, 250);
+
+  return {
+    state: next,
+    storyId,
+    choiceId,
+    title: story.title,
+    result: resultText,
+    success,
+    roll: check.roll,
+    total: check.total,
+    challenge,
+    changes
+  };
 }
 
-export function resetState() { return initialState(); }
+export function resetState() {
+  return initialState();
+}
+
+export function describeChanges(before, after) {
+  const changes = [];
+  const numeric = (group, key, label) => {
+    const from = Number(before[group]?.[key] ?? 0);
+    const to = Number(after[group]?.[key] ?? 0);
+    if (to !== from) changes.push({ type: group, id: key, label, before: from, after: to, delta: to - from });
+  };
+
+  if (Number(before.echoes ?? 0) !== Number(after.echoes ?? 0)) {
+    changes.push({ type: "echoes", id: "echoes", label: "Echoes", before: Number(before.echoes ?? 0), after: Number(after.echoes ?? 0), delta: Number(after.echoes ?? 0) - Number(before.echoes ?? 0) });
+  }
+
+  for (const key of new Set([...Object.keys(before.qualities ?? {}), ...Object.keys(after.qualities ?? {})])) numeric("qualities", key, title(key));
+  for (const key of new Set([...Object.keys(before.menaces ?? {}), ...Object.keys(after.menaces ?? {})])) numeric("menaces", key, title(key));
+  for (const key of new Set([...Object.keys(before.items ?? {}), ...Object.keys(after.items ?? {})])) numeric("items", key, title(key));
+
+  if (before.locationId !== after.locationId) {
+    changes.push({ type: "location", id: after.locationId, label: "Location", before: before.locationId, after: after.locationId });
+  }
+  return changes;
+}
+
+function title(value) {
+  return String(value).split("-").map((part) => part ? part[0].toUpperCase() + part.slice(1) : "").join(" ");
+}
