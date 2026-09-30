@@ -22,11 +22,12 @@ export function render(app, state, handlers) {
   const storiesHtml = stories.map((story) => {
     const available = new Set(availableChoices(state, story.id).map((choice) => choice.id));
     const choicesHtml = story.choices.map((choice) => {
+      const challengeQuality = choice.challenge?.quality ?? choice.challenge?.stat;
       const challenge = choice.challenge
         ? [
             '<div class="challenge-line">',
-            '<span class="challenge-icon">', icon[choice.challenge.quality] ?? "•", '</span>',
-            '<span><strong>', formatName(choice.challenge.quality), ' challenge</strong><br>',
+            '<span class="challenge-icon">', icon[challengeQuality] ?? "•", '</span>',
+            '<span><strong>', formatName(challengeQuality), ' challenge</strong><br>',
             '<small>Difficulty ', choice.challenge.difficulty, '</small></span></div>'
           ].join("")
         : '<div class="challenge-line simple"><span class="challenge-icon">◆</span><span><strong>A straightforward choice</strong><br><small>No challenge roll</small></span></div>';
@@ -173,7 +174,7 @@ export function render(app, state, handlers) {
 }
 
 function formatName(value) {
-  return value.split("-").map((part) => part[0].toUpperCase() + part.slice(1)).join(" ");
+  return String(value ?? "unknown").split("-").map((part) => part[0].toUpperCase() + part.slice(1)).join(" ");
 }
 
 function escapeHtml(value) {
