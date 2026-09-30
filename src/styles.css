@@ -812,3 +812,63 @@ button, select { font: inherit; }
 .outcome-onwards:focus-visible{outline:3px solid #d9b45a;outline-offset:2px}
 .runtime-notice{max-width:1360px;margin:0 auto;padding:10px 16px;background:#f3e3b5;color:#3b2b10;font:700 .8rem Arial,sans-serif;border-bottom:1px solid #c5ab68}
 [aria-busy="true"] .go-button,[aria-busy="true"] .travel-button{cursor:wait}
+
+
+/* Functional tabs, inventory, bazaar, plans and opportunity cards */
+.main-tabs .tab-button{appearance:none;border:0;border-bottom:4px solid transparent;background:transparent;color:#5cbec6;font:700 .84rem Georgia,"Times New Roman",serif;padding:0 0 8px;cursor:pointer}
+.main-tabs .tab-button:hover,.main-tabs .tab-button:focus-visible{color:#d8d1bf}
+.main-tabs .tab-button.active{color:#d8d1bf;border-bottom-color:#c4b895}
+
+.secondary-screen{padding:18px 20px 22px;min-height:420px}
+.secondary-screen>h1{margin:0;font-size:1.55rem}
+.screen-subtitle{margin:4px 0 18px;font-style:italic;color:#504a40}
+.screen-card{margin:0 0 12px;padding:13px 15px;background:rgba(255,255,255,.18);border:1px solid rgba(91,78,57,.24)}
+.screen-card h3{margin:0 0 7px}
+.screen-card p{margin:0 0 8px;line-height:1.45}
+.screen-card small{color:#5e584d}
+.empty-state{padding:14px;color:#beb6a8;border:1px dashed #555;text-align:center}
+.balance-line{font-size:1rem;margin:0 0 12px}
+
+.section-heading.compact{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:0 0 8px}
+.section-heading.compact h2{margin:0;color:#e9e2d5}
+.section-heading.compact .eyebrow{margin:0 0 2px;color:#c3b997}
+.opportunity-hand{margin-bottom:12px}
+.opportunity-card{display:grid;grid-template-columns:48px 1fr;gap:12px;margin:0 0 8px;padding:11px}
+.opportunity-card h3{margin:0 0 3px}
+.opportunity-card p{margin:0 0 8px;line-height:1.35}
+.opportunity-mark{display:grid;place-items:center;width:43px;height:43px;border-radius:50%;background:#3d7f85;color:#e8debb;font-size:1.25rem;border:2px solid #b89e5f}
+.card-actions{display:flex;flex-wrap:wrap;gap:7px}
+.card-choice,.minor-button{border:1px solid #756c5d;background:#e1d8c4;color:#28231d;padding:6px 9px;cursor:pointer;font:700 .74rem Arial,sans-serif}
+.card-choice:hover,.minor-button:hover{filter:brightness(.96)}
+.card-choice small{display:block;margin-top:2px;font-weight:400;color:#60584c}
+.draw-card{min-width:92px}
+
+.stats-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.stat-card{display:flex;justify-content:space-between;padding:8px;background:rgba(70,61,48,.08);border:1px solid rgba(80,70,55,.16)}
+.menace-list{display:grid;gap:7px}
+.menace-card{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-left:4px solid #807862;background:rgba(255,255,255,.14)}
+.menace-card div{display:flex;flex-direction:column}
+.menace-rising{border-left-color:#ad7b3b}
+.menace-dangerous{border-left-color:#8e3434;background:rgba(140,45,45,.08)}
+.tag-list{display:flex;flex-wrap:wrap;gap:6px}
+
+.equipment-grid,.outfit-grid,.inventory-grid,.shop-grid{display:grid;gap:8px}
+.equipment-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.equipment-slot,.saved-outfit{padding:9px;border:1px solid rgba(80,70,55,.2);background:rgba(255,255,255,.12)}
+.equipment-slot{display:flex;flex-direction:column;gap:5px}
+.saved-outfit{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.item-card,.shop-card{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:11px 12px;border:1px solid rgba(80,70,55,.2);background:rgba(255,255,255,.13)}
+.item-card h3,.shop-card h3{margin:0 0 4px}
+.item-card p,.shop-card p{margin:0;line-height:1.35}
+.item-card em{display:block;margin-top:4px;color:#5a6653}
+.item-actions{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end}
+.shop-price{display:flex;flex-direction:column;align-items:end;gap:7px;min-width:90px}
+.plans-list,.message-journal{margin:0 0 10px;padding-left:20px}
+.plans-list li,.message-journal li{margin-bottom:6px}
+
+@media(max-width:700px){
+  .equipment-grid,.stats-grid{grid-template-columns:1fr}
+  .item-card,.shop-card{grid-template-columns:1fr}
+  .item-actions,.shop-price{justify-content:flex-start;align-items:flex-start}
+  .opportunity-card{grid-template-columns:40px 1fr}
+}
