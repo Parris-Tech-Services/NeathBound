@@ -1,5 +1,5 @@
 // NeathBound game API on Supabase: same routes as the former Cloudflare Worker
-// (worker/index.js), now authenticated by Supabase Auth. Pure JavaScript with
+// (the former Cloudflare worker/index.js), now authenticated by Supabase Auth. Pure JavaScript with
 // the repository injected, so Node tests run exactly what Deno deploys.
 //
 //   POST /api/player                                        create (idempotent)

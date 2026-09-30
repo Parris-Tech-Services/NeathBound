@@ -1,0 +1,19 @@
+# Free Supabase projects pause after 7 days without activity. A small weekly
+# read keeps NeathBound's backend awake. It fails loudly if the project is
+# unreachable (e.g. already paused), so it can be restored from the dashboard.
+name: Keep backend awake
+on:
+  schedule:
+    - cron: "17 3 * * 1,4"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read public world state
+        run: |
+          curl --fail-with-body -sS \
+            "https://ynrfskgfrgqxwjswtnka.supabase.co/rest/v1/world_qualities?select=id&limit=1" \
+            -H "apikey: sb_publishable_Kf-_b_1FPPlPUGRTpOXyhQ_GO4Gdaqm"
