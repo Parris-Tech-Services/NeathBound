@@ -1,10 +1,11 @@
-import { availableChoices, availableStories, currentLocation, effectiveChallenge } from "../game/engine.js?v=20260930-14";
-import { locations } from "../game/content.js?v=20260930-14";
-import { loadPreferences } from "./preferences.js?v=20260930-14";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge } from "../game/engine.js?v=20260930-15";
+import { locations } from "../game/content.js?v=20260930-15";
+import { loadPreferences } from "./preferences.js?v=20260930-15";
+import { renderOpportunityPanel, renderScreen } from "./screens.js?v=20260930-15";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
 
-export function render(app, state, handlers, outcome = null) {
+export function render(app, state, handlers, outcome = null, activeTab = "story") {
   const location = currentLocation(state);
   const stories = availableStories(state);
   const inventory = Object.entries(state.items ?? {}).filter(([, quantity]) => quantity > 0);
@@ -134,13 +135,9 @@ export function render(app, state, handlers, outcome = null) {
       '</section>',
 
       '<nav class="main-tabs" aria-label="Game sections">',
-        '<a class="active" href="#stories">STORY</a>',
-        '<a href="#journal">MESSAGES</a>',
-        '<a href="#character">MYSELF</a>',
-        '<a href="#possessions">POSSESSIONS</a>',
-        '<a href="#possessions">BAZAAR</a>',
-        '<a href="#character">FATE</a>',
-        '<a href="#journal">PLANS</a>',
+        ...["story","messages","myself","possessions","bazaar","fate","plans"].map((tab) =>
+          '<button type="button" class="tab-button' + (activeTab === tab ? ' active' : '') + '" data-tab="' + tab + '">' + tab.toUpperCase() + '</button>'
+        ),
       '</nav>',
 
       '<div class="game-grid">',
@@ -173,10 +170,12 @@ export function render(app, state, handlers, outcome = null) {
         '</aside>',
 
         '<main class="story-column" id="stories">',
-          outcome
-            ? outcomeHtml
-            : [
-                '<section class="story-board">',
+          activeTab === "story"
+            ? (outcome
+                ? outcomeHtml
+                : [
+                    renderOpportunityPanel(state),
+                    '<section class="story-board">',
                   '<div class="board-inner">',
                     '<section class="featured-story">',
                       '<div class="feature-art feature-art-', escapeClass(state.locationId), '" aria-hidden="true">', locationArtSvg(state.locationId), '</div>',
@@ -193,9 +192,7 @@ export function render(app, state, handlers, outcome = null) {
               ].join(""),
 
           '<section class="journal parchment" id="journal">',
-            '<h3>What the city remembers</h3>',
-            '<ol>', journalHtml, '</ol>',
-          '</section>',
+
         '</main>',
 
         '<aside class="right-rail">',
@@ -242,6 +239,20 @@ export function render(app, state, handlers, outcome = null) {
     button.addEventListener("click", () => handlers.choose(button.dataset.story, button.dataset.choice));
   });
   app.querySelector("[data-action=onwards]")?.addEventListener("click", handlers.onwards);
+  app.querySelectorAll("[data-tab]").forEach((button) => button.addEventListener("click", () => handlers.navigate(button.dataset.tab)));
+  app.querySelectorAll("[data-system-action]").forEach((button) => {
+    button.dataset.originallyDisabled = String(button.disabled);
+    button.addEventListener("click", () => handlers.systemAction(button.dataset.systemAction, {
+      itemId: button.dataset.itemId,
+      menaceId: button.dataset.menaceId,
+      slot: button.dataset.slot,
+      outfitId: button.dataset.outfitId,
+      cardId: button.dataset.cardId,
+      choiceId: button.dataset.choiceId
+    }));
+  });
+  app.querySelector("[data-action=add-goal]")?.addEventListener("click", handlers.addGoal);
+  app.querySelectorAll("[data-action=remove-goal]").forEach((button) => button.addEventListener("click", () => handlers.removeGoal(Number(button.dataset.goalIndex))));
   app.querySelectorAll("[data-action=bookmark]").forEach((button) => button.addEventListener("click", () => handlers.bookmark(button.dataset.story)));
   app.querySelector("[data-action=outfit]").addEventListener("change", (event) => handlers.outfit(event.target.value));
   app.querySelector("[data-action=travel]").addEventListener("click", () => handlers.travel(app.querySelector("#travel-location").value));
