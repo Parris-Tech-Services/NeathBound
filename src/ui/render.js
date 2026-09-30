@@ -72,6 +72,8 @@ export function render(app, state, handlers, ui = {}) {
     ].join("");
   }).join("");
 
+  const opportunityHtml = renderOpportunities(state, pending);
+  const goalHtml = renderMainGoal(state);
   const resultHtml = ui.outcome
     ? renderOutcome(ui.outcome)
     : (ui.notice ? renderNotice(ui.notice) : "");
@@ -127,6 +129,8 @@ export function render(app, state, handlers, ui = {}) {
       '<p>', escapeHtml(location.subtitle), '</p>',
       '<p class="feature-note"><strong>', escapeHtml(preferences.notes[`location:${state.locationId}`] ?? location.atmosphere), '</strong></p>',
       '</div></section>',
+      goalHtml,
+      opportunityHtml,
       '<section class="story-stack">', storiesHtml || '<p class="empty-state">No stories are currently available here. Try travelling or checking your plans.</p>', '</section>',
       '</div></section>'
     ].join(""),
@@ -227,6 +231,9 @@ function bind(app, handlers) {
     button.addEventListener("click", () => handlers.transact(button.dataset.transaction, button.dataset.item)));
   app.querySelectorAll("[data-recover]").forEach((button) =>
     button.addEventListener("click", () => handlers.recover(button.dataset.recover)));
+  app.querySelector("[data-action=draw-opportunity]")?.addEventListener("click", handlers.drawOpportunity);
+  app.querySelectorAll("[data-discard-opportunity]").forEach((button) =>
+    button.addEventListener("click", () => handlers.discardOpportunity(button.dataset.discardOpportunity)));
   app.querySelectorAll("[data-action=bookmark]").forEach((button) =>
     button.addEventListener("click", () => handlers.bookmark(button.dataset.story)));
   app.querySelectorAll("[data-action=edit-note]").forEach((button) =>
@@ -339,4 +346,31 @@ function escapeHtml(value) {
 
 function escapeClass(value) {
   return String(value ?? "unknown").replace(/[^a-z0-9_-]/gi, "-").toLowerCase();
+}
+
+
+function renderOpportunities(state, pending) {
+  const hand = state.hand ?? [];
+  const cards = hand.map((id) => {
+    const story = storyDefinitions[id];
+    if (!story) return "";
+    return '<article class="opportunity-card"><strong>' + escapeHtml(story.title) + '</strong><small>' + escapeHtml(story.kicker ?? "") + '</small><button data-discard-opportunity="' + id + '"' + (pending ? ' disabled' : '') + '>DISCARD</button></article>';
+  }).join("");
+  return '<section class="opportunity-hand"><div class="section-heading"><div><p class="eyebrow">Opportunities</p><h3>Hand ' + hand.length + '/3</h3></div><button data-action="draw-opportunity"' + (pending || hand.length >= 3 ? ' disabled' : '') + '>DRAW</button></div><div class="opportunity-cards">' + (cards || '<p class="empty-state">Your hand is empty. Draw an opportunity in this district.</p>') + '</div></section>';
+}
+
+function renderMainGoal(state) {
+  const goal = mainGoal(state);
+  return '<section class="main-goal"><p class="eyebrow">Current objective</p><h3>' + escapeHtml(goal.title) + '</h3><p>' + escapeHtml(goal.text) + '</p></section>';
+}
+
+function mainGoal(state) {
+  const flags = state.flags ?? {};
+  if (!flags["story-complete:bell-under-water"]) return { title: "Follow the brass key", text: "Investigate the bell beneath Lantern Quay and learn why the key you woke with responds to it." };
+  if (!flags["story-complete:red-thread"]) return { title: "Follow what was lost", text: "The Velvet Market is full of routes that do not appear on maps. Find the child with the red thread." };
+  if ((state.items?.["archive-key"] ?? 0) > 0) return { title: "Find the key's door", text: "Take the archive key to the Hollow Archive and discover what it unlocks." };
+  if (!(state.unlockedLocations ?? []).includes("clockwork-gardens")) return { title: "Reach the Clockwork Gardens", text: "Find a route upward into the glasshouses above the Lower City." };
+  if ((state.items?.["small-sun"] ?? 0) > 0) return { title: "Return the borrowed darkness", text: "The small sun came with a promise. Carry its displaced darkness back to the Gardens." };
+  if (flags["bound-into-the-index"] && !flags["read-own-entry"]) return { title: "Look yourself up", text: "You have become an entry in the Archive. Find out what the Index says about you." };
+  return { title: "Decide what the city remembers", text: "Follow your plans, reduce your menaces, and pursue the consequences of the choices you have made." };
 }
