@@ -9,6 +9,7 @@ and stays inside one lane. Integration is owned by the release coordinator.
 | Narrative | `src/game/content.js`, `server/content/storylets.json`, story cards, locations, item text | engine algorithms and layout |
 | Interface | `src/ui/`, `index.html`, `src/styles.css` | save schema and story rules |
 | Save & accessibility | `src/game/state.js` persistence adapters, settings, keyboard/ARIA behavior, API client integration | story balance and visual restyling |
+| Backend | `supabase/` (migrations, `api` function), `src/services/`, `src/config.js`, `scripts/sync-engine.mjs`, backend workflows | story content and visual restyling |
 | QA & tooling | `tests/`, docs, fixtures, smoke scripts, release checks | production game behavior unless fixing a test contract |
 
 Suggested worktrees:

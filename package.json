@@ -11,8 +11,6 @@
     "api": "node server/index.mjs",
     "api:test": "node --test server/tests/*.test.mjs",
     "validate:content": "node tools/validate-content.mjs",
-    "worker:dev": "npx wrangler@latest dev --local",
-    "db:migrate:local": "npx wrangler@latest d1 migrations apply neathbound --local",
-    "deploy:worker": "npx wrangler@latest deploy"
+    "sync:engine": "node scripts/sync-engine.mjs"
   }
 }
