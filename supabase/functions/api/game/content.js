@@ -1,4 +1,14 @@
 
+
+export const circles = {
+  lamplighters: { name: "The Lamplighters", description: "They keep the dark at bay, for a price." },
+  archivists: { name: "The Archivists", description: "Hoarders of forgotten paper and dangerous ink." },
+  ferrymen: { name: "The Ferrymen", description: "They row where no one else will." },
+  velvet_houses: { name: "The Velvet Houses", description: "Aristocrats, patrons, and monsters." },
+  brass_union: { name: "The Brass Union", description: "Lawyers, brokers, and devils." },
+  roof_surveyors: { name: "The Roof Surveyors", description: "They look down on everyone else." }
+};
+
 export const itemCategories = {
   curiosity: "Curiosities",
   resource: "Resources",
@@ -66,7 +76,7 @@ export const locations = {
     region: "The Lower City",
     subtitle: "A bazaar for memories, rumours, and perfectly ordinary knives.",
     atmosphere: "Every stall has a curtain. Every curtain has a shadow behind it.",
-    stories: ["borrowed-face", "red-thread", "market-gossip", "market-exchange", "the-sand-reader", "unwritten-ink", "the-debt-collector", "the-loose-end"]
+    stories: ["borrowed-face", "red-thread", "market-gossip", "market-exchange", "circle-diplomacy", "the-sand-reader", "unwritten-ink", "the-debt-collector", "the-loose-end"]
   },
   "hollow-archive": {
     name: "The Hollow Archive",
@@ -133,6 +143,29 @@ export const menaceAreas = {
 };
 
 export const stories = {
+  "circle-diplomacy": {
+    title: "A Meeting of Circles",
+    kicker: "Standing and Obligations",
+    text: "Representatives of the various Circles gather at neutral tables to exchange favours, collect debts, and measure standing.",
+    tags: ["always-available"],
+    choices: [
+      {
+        id: "call-in-archivists",
+        label: "Call in an Obligation from the Archivists",
+        requirements: [{ type: "quality", id: "obligations-archivists", op: ">=", value: 1 }],
+        success: "They owe you a favour. They pay it in heavy, dangerous books.",
+        successEffects: [{ type: "quality", id: "obligations-archivists", amount: -1 }, { type: "item", id: "unfinished-page", amount: 5 }]
+      },
+      {
+        id: "raise-standing-lamplighters",
+        label: "Increase your Standing with the Lamplighters",
+        requirements: [{ type: "quality", id: "obligations-lamplighters", op: ">=", value: 3 }, { type: "item", id: "glimmering-shard", op: ">=", value: 20 }],
+        success: "You offer them light and call in old debts. They will remember your name.",
+        successEffects: [{ type: "quality", id: "obligations-lamplighters", amount: -3 }, { type: "item", id: "glimmering-shard", amount: -20 }, { type: "quality", id: "standing-lamplighters", amount: 1 }]
+      }
+    ]
+  },
+
   "market-exchange": {
     title: "The Silent Exchange",
     kicker: "Currencies of the Neath",

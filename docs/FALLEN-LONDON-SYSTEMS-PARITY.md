@@ -353,7 +353,7 @@ NeathBound:
   - Standing: permanent reputation
 - faction-specific branches and equipment
 
-Status: NOT IMPLEMENTED
+Status: DONE (Circles with Obligations and Standing established, UI built, and Velvet Market diplomacy added).
 
 ## 16. Professions
 

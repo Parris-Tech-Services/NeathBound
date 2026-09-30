@@ -1,5 +1,5 @@
 import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20260930-21";
-import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories } from "../game/content.js?v=20260930-21";
+import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles } from "../game/content.js?v=20260930-21";
 import { loadPreferences } from "./preferences.js?v=20260930-21";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
@@ -84,7 +84,25 @@ const inventoryHtml = inventory.length
     ? inventory.map(([item, quantity]) => '<span>' + formatName(item) + (quantity > 1 ? ' ×' + quantity : '') + '</span>').join("")
     : "<small>Nothing of note.</small>";
   const inventoryCount = inventory.reduce((total, [, quantity]) => total + quantity, 0);
-  const qualityCardsHtml = Object.entries(state.qualities ?? {}).map(([id, value]) => {
+  
+  const circlesHtml = Object.entries(circles).map(([id, def]) => {
+    const obligations = state.qualities?.[`obligations-${id}`] ?? 0;
+    const standing = state.qualities?.[`standing-${id}`] ?? 0;
+    if (obligations === 0 && standing === 0) return '';
+    return `
+      <div class="circle-card">
+        <h4>${escapeHtml(def.name)}</h4>
+        <p>${escapeHtml(def.description)}</p>
+        <div class="circle-stats">
+          <span><strong>${standing}</strong> Standing</span>
+          <span><strong>${obligations}</strong> Obligations</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  const qualityCardsHtml = Object.entries(state.qualities ?? {}).filter(([id]) => !id.startsWith("obligations-") && !id.startsWith("standing-")).map(([id, value]) => {
+
     const details = QUALITY_DETAILS[id] ?? { glyph: "◆", description: "A quality the city has learned to associate with you." };
     const width = Math.min(100, Math.max(4, Number(value) * 10));
     return [
@@ -347,6 +365,8 @@ possessionCardsHtml,
               '<div class="myself-section-heading"><div><p class="myself-kicker">Capabilities</p><h3>Qualities</h3></div><p>What the city has learned you can do.</p></div>',
               '<div class="character-stat-grid">', qualityCardsHtml, '</div>',
             '</section>',
+
+            (circlesHtml ? '<section class="myself-section"><div class="myself-section-heading"><div><p class="myself-kicker">Society</p><h3>Circles</h3></div><p>Standing and obligations.</p></div><div class="circles-grid">' + circlesHtml + '</div></section>' : ''),
 
             '<section class="myself-section">',
               '<div class="myself-section-heading"><div><p class="myself-kicker">Consequences</p><h3>Menaces</h3></div><p>Trouble has a way of keeping its own accounts.</p></div>',
