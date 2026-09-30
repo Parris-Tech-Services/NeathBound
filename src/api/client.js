@@ -19,7 +19,7 @@ export async function connect(content, config, storage = globalThis.localStorage
   if (config.supabaseUrl) {
     try {
       const online = new OnlineGame(config, storage);
-      await online.load();
+      online.initialView = await online.load(); // reused by the first draw
       return online;
     } catch (error) {
       console.info("Neathbound: playing offline.", error.message);

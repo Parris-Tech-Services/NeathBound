@@ -38,4 +38,4 @@ async function act(step) {
   }
 }
 
-draw(await game.load());
+draw(game.initialView ?? (await game.load()));
