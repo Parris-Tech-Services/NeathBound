@@ -34,6 +34,15 @@ const repo = {
     const { error } = await admin.rpc("save_player", { p_user_id: userId, p_state: state });
     if (error) throw error;
   },
+  async savePlayerIfRevision(userId: string, state: unknown, expectedRevision: number) {
+    const { data, error } = await admin.rpc("save_player_if_revision", {
+      p_user_id: userId,
+      p_state: state,
+      p_expected_revision: expectedRevision
+    });
+    if (error) throw error;
+    return Boolean(data);
+  },
   async loadWorldQualities() {
     const { data, error } = await admin.from("world_qualities").select("id, value");
     if (error) throw error;
@@ -52,8 +61,9 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
     const result = await handle(
-      { method: req.method, path: new URL(req.url).pathname, userId: auth.user.id },
+      { method: req.method, path: new URL(req.url).pathname, userId: auth.user.id, body },
       { repo }
     );
     return new Response(JSON.stringify(result.body), { status: result.status, headers });
