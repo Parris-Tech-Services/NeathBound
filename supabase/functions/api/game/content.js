@@ -31,6 +31,7 @@ export const locations = {
 
 export const stories = {
   "bell-under-water": {
+    once: true,
     title: "The Bell Under Water",
     kicker: "A sound from below",
     text: "At low tide, the quay reveals a stairway descending into black water. A bell tolls somewhere beneath the last step. The brass key in your pocket warms.",
@@ -69,6 +70,7 @@ export const stories = {
     ]
   },
   "cartographer-at-dusk": {
+    once: true,
     title: "The Cartographer at Dusk",
     kicker: "A map with an appetite",
     text: "A one-eyed cartographer offers you a map that redraws itself whenever you blink. She wants a true name in exchange for the eastern road.",
@@ -99,6 +101,7 @@ export const stories = {
     ]
   },
   "borrowed-face": {
+    once: true,
     title: "A Borrowed Face",
     kicker: "The tailor's invitation",
     text: "A tailor has stitched a face from moonlit silk. It resembles you, but happier. Wearing it would open every door in the market—and close one behind you.",
@@ -132,6 +135,7 @@ export const stories = {
     ]
   },
   "red-thread": {
+    once: true,
     title: "The Red Thread",
     kicker: "A bargain in three knots",
     text: "A child in a red coat asks you to follow a thread through the market. She promises it leads to whatever you have misplaced.",
@@ -154,7 +158,8 @@ export const stories = {
         requirements: [],
         success: "The market exhales. You keep the loose end; it may be useful.",
         successEffects: [
-          { type: "echoes", amount: 10 },
+          { type: "item", id: "red-thread-end", amount: 1 },
+          { type: "echoes", amount: 4 },
           { type: "location", id: "velvet-market" }
         ],
         failureEffects: []
@@ -162,6 +167,7 @@ export const stories = {
     ]
   },
   "index-of-lost-things": {
+    once: true,
     title: "The Index of Lost Things",
     kicker: "A volume that knows you",
     text: "The archive's index opens to a page describing the thing you miss most. The entry is written in ink that is still wet.",
@@ -195,6 +201,7 @@ export const stories = {
     ]
   },
   "the-quiet-librarian": {
+    once: true,
     title: "The Quiet Librarian",
     kicker: "A question without a mouth",
     text: "The librarian points to three shelves: what you were, what you are, and what the city expects you to become. Only one shelf is dusty.",
@@ -233,17 +240,37 @@ export const stories = {
     tags: ["opportunity"],
     choices: [
       { id: "pour", label: "Pour the tea into the tide", requirements: [], success: "The water settles. The dockworker gives you a name to use at the market.", successEffects: [{ type: "flag", id: "acquaintance-dockworker", value: true }, { type: "quality", id: "poise", amount: 1 }, { type: "location", id: "lantern-quay" }], failureEffects: [] },
-      { id: "drink", label: "Drink the impossible tea", requirements: [], success: "You remember a shore that has never existed.", failure: "The cup tastes of every promise you have broken.", challenge: { quality: "nerve", difficulty: 5 }, successEffects: [{ type: "item", id: "tide-cup", amount: 1 }, { type: "quality", id: "dread", amount: 1 }, { type: "location", id: "hollow-archive" }], failureEffects: [{ type: "quality", id: "dread", amount: 1 }, { type: "location", id: "hollow-archive" }] }
+      { id: "drink", label: "Drink the impossible tea", requirements: [], success: "You remember a shore that has never existed.", failure: "The cup tastes of every promise you have broken.", challenge: { quality: "nerve", difficulty: 5 }, successEffects: [{ type: "item", id: "tide-cup", amount: 1 }, { type: "menace", id: "dread", amount: 1 }, { type: "location", id: "hollow-archive" }], failureEffects: [{ type: "menace", id: "dread", amount: 1 }, { type: "location", id: "hollow-archive" }] }
     ]
   },
   "market-gossip": {
     title: "Market Gossip",
     kicker: "A rumour with clean shoes",
     text: "Three merchants are whispering about a door that only opens for people who have been seen in the wrong place. They notice you listening.",
-    tags: ["opportunity"],
+    tags: ["opportunity", "repeatable"],
     choices: [
-      { id: "trade-rumour", label: "Trade a rumour of your own", success: "The merchants accept the exchange and point you toward the Gardens.", reward: { echoes: 7, unlock: "clockwork-gardens", menace: ["suspicion", 1] }, target: "clockwork-gardens" },
-      { id: "leave", label: "Leave before they learn your name", success: "You leave with your name intact and your pockets lighter by one secret.", reward: { quality: ["shadow", 1] }, target: "velvet-market" }
+      {
+        id: "trade-rumour",
+        label: "Trade a rumour of your own",
+        success: "The merchants accept the exchange and point you toward the Gardens.",
+        successEffects: [
+          { type: "echoes", amount: 4 },
+          { type: "unlock-location", id: "clockwork-gardens" },
+          { type: "menace", id: "suspicion", amount: 1 },
+          { type: "location", id: "clockwork-gardens" }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "leave",
+        label: "Leave before they learn your name",
+        success: "You leave with your name intact and your pockets lighter by one secret.",
+        successEffects: [
+          { type: "quality", id: "shadow", amount: 1 },
+          { type: "location", id: "velvet-market" }
+        ],
+        failureEffects: []
+      }
     ]
   },
   "catalogue-the-dark": {
@@ -252,29 +279,99 @@ export const stories = {
     text: "A shelf has been filled with darkness instead of books. The archive will pay you in echoes if you assign each patch a proper title.",
     challenge: { quality: "insight", difficulty: 7 },
     choices: [
-      { id: "catalogue", label: "Give the darkness its titles", success: "The shelf becomes legible. The archive records your name with a respectful error.", failure: "The darkness gives you a title instead.", reward: { echoes: 15, item: "ink-of-absence" }, target: "hollow-archive" },
-      { id: "close-shelf", label: "Close the shelf", success: "Some knowledge is safer when it remains unindexed.", reward: { menace: ["suspicion", -1] }, target: "lantern-quay" }
+      {
+        id: "catalogue",
+        label: "Give the darkness its titles",
+        success: "The shelf becomes legible. The archive records your name with a respectful error.",
+        failure: "The darkness gives you a title instead.",
+        successEffects: [
+          { type: "echoes", amount: 15 },
+          { type: "item", id: "ink-of-absence", amount: 1 },
+          { type: "location", id: "hollow-archive" }
+        ],
+        failureEffects: [
+          { type: "menace", id: "dread", amount: 1 },
+          { type: "location", id: "hollow-archive" }
+        ]
+      },
+      {
+        id: "close-shelf",
+        label: "Close the shelf",
+        challenge: false,
+        success: "Some knowledge is safer when it remains unindexed.",
+        successEffects: [
+          { type: "menace", id: "suspicion", amount: -1 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      }
     ]
   },
   "garden-appointment": {
+    once: true,
     title: "The Garden Appointment",
     kicker: "A flower expects you",
     text: "A clockwork flower has scheduled a meeting for you at the far end of the glasshouse. It has sent three reminders and one threat.",
     requirements: [{ type: "item", id: "tide-cup", op: ">=", value: 1 }],
     challenge: { quality: "poise", difficulty: 6 },
     choices: [
-      { id: "attend", label: "Attend the appointment", success: "The flower offers a seed that remembers the sun.", failure: "You arrive late. The flower makes a note of it.", reward: { item: "sun-seed", quality: ["poise", 1] }, target: "clockwork-gardens" },
-      { id: "apologise", label: "Send an apology by moth", success: "The flower accepts. For now.", reward: { menace: ["scandal", -1] }, target: "velvet-market" }
+      {
+        id: "attend",
+        label: "Attend the appointment",
+        success: "The flower offers a seed that remembers the sun.",
+        failure: "You arrive late. The flower makes a note of it.",
+        successEffects: [
+          { type: "item", id: "sun-seed", amount: 1 },
+          { type: "quality", id: "poise", amount: 1 },
+          { type: "location", id: "clockwork-gardens" }
+        ],
+        failureEffects: [
+          { type: "menace", id: "scandal", amount: 1 },
+          { type: "location", id: "clockwork-gardens" }
+        ]
+      },
+      {
+        id: "apologise",
+        label: "Send an apology by moth",
+        challenge: false,
+        success: "The flower accepts. For now.",
+        successEffects: [
+          { type: "menace", id: "scandal", amount: -1 },
+          { type: "location", id: "velvet-market" }
+        ],
+        failureEffects: []
+      }
     ]
   },
   "borrowed-sunlight": {
+    once: true,
     title: "Borrowed Sunlight",
     kicker: "A dangerous luxury",
     text: "A glass jar contains a thumb-sized sun. The gardener offers it to you for one night, provided you promise to return the darkness it displaces.",
     tags: ["opportunity"],
     choices: [
-      { id: "borrow", label: "Borrow the small sun", success: "The city looks almost kind in its light.", reward: { item: "small-sun", echoes: 9, menace: ["dread", 1] }, target: "lantern-quay" },
-      { id: "refuse-sun", label: "Refuse the bargain", success: "The gardener approves of your caution.", reward: { quality: ["nerve", 1] }, target: "clockwork-gardens" }
+      {
+        id: "borrow",
+        label: "Borrow the small sun",
+        success: "The city looks almost kind in its light.",
+        successEffects: [
+          { type: "item", id: "small-sun", amount: 1 },
+          { type: "echoes", amount: 9 },
+          { type: "menace", id: "dread", amount: 1 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "refuse-sun",
+        label: "Refuse the bargain",
+        success: "The gardener approves of your caution.",
+        successEffects: [
+          { type: "quality", id: "nerve", amount: 1 },
+          { type: "location", id: "clockwork-gardens" }
+        ],
+        failureEffects: []
+      }
     ]
   },
   "salt-on-the-map": {
