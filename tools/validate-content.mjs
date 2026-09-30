@@ -1,6 +1,6 @@
 import { locations, stories } from "../src/game/content.js";
 
-const effectTypes = new Set(["quality", "set-quality", "echoes", "item", "flag", "location"]);
+const effectTypes = new Set(["quality", "set-quality", "echoes", "item", "flag", "location", "menace", "unlock-location"]);
 const requirementTypes = new Set(["quality", "item", "flag", "echoes", "location", "world-quality"]);
 const errors = [];
 function requirements(value) {
@@ -38,7 +38,7 @@ for (const [storyId, story] of Object.entries(stories)) {
 
     for (const effect of [...(choice.successEffects ?? []), ...(choice.failureEffects ?? [])]) {
       if (!effectTypes.has(effect.type)) errors.push(`Choice ${storyId}/${choice.id} has unknown effect type ${effect.type}`);
-      if (effect.type === "location" && !locations[effect.id]) {
+      if ((effect.type === "location" || effect.type === "unlock-location") && !locations[effect.id]) {
         errors.push(`Choice ${storyId}/${choice.id} targets missing location ${effect.id}`);
       }
     }
