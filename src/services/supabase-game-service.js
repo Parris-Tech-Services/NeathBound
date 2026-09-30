@@ -41,6 +41,14 @@ export class SupabaseGameService {
     return this.#call("POST", `menaces/${encodeURIComponent(menaceId)}/recover`, actionBody(expectedRevision));
   }
 
+  drawOpportunity(expectedRevision = 0) {
+    return this.#call("POST", "opportunities/draw", actionBody(expectedRevision));
+  }
+
+  discardOpportunity(storyId, expectedRevision = 0) {
+    return this.#call("POST", `opportunities/discard/${encodeURIComponent(storyId)}`, actionBody(expectedRevision));
+  }
+
   reset() {
     return this.#call("POST", "reset", { requestId: crypto.randomUUID() });
   }
