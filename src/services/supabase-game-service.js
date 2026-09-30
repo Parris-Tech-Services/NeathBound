@@ -16,12 +16,16 @@ export class SupabaseGameService {
     return this.#call("GET", "player");
   }
 
-  choose(storyId, choiceId) {
-    return this.#call("POST", `storylets/${encodeURIComponent(storyId)}/branches/${encodeURIComponent(choiceId)}/choose`);
+  choose(storyId, choiceId, { expectedRevision } = {}) {
+    return this.#call(
+      "POST",
+      `storylets/${encodeURIComponent(storyId)}/branches/${encodeURIComponent(choiceId)}/choose`,
+      { expectedRevision }
+    );
   }
 
-  travel(locationId) {
-    return this.#call("POST", `travel/${encodeURIComponent(locationId)}`);
+  travel(locationId, { expectedRevision } = {}) {
+    return this.#call("POST", `travel/${encodeURIComponent(locationId)}`, { expectedRevision });
   }
 
   reset() {
@@ -40,7 +44,8 @@ export class SupabaseGameService {
       body: method === "POST" ? JSON.stringify(requestBody) : undefined
     });
     const payload = await response.json().catch(() => ({}));
-    // 409 = the rules refused the choice; the body carries { error, state }.
+    // 409 is a recoverable rule/concurrency refusal. The authoritative state
+    // is returned so the page can heal without another blind retry.
     if (response.ok || response.status === 409) return payload;
     throw new Error(payload.error ?? `Request failed: ${response.status}`);
   }
