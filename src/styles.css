@@ -864,3 +864,116 @@ button, select { font: inherit; }
   .profile-grid { grid-template-columns: 1fr; }
   .screen-panel { min-height: 0; padding: 14px; }
 }
+
+
+/* Functional systems: economy, opportunities, equipment and objectives */
+.main-goal {
+  margin: 10px 0;
+  padding: 12px 14px;
+  color: #171717;
+  background: linear-gradient(100deg,#d6cfbc,#c8bea8);
+  border: 1px solid #928874;
+  border-left: 5px solid #8b6b2d;
+}
+.main-goal .eyebrow,
+.opportunity-hand .eyebrow { margin: 0 0 3px; font: 700 .68rem Arial,sans-serif; letter-spacing: .12em; color: #715b2e; }
+.main-goal h3 { margin: 0 0 4px; }
+.main-goal p:last-child { margin: 0; font-size: .82rem; line-height: 1.35; }
+
+.opportunity-hand {
+  margin: 10px 0;
+  padding: 10px;
+  color: #171717;
+  background: rgba(219,211,191,.88);
+  border: 1px solid #988d78;
+}
+.opportunity-hand .section-heading {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+.opportunity-hand h3 { margin:0; font-size:1rem; }
+.opportunity-hand button,
+.inventory-card button,
+.menace-card button,
+.secondary-action,
+.plan-card button {
+  border: 1px solid #296971;
+  background: linear-gradient(#4e979e,#32757c);
+  color: #f1f7f7;
+  padding: 6px 10px;
+  font: 700 .68rem Arial,sans-serif;
+  cursor:pointer;
+}
+.opportunity-hand button:disabled,
+.inventory-card button:disabled,
+.menace-card button:disabled { opacity:.45; cursor:not-allowed; }
+.opportunity-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:7px; }
+.opportunity-card {
+  display:grid;
+  gap:4px;
+  padding:8px;
+  background:rgba(255,255,255,.18);
+  border:1px solid #a59a84;
+}
+.opportunity-card small { min-height:2.2em; color:#4f493e; }
+
+.inventory-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:10px;
+}
+.inventory-card {
+  display:flex;
+  flex-direction:column;
+  min-height:150px;
+  padding:12px;
+  background:rgba(255,255,255,.16);
+  border:1px solid #9a907d;
+  box-shadow:inset 0 0 12px rgba(85,68,45,.06);
+}
+.inventory-card h3 { margin:0 0 6px; }
+.inventory-card p { flex:1; margin:0 0 8px; line-height:1.35; font-size:.8rem; }
+.inventory-card small { display:block; margin-bottom:9px; color:#554e42; }
+.item-actions { display:flex; flex-wrap:wrap; gap:6px; }
+.shop-card button { width:100%; margin-top:auto; }
+
+.equipment-list { display:grid; gap:6px; }
+.equipment-slot {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:8px 10px;
+  border:1px solid #a29680;
+  background:rgba(255,255,255,.14);
+}
+.quality-rating { display:block; margin-top:3px; color:#bbb4a5; font-size:.65rem; }
+.quality-title em { color:#73cbd0; font-style:normal; margin-left:2px; }
+
+.menace-list { display:grid; gap:8px; }
+.menace-card {
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:5px 10px;
+  align-items:center;
+  padding:9px 10px;
+  border:1px solid #a18c7e;
+  background:rgba(105,55,50,.08);
+}
+.menace-card div { display:grid; }
+.menace-card small { font-size:.68rem; }
+.menace-card > span { font-size:1.15rem; font-weight:700; }
+.menace-card button { grid-column:1 / -1; }
+.menace-rising { border-left:4px solid #ad8c35; }
+.menace-serious { border-left:4px solid #a55e37; }
+.menace-critical { border-left:4px solid #8c2e2e; }
+
+.journal-list li p { margin:4px 0; }
+.journal-list li small { color:#625b50; }
+.secondary-action { margin-top:12px; }
+.save-mode { color:#9e998f; font-weight:400; }
+
+@media (max-width:700px) {
+  .inventory-grid,.opportunity-cards { grid-template-columns:1fr; }
+}
