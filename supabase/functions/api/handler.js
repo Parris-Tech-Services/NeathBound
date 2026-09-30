@@ -1,4 +1,4 @@
-import { availableChoices, availableStories, currentLocation, effectiveChallenge, resolveChoice } from "./game/engine.js";
+import { availableChoices, availableStories, buyItem, currentLocation, effectiveChallenge, equipItem, resolveChoice, sellItem } from "./game/engine.js";
 import { locations } from "./game/content.js";
 import { initialState, normaliseState } from "./game/state.js";
 
