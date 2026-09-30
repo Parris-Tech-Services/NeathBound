@@ -1,0 +1,460 @@
+[
+  {
+    "id": "bell-under-water",
+    "area": "lantern-quay",
+    "sort": 0,
+    "title": "The Bell Under Water",
+    "kicker": "A sound from below",
+    "text": "At low tide, the quay reveals a stairway descending into black water. A bell tolls somewhere beneath the last step. The brass key in your pocket warms.",
+    "requirements": [],
+    "branches": [
+      {
+        "id": "bell-under-water.descend",
+        "label": "Descend toward the bell",
+        "sort": 0,
+        "requirements": [],
+        "challenge": {
+          "quality": "nerve",
+          "difficulty": 5
+        },
+        "success": {
+          "text": "You find a submerged door and unlock it. Something on the other side learns your name.",
+          "effects": [
+            {
+              "quality": "echoes",
+              "add": 8
+            },
+            {
+              "quality": "black-sand",
+              "set": 1
+            }
+          ],
+          "moveTo": "hollow-archive"
+        },
+        "failure": {
+          "text": "The water closes over your head. You return with a pocketful of black sand.",
+          "effects": [
+            {
+              "quality": "echoes",
+              "add": 8
+            },
+            {
+              "quality": "black-sand",
+              "set": 1
+            }
+          ],
+          "moveTo": "hollow-archive"
+        }
+      },
+      {
+        "id": "bell-under-water.listen",
+        "label": "Listen for the pattern",
+        "sort": 1,
+        "requirements": [],
+        "challenge": {
+          "quality": "nerve",
+          "difficulty": 5
+        },
+        "success": {
+          "text": "The bell's rhythm maps a route through the city.",
+          "effects": [
+            {
+              "quality": "insight",
+              "add": 1
+            }
+          ],
+          "moveTo": "lantern-quay"
+        },
+        "failure": {
+          "text": "You hear only your own heartbeat, which is embarrassing but useful.",
+          "effects": [
+            {
+              "quality": "insight",
+              "add": 1
+            }
+          ],
+          "moveTo": "lantern-quay"
+        }
+      }
+    ]
+  },
+  {
+    "id": "cartographer-at-dusk",
+    "area": "lantern-quay",
+    "sort": 1,
+    "title": "The Cartographer at Dusk",
+    "kicker": "A map with an appetite",
+    "text": "A one-eyed cartographer offers you a map that redraws itself whenever you blink. She wants a true name in exchange for the eastern road.",
+    "requirements": [],
+    "branches": [
+      {
+        "id": "cartographer-at-dusk.trade",
+        "label": "Offer the name you were given",
+        "sort": 0,
+        "requirements": [],
+        "challenge": null,
+        "success": {
+          "text": "The map accepts the name and opens a red road to the market.",
+          "effects": [
+            {
+              "quality": "echoes",
+              "add": 4
+            }
+          ],
+          "moveTo": "velvet-market"
+        },
+        "failure": null
+      },
+      {
+        "id": "cartographer-at-dusk.decline",
+        "label": "Keep your name",
+        "sort": 1,
+        "requirements": [],
+        "challenge": null,
+        "success": {
+          "text": "The cartographer nods. She marks a safer route in invisible ink.",
+          "effects": [
+            {
+              "quality": "poise",
+              "add": 1
+            }
+          ],
+          "moveTo": "lantern-quay"
+        },
+        "failure": null
+      }
+    ]
+  },
+  {
+    "id": "borrowed-face",
+    "area": "velvet-market",
+    "sort": 0,
+    "title": "A Borrowed Face",
+    "kicker": "The tailor's invitation",
+    "text": "A tailor has stitched a face from moonlit silk. It resembles you, but happier. Wearing it would open every door in the market—and close one behind you.",
+    "requirements": [],
+    "branches": [
+      {
+        "id": "borrowed-face.wear",
+        "label": "Wear the borrowed face",
+        "sort": 0,
+        "requirements": [],
+        "challenge": {
+          "quality": "poise",
+          "difficulty": 4
+        },
+        "success": {
+          "text": "The market parts like grass. You leave with a silver thimble and a new rumour about yourself.",
+          "effects": [
+            {
+              "quality": "echoes",
+              "add": 6
+            },
+            {
+              "quality": "silver-thimble",
+              "set": 1
+            }
+          ],
+          "moveTo": "velvet-market"
+        },
+        "failure": {
+          "text": "The face slips. The tailor charges you for the embarrassment.",
+          "effects": [
+            {
+              "quality": "echoes",
+              "add": 6
+            },
+            {
+              "quality": "silver-thimble",
+              "set": 1
+            }
+          ],
+          "moveTo": "velvet-market"
+        }
+      },
+      {
+        "id": "borrowed-face.study",
+        "label": "Study the stitching",
+        "sort": 1,
+        "requirements": [],
+        "challenge": {
+          "quality": "poise",
+          "difficulty": 4
+        },
+        "success": {
+          "text": "You learn how appearances are fastened here.",
+          "effects": [
+            {
+              "quality": "insight",
+              "add": 1
+            }
+          ],
+          "moveTo": "hollow-archive"
+        },
+        "failure": {
+          "text": "The city refuses to explain itself.",
+          "effects": [
+            {
+              "quality": "insight",
+              "add": 1
+            }
+          ],
+          "moveTo": "hollow-archive"
+        }
+      }
+    ]
+  },
+  {
+    "id": "red-thread",
+    "area": "velvet-market",
+    "sort": 1,
+    "title": "The Red Thread",
+    "kicker": "A bargain in three knots",
+    "text": "A child in a red coat asks you to follow a thread through the market. She promises it leads to whatever you have misplaced.",
+    "requirements": [],
+    "branches": [
+      {
+        "id": "red-thread.follow",
+        "label": "Follow the thread",
+        "sort": 0,
+        "requirements": [],
+        "challenge": null,
+        "success": {
+          "text": "It leads to a locked archive door and a useful key.",
+          "effects": [
+            {
+              "quality": "archive-key",
+              "set": 1
+            }
+          ],
+          "moveTo": "hollow-archive"
+        },
+        "failure": null
+      },
+      {
+        "id": "red-thread.cut",
+        "label": "Cut the thread",
+        "sort": 1,
+        "requirements": [],
+        "challenge": null,
+        "success": {
+          "text": "The market exhales. You keep the loose end; it may be useful.",
+          "effects": [
+            {
+              "quality": "echoes",
+              "add": 10
+            }
+          ],
+          "moveTo": "velvet-market"
+        },
+        "failure": null
+      }
+    ]
+  },
+  {
+    "id": "index-of-lost-things",
+    "area": "hollow-archive",
+    "sort": 0,
+    "title": "The Index of Lost Things",
+    "kicker": "A volume that knows you",
+    "text": "The archive's index opens to a page describing the thing you miss most. The entry is written in ink that is still wet.",
+    "requirements": [],
+    "branches": [
+      {
+        "id": "index-of-lost-things.read",
+        "label": "Read the full entry",
+        "sort": 0,
+        "requirements": [],
+        "challenge": {
+          "quality": "insight",
+          "difficulty": 6
+        },
+        "success": {
+          "text": "The archive gives you a memory, sharpened into a tool.",
+          "effects": [
+            {
+              "quality": "bright-memory",
+              "set": 1
+            },
+            {
+              "quality": "insight",
+              "add": 1
+            }
+          ],
+          "moveTo": "hollow-archive"
+        },
+        "failure": {
+          "text": "The words rearrange into a recipe for regret.",
+          "effects": [
+            {
+              "quality": "bright-memory",
+              "set": 1
+            },
+            {
+              "quality": "insight",
+              "add": 1
+            }
+          ],
+          "moveTo": "hollow-archive"
+        }
+      },
+      {
+        "id": "index-of-lost-things.close",
+        "label": "Close the book gently",
+        "sort": 1,
+        "requirements": [],
+        "challenge": {
+          "quality": "insight",
+          "difficulty": 6
+        },
+        "success": {
+          "text": "The librarian smiles. Some doors are safer when left named.",
+          "effects": [
+            {
+              "quality": "poise",
+              "add": 1
+            }
+          ],
+          "moveTo": "lantern-quay"
+        },
+        "failure": {
+          "text": "The city refuses to explain itself.",
+          "effects": [
+            {
+              "quality": "poise",
+              "add": 1
+            }
+          ],
+          "moveTo": "lantern-quay"
+        }
+      }
+    ]
+  },
+  {
+    "id": "the-quiet-librarian",
+    "area": "hollow-archive",
+    "sort": 1,
+    "title": "The Quiet Librarian",
+    "kicker": "A question without a mouth",
+    "text": "The librarian points to three shelves: what you were, what you are, and what the city expects you to become. Only one shelf is dusty.",
+    "requirements": [],
+    "branches": [
+      {
+        "id": "the-quiet-librarian.dusty",
+        "label": "Choose the dusty shelf",
+        "sort": 0,
+        "requirements": [],
+        "challenge": null,
+        "success": {
+          "text": "You find a route back to the quay and a page with your handwriting.",
+          "effects": [
+            {
+              "quality": "echoes",
+              "add": 12
+            },
+            {
+              "quality": "unfinished-page",
+              "set": 1
+            }
+          ],
+          "moveTo": "lantern-quay"
+        },
+        "failure": null
+      },
+      {
+        "id": "the-quiet-librarian.future",
+        "label": "Choose the expected shelf",
+        "sort": 1,
+        "requirements": [],
+        "challenge": null,
+        "success": {
+          "text": "The city applauds politely. You gain a title you did not request.",
+          "effects": [
+            {
+              "quality": "echoes",
+              "add": 3
+            },
+            {
+              "quality": "poise",
+              "add": 1
+            }
+          ],
+          "moveTo": "velvet-market"
+        },
+        "failure": null
+      }
+    ]
+  },
+  {
+    "id": "the-locked-stacks",
+    "area": "hollow-archive",
+    "sort": 2,
+    "title": "The Locked Stacks",
+    "kicker": "A door that was waiting for you",
+    "text": "Behind the reading room, a narrow door has been painted to look like more shelves. The archive key fits it as if it had been cut from the lock itself.",
+    "requirements": [
+      {
+        "quality": "archive-key",
+        "min": 1
+      }
+    ],
+    "branches": [
+      {
+        "id": "the-locked-stacks.bribe",
+        "label": "Pay the doorkeeper-moth its toll",
+        "sort": 0,
+        "requirements": [
+          {
+            "quality": "echoes",
+            "min": 10
+          }
+        ],
+        "challenge": null,
+        "success": {
+          "text": "The moth counts every coin twice, then lets you read the catalogue of things the city has forgotten on purpose.",
+          "effects": [
+            {
+              "quality": "echoes",
+              "add": -10
+            },
+            {
+              "quality": "insight",
+              "add": 2
+            }
+          ],
+          "moveTo": null
+        },
+        "failure": null
+      },
+      {
+        "id": "the-locked-stacks.slip",
+        "label": "Slip past while the lamps gutter",
+        "sort": 1,
+        "requirements": [],
+        "challenge": {
+          "quality": "nerve",
+          "difficulty": 7
+        },
+        "success": {
+          "text": "You move between heartbeats and return with a page no one will admit is missing.",
+          "effects": [
+            {
+              "quality": "unfinished-page",
+              "set": 1
+            },
+            {
+              "quality": "nerve",
+              "add": 1
+            }
+          ],
+          "moveTo": null
+        },
+        "failure": {
+          "text": "The lamps flare. You are escorted, very politely, back to the quay.",
+          "effects": [],
+          "moveTo": "lantern-quay"
+        }
+      }
+    ]
+  }
+]

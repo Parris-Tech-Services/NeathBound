@@ -1,0 +1,23 @@
+[
+  {
+    "id": "lantern-quay",
+    "name": "Lantern Quay",
+    "subtitle": "Where the tide carries messages in sealed bottles.",
+    "atmosphere": "Wet brass, coal smoke, and a bell that rings beneath the water.",
+    "sort": 0
+  },
+  {
+    "id": "velvet-market",
+    "name": "The Velvet Market",
+    "subtitle": "A bazaar for memories, rumours, and perfectly ordinary knives.",
+    "atmosphere": "Every stall has a curtain. Every curtain has a shadow behind it.",
+    "sort": 1
+  },
+  {
+    "id": "hollow-archive",
+    "name": "The Hollow Archive",
+    "subtitle": "A library where the books remember who borrowed them.",
+    "atmosphere": "Dust hangs in the air like a second, slower snowfall.",
+    "sort": 2
+  }
+]

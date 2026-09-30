@@ -1,0 +1,14 @@
+{
+  "startingArea": "lantern-quay",
+  "startingName": "The Unmoored",
+  "startingQualities": {
+    "nerve": 2,
+    "insight": 2,
+    "poise": 1,
+    "echoes": 12,
+    "salted-map": 1
+  },
+  "startingJournal": [
+    "You woke beneath a sky made of stone, with a brass key in your hand."
+  ]
+}

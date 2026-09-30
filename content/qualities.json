@@ -1,0 +1,62 @@
+[
+  {
+    "id": "nerve",
+    "name": "Nerve",
+    "category": "stat",
+    "description": "Courage in the face of the city."
+  },
+  {
+    "id": "insight",
+    "name": "Insight",
+    "category": "stat",
+    "description": "Seeing what the city would rather you did not."
+  },
+  {
+    "id": "poise",
+    "name": "Poise",
+    "category": "stat",
+    "description": "Grace, manners and the right mask."
+  },
+  {
+    "id": "echoes",
+    "name": "Echoes",
+    "category": "currency",
+    "description": "Coins that still ring with the sound of their last owner."
+  },
+  {
+    "id": "salted-map",
+    "name": "Salted Map",
+    "category": "item",
+    "description": ""
+  },
+  {
+    "id": "black-sand",
+    "name": "Black Sand",
+    "category": "item",
+    "description": ""
+  },
+  {
+    "id": "silver-thimble",
+    "name": "Silver Thimble",
+    "category": "item",
+    "description": ""
+  },
+  {
+    "id": "archive-key",
+    "name": "Archive Key",
+    "category": "item",
+    "description": ""
+  },
+  {
+    "id": "bright-memory",
+    "name": "Bright Memory",
+    "category": "item",
+    "description": ""
+  },
+  {
+    "id": "unfinished-page",
+    "name": "Unfinished Page",
+    "category": "item",
+    "description": ""
+  }
+]
