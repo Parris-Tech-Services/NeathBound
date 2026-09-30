@@ -121,7 +121,7 @@ test("Possessions opens a dedicated inventory view and Story returns to play", a
   assert.equal(await page.locator("[data-view-panel=story]").isHidden(), true, "story view is hidden while possessions is open");
   assert.match(await page.locator("#possessions").innerText(), /Salted Map/);
   assert.match(await page.locator("#possessions").innerText(), /Brass Key/);
-  assert.match(await page.locator("#possessions").innerText(), /Documents/);
+  assert.match(await page.locator("#possessions").innerText(), /DOCUMENTS/i);
 
   await page.locator(".main-tabs [data-view=story]").click();
   assert.equal(await page.locator("[data-view-panel=story]").isVisible(), true, "Story returns to the playable view");
