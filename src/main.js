@@ -1,6 +1,6 @@
-import { createGameService } from "./services/index.js?v=20260930-17";
-import { render } from "./ui/render.js?v=20260930-17";
-import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20260930-17";
+import { createGameService } from "./services/index.js?v=20260930-18";
+import { render } from "./ui/render.js?v=20260930-18";
+import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20260930-18";
 
 const app = document.querySelector("#app");
 const bootScreen = document.querySelector("#boot-screen");
@@ -18,6 +18,7 @@ let bootFinished = false;
 let currentState = null;
 let lastOutcome = null;
 let pending = false;
+let started = false;
 
 async function draw(state) {
   const resolvedState = state ?? await service.getState();
@@ -173,13 +174,23 @@ function showError(error) {
   app.prepend(message);
 }
 
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible" && !pending && !lastOutcome) {
-    draw().catch((error) => {
-  showError(error);
-  finishBoot();
-});
+async function startGame() {
+  if (started) return;
+  started = true;
+  try {
+    await draw();
+  } catch (error) {
+    showError(error);
+    finishBoot();
   }
+}
+
+window.addEventListener("neathbound:enter", () => {
+  startGame();
 });
 
-draw().catch(showError);
+document.addEventListener("visibilitychange", () => {
+  if (started && document.visibilityState === "visible" && !pending && !lastOutcome) {
+    draw().catch(showError);
+  }
+});
