@@ -1,6 +1,6 @@
 import { locations, stories } from "../src/game/content.js";
 
-const effectTypes = new Set(["quality", "set-quality", "echoes", "item", "flag", "location", "menace", "unlock-location"]);
+const effectTypes = new Set(["quality", "set-quality", "echoes", "item", "flag", "location", "menace", "unlock-location", "momentum", "global-flag", "acquaintance"]);
 const requirementTypes = new Set(["quality", "item", "flag", "echoes", "location", "world-quality"]);
 const errors = [];
 function requirements(value) {

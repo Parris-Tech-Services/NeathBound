@@ -56,3 +56,21 @@ test("story and choice availability are explicit predicates", () => {
   assert.equal(storyAvailable(state, "borrowed-face"), false);
   assert.equal(choiceAvailable(state, "bell-under-water", "descend"), true);
 });
+
+test("momentum turns a near-miss challenge into a success and is spent", () => {
+  const state = initialState();
+  state.momentum = 1;
+  // die 1 + nerve 2 = 3 vs difficulty 5: a near miss that momentum (+3) rescues
+  const result = resolveChoice(state, "bell-under-water", "descend", () => 0);
+  assert.equal(result.success, true);
+  assert.equal(result.usedMomentum, true);
+  assert.equal(result.state.momentum, 0);
+  assert.match(result.state.journal[0], /with momentum/);
+  assert.ok(result.changes.some((change) => change.type === "momentum" && change.delta === -1));
+});
+
+test("without momentum the same near miss fails", () => {
+  const result = resolveChoice(initialState(), "bell-under-water", "descend", () => 0);
+  assert.equal(result.success, false);
+  assert.equal(result.usedMomentum, false);
+});

@@ -71,7 +71,16 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
 
   const challenge = effectiveChallenge(story, choice);
   const check = resolveChallenge(next, challenge, random);
-  const success = check.success;
+  let success = check.success;
+  // Momentum: a near miss (within 3) can be turned into a success by
+  // spending one point of momentum.
+  let usedMomentum = false;
+  if (challenge && !success && (next.momentum ?? 0) > 0 && check.total + 3 >= challenge.difficulty) {
+    next.momentum -= 1;
+    check.total += 3;
+    check.success = success = true;
+    usedMomentum = true;
+  }
   const resultText = success
     ? choice.success
     : (choice.failure ?? "The city refuses to explain itself.");
@@ -79,11 +88,15 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
   applyEffects(next, success ? (choice.successEffects ?? []) : (choice.failureEffects ?? []));
   next.flags[`${storyId}:${choiceId}`] = true;
   if (story.once) next.flags[`story-complete:${storyId}`] = true;
+  if (next.hand?.includes(storyId)) {
+    next.hand.splice(next.hand.indexOf(storyId), 1);
+    next.discard = [...(next.discard ?? []), storyId];
+  }
   next.revision = Number(next.revision ?? 0) + 1;
 
   const changes = describeChanges(before, next);
   const challengeText = challenge
-    ? ` (${success ? "success" : "failure"}: ${check.total} vs ${challenge.difficulty})`
+    ? ` (${success ? "success" : "failure"}: ${check.total} vs ${challenge.difficulty}${usedMomentum ? " with momentum" : ""})`
     : "";
   const journalText = `${story.title}: ${resultText}${challengeText}`;
   next.journal = [journalText, ...next.journal].slice(0, 100);
@@ -108,6 +121,7 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     roll: check.roll,
     total: check.total,
     challenge,
+    usedMomentum,
     changes
   };
 }
@@ -124,6 +138,10 @@ export function describeChanges(before, after) {
     if (to !== from) changes.push({ type: group, id: key, label, before: from, after: to, delta: to - from });
   };
 
+  if (Number(before.momentum ?? 0) !== Number(after.momentum ?? 0)) {
+    changes.push({ type: "momentum", id: "momentum", label: "Momentum", before: Number(before.momentum ?? 0), after: Number(after.momentum ?? 0), delta: Number(after.momentum ?? 0) - Number(before.momentum ?? 0) });
+  }
+
   if (Number(before.echoes ?? 0) !== Number(after.echoes ?? 0)) {
     changes.push({ type: "echoes", id: "echoes", label: "Echoes", before: Number(before.echoes ?? 0), after: Number(after.echoes ?? 0), delta: Number(after.echoes ?? 0) - Number(before.echoes ?? 0) });
   }
@@ -133,7 +151,7 @@ export function describeChanges(before, after) {
   for (const key of new Set([...Object.keys(before.items ?? {}), ...Object.keys(after.items ?? {})])) numeric("items", key, title(key));
 
   if (before.locationId !== after.locationId) {
-    changes.push({ type: "location", id: after.locationId, label: "Location", before: before.locationId, after: after.locationId });
+    changes.push({ type: "location", id: after.locationId, label: "Location", before: before.locationId, after: after.locationId, message: `You are now at ${locations[after.locationId]?.name ?? title(after.locationId)}.` });
   }
   return changes;
 }

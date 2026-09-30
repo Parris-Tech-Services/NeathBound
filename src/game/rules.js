@@ -69,6 +69,13 @@ export function applyEffect(state, effect) {
       state.unlockedLocations ??= [];
       if (!state.unlockedLocations.includes(effect.id)) state.unlockedLocations.push(effect.id);
       break;
+    case "momentum":
+      state.momentum = Math.max(0, Number(state.momentum ?? 0) + Number(effect.amount ?? 0));
+      break;
+    case "global-flag":
+      state.globalFlags ??= {};
+      state.globalFlags[effect.id] = effect.value ?? true;
+      break;
     case "acquaintance":
       state.acquaintances ??= [];
       if (!state.acquaintances.includes(effect.id)) state.acquaintances.push(effect.id);

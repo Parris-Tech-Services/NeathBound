@@ -1,9 +1,11 @@
-import { createGameService } from "./services/index.js?v=20260930-11";
-import { render } from "./ui/render.js?v=20260930-11";
-import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20260930-11";
+import { createGameService } from "./services/index.js?v=20260930-12";
+import { render } from "./ui/render.js?v=20260930-12";
+import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20260930-12";
 
 const app = document.querySelector("#app");
 const service = createGameService();
+
+let lastOutcome = null;
 
 async function draw(state) {
   const resolvedState = state ?? await service.getState();
@@ -11,8 +13,10 @@ async function draw(state) {
   render(app, resolvedState, {
     async choose(storyId, choiceId) {
       try {
+        document.querySelectorAll("[data-choice]").forEach(b => b.disabled = true);
         const outcome = await service.choose(storyId, choiceId);
         if (outcome.error) return;
+        lastOutcome = outcome;
         await draw(outcome.state ?? outcome);
         window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (error) {
@@ -22,6 +26,7 @@ async function draw(state) {
     async travel(locationId) {
       try {
         const nextState = await service.travel(locationId);
+        lastOutcome = null;
         await draw(nextState.state ?? nextState);
         window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (error) {
@@ -53,12 +58,13 @@ async function draw(state) {
       if (!window.confirm("Begin a new life? Your story will be replaced.")) return;
       try {
         const nextState = await service.reset();
+        lastOutcome = null;
         await draw(nextState.state ?? nextState);
       } catch (error) {
         showError(error);
       }
     }
-  });
+  }, lastOutcome);
 }
 
 function showError(error) {
