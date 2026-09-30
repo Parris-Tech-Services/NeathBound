@@ -19,6 +19,7 @@ function legacyEffects(choice) {
   const reward = choice.reward ?? {};
   const effects = [];
   if (reward.echoes) effects.push({ type: "echoes", amount: reward.echoes });
+  if (reward.momentum) effects.push({ type: "momentum", amount: reward.momentum });
   if (reward.item) effects.push({ type: "item", id: reward.item, amount: 1 });
   if (reward.quality) effects.push({ type: "quality", id: reward.quality[0], amount: reward.quality[1] });
   if (reward.menace) effects.push({ type: "menace", id: reward.menace[0], amount: reward.menace[1] });
@@ -26,6 +27,39 @@ function legacyEffects(choice) {
   if (reward.globalFlag) effects.push({ type: "global-flag", id: reward.globalFlag[0], value: reward.globalFlag[1] });
   if (choice.target) effects.push({ type: "location", id: choice.target });
   return effects;
+}
+
+
+function computeChanges(oldState, newState) {
+  const changes = [];
+  
+  for (const [id, val] of Object.entries(newState.qualities || {})) {
+    const oldVal = oldState.qualities?.[id] ?? 0;
+    if (val !== oldVal) changes.push({ type: 'quality', id, amount: val - oldVal });
+  }
+  
+  for (const [id, val] of Object.entries(newState.items || {})) {
+    const oldVal = oldState.items?.[id] ?? 0;
+    if (val !== oldVal) changes.push({ type: 'item', id, amount: val - oldVal });
+  }
+  for (const [id, oldVal] of Object.entries(oldState.items || {})) {
+    if (!(id in (newState.items || {}))) changes.push({ type: 'item', id, amount: -oldVal });
+  }
+  
+  for (const [id, val] of Object.entries(newState.menaces || {})) {
+    const oldVal = oldState.menaces?.[id] ?? 0;
+    if (val !== oldVal) changes.push({ type: 'menace', id, amount: val - oldVal });
+  }
+  
+  if ((newState.momentum ?? 0) !== (oldState.momentum ?? 0)) {
+    changes.push({ type: 'momentum', amount: (newState.momentum ?? 0) - (oldState.momentum ?? 0) });
+  }
+  
+  if ((newState.echoes ?? 0) !== (oldState.echoes ?? 0)) {
+    changes.push({ type: 'echoes', amount: (newState.echoes ?? 0) - (oldState.echoes ?? 0) });
+  }
+  
+  return changes;
 }
 
 export function storyAvailable(state, storyId, context = {}) {
@@ -60,7 +94,15 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
 
   const challenge = choice.challenge ?? story.challenge ?? null;
   const check = resolveChallenge(next, challenge, random);
-  const success = check.success;
+  let success = check.success;
+  let usedMomentum = false;
+  if (challenge && !success && next.momentum > 0 && check.total + 3 >= challenge.difficulty) {
+    next.momentum -= 1;
+    check.total += 3;
+    success = true;
+    check.success = true;
+    usedMomentum = true;
+  }
   const resultText = success ? choice.success : (choice.failure ?? "The city refuses to explain itself.");
   if (choice.successEffects || choice.failureEffects) {
     applyEffects(next, success ? choice.successEffects : choice.failureEffects);
@@ -69,6 +111,7 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
       if (effect.type === "menace") next.menaces[effect.id] = Math.max(0, (next.menaces[effect.id] ?? 0) + effect.amount);
       else if (effect.type === "unlock") { if (!next.unlockedLocations.includes(effect.id)) next.unlockedLocations.push(effect.id); }
       else if (effect.type === "global-flag") next.globalFlags[effect.id] = effect.value;
+      else if (effect.type === "momentum") next.momentum = Math.max(0, (next.momentum ?? 0) + effect.amount);
       else applyEffects(next, [effect]);
     }
   }
@@ -80,9 +123,10 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     if (!next.discard) next.discard = [];
     next.discard.push(storyId);
   }
-  const challengeText = challenge ? ` (${success ? "success" : "failure"}: ${check.total} vs ${challenge.difficulty})` : "";
+  const challengeText = challenge ? ` (${success ? "success" : "failure"}: ${check.total} vs ${challenge.difficulty}${usedMomentum ? ' with momentum' : ''})` : "";
   next.journal = [`${story.title}: ${resultText}${challengeText}`, ...next.journal].slice(0, 30);
-  return { state: next, result: resultText, success, roll: check.roll, total: check.total, challenge };
+  const changes = computeChanges(state, next);
+  return { state: next, result: resultText, success, roll: check.roll, total: check.total, challenge, changes };
 }
 
 export function resetState() { return initialState(); }
