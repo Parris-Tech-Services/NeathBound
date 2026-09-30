@@ -1,5 +1,5 @@
-import { LocalGameService } from "./local-game-service.js";
-import { RemoteGameService } from "./remote-game-service.js";
+import { LocalGameService } from "./local-game-service.js?v=20260930-5";
+import { RemoteGameService } from "./remote-game-service.js?v=20260930-5";
 
 export function createGameService() {
   const params = new URLSearchParams(globalThis.location?.search ?? "");
