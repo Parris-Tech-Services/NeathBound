@@ -217,7 +217,12 @@ test("every location a storylet can send the player to is reachable by travel af
       if (choice.reward?.unlock) unlocked.add(choice.reward.unlock);
     }
   }
-  for (const locationId of Object.keys(locations)) assert.ok(unlocked.has(locationId), `${locationId} can never be unlocked for travel`);
+  // Menace consequence areas are reached only by a menace reaching 8, never by
+  // travel (docs/FALLEN-LONDON-MECHANICS-AND-LINGO.md), so they are exempt.
+  for (const [locationId, location] of Object.entries(locations)) {
+    if (location.consequenceOf) continue;
+    assert.ok(unlocked.has(locationId), `${locationId} can never be unlocked for travel`);
+  }
 });
 
 test("the brass key goes back to its door only after the bell has been answered", () => {

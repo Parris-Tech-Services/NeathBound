@@ -1,6 +1,11 @@
-import { locations, stories } from "./content.js";
+import { locations, menaceAreas, stories } from "./content.js";
 import { cloneState, initialState } from "./state.js";
-import { applyEffects, requirementsMet, resolveChallenge } from "./rules.js";
+import { applyEffects, awardProgress, describeChallenge, requirementsMet, resolveChallenge } from "./rules.js";
+
+export { describeChallenge };
+
+export const MENACE_WARNING_LEVEL = 5;
+export const MENACE_CONSEQUENCE_LEVEL = 8;
 
 export function currentLocation(state) {
   return locations[state.locationId] ?? locations["lantern-quay"];
@@ -23,6 +28,12 @@ export function effectiveChallenge(story, choice) {
   if (!story || !choice) return null;
   if (choice.challenge === false || choice.challenge === null) return null;
   return choice.challenge ?? story.challenge ?? null;
+}
+
+// While in a menace consequence area the only way out is its storylets.
+export function travelBlockedReason(state) {
+  const here = locations[state.locationId];
+  return here?.consequenceOf ? `You cannot simply leave ${here.name}. Find a way out through its stories.` : null;
 }
 
 export function storyAvailable(state, storyId, context = {}) {
@@ -86,6 +97,25 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     : (choice.failure ?? "The city refuses to explain itself.");
 
   applyEffects(next, success ? (choice.successEffects ?? []) : (choice.failureEffects ?? []));
+
+  // Progress on success AND failure, by difficulty band (progress pyramid).
+  const progress = challenge
+    ? awardProgress(next, challenge.quality, success ? check.band.success : check.band.failure)
+    : null;
+
+  // Menaces: a warning at 5; at 8 the player is taken to that menace's area.
+  const menaceNotes = [];
+  for (const [menace, areaId] of Object.entries(menaceAreas ?? {})) {
+    const from = Number(before.menaces?.[menace] ?? 0);
+    const to = Number(next.menaces?.[menace] ?? 0);
+    if (to >= MENACE_CONSEQUENCE_LEVEL && from < MENACE_CONSEQUENCE_LEVEL && locations[areaId]) {
+      next.locationId = areaId;
+      next.flags[`menace-consequence:${menace}`] = true;
+      menaceNotes.push({ type: "menace-consequence", id: menace, message: `Your ${title(menace)} has reached ${to}. You have been taken to ${locations[areaId].name}.` });
+    } else if (to >= MENACE_WARNING_LEVEL && from < MENACE_WARNING_LEVEL) {
+      menaceNotes.push({ type: "menace-warning", id: menace, message: `Take care: your ${title(menace)} is ${to}. At ${MENACE_CONSEQUENCE_LEVEL} there will be consequences.` });
+    }
+  }
   next.flags[`${storyId}:${choiceId}`] = true;
   if (story.once) next.flags[`story-complete:${storyId}`] = true;
   if (next.hand?.includes(storyId)) {
@@ -96,8 +126,19 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
   next.flags.__revision = next.revision;
 
   const changes = describeChanges(before, next);
+  if (progress?.points) {
+    const name = title(challenge.quality);
+    changes.push({
+      type: "progress",
+      id: challenge.quality,
+      message: `Your ${name} is increasing: +${progress.points} progress (${progress.progress} of ${progress.nextLevelCost} towards level ${progress.level + 1}).`
+    });
+  }
+  changes.push(...menaceNotes);
   const challengeText = challenge
-    ? ` (${success ? "success" : "failure"}: ${check.total} vs ${challenge.difficulty}${usedMomentum ? " with momentum" : ""})`
+    ? check.total !== null
+      ? ` (${success ? "success" : "failure"}: ${check.total} vs ${challenge.difficulty}${usedMomentum ? " with momentum" : ""})`
+      : ` (${success ? "success" : "failure"}: ${check.label}, ${check.percent}% chance)`
     : "";
   const journalText = `${story.title}: ${resultText}${challengeText}`;
   next.journal = [journalText, ...next.journal].slice(0, 100);
@@ -122,6 +163,10 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     roll: check.roll,
     total: check.total,
     challenge,
+    chance: check.chance,
+    percent: check.percent,
+    label: check.label,
+    progress,
     usedMomentum,
     changes
   };
