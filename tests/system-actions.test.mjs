@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { initialState, normaliseState } from "../src/game/state.js";
 import { resolveGameAction } from "../src/game/engine.js";
 import { resolveChallenge } from "../src/game/rules.js";
+import { OPPORTUNITY_CARDS } from "../src/game/opportunities.js";
 
 const SUCCEED = () => 0.99;
 
@@ -61,7 +62,6 @@ test("opportunity cards draw into a persistent hand, play and discard", () => {
   assert.equal(state.hand.length, 1);
   const cardId = state.hand[0];
 
-  const { OPPORTUNITY_CARDS } = await import("../src/game/opportunities.js");
   const choiceId = OPPORTUNITY_CARDS[cardId].choices[0].id;
   const played = resolveGameAction(state, "play-card", { cardId, choiceId }, SUCCEED);
   assert.equal(played.error, undefined);
