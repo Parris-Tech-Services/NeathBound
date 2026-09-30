@@ -54,9 +54,24 @@ export function normaliseState(input = {}) {
     items: { ...legacyItems },
     unlockedLocations: [...new Set(input.unlockedLocations ?? base.unlockedLocations)],
     acquaintances: [...new Set(input.acquaintances ?? base.acquaintances)],
-    flags: { ...(input.flags ?? {}), "__revision": Number.isInteger(input.revision) ? input.revision : Number(input.flags?.["__revision"] ?? 0) },
+    flags: {
+      ...(input.flags ?? {}),
+      "__revision": Number.isInteger(input.revision) ? input.revision : Number(input.flags?.["__revision"] ?? 0),
+      "__equipment": {
+        ...base.equipment,
+        ...(input.flags?.["__equipment"] ?? {}),
+        ...(input.equipment ?? {})
+      }
+    },
     journal: Array.isArray(input.journal) ? input.journal.slice(0, 100) : base.journal,
-    events: Array.isArray(input.events) ? input.events.slice(0, 250) : [],
+    events: Array.isArray(input.events)
+      ? input.events.slice(0, 250)
+      : (Array.isArray(input.flags?.["__events"]) ? input.flags["__events"].slice(0, 250) : []),
+    equipment: {
+      ...base.equipment,
+      ...(input.flags?.["__equipment"] ?? {}),
+      ...(input.equipment ?? {})
+    },
     hand: Array.isArray(input.hand) ? [...new Set(input.hand)] : [],
     discard: Array.isArray(input.discard) ? [...new Set(input.discard)] : []
   };
