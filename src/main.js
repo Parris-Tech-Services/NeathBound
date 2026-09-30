@@ -1,5 +1,5 @@
 import { createGameService } from "./services/index.js?v=20260930-12";
-import { render } from "./ui/render.js?v=20260930-12";
+import { render } from "./ui/render.js?v=20260930-13";
 import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20260930-12";
 
 const app = document.querySelector("#app");
