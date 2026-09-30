@@ -70,26 +70,42 @@ async function openGame() {
   page.on("requestfailed", (req) => record(req.url(), `request failed: ${req.url()} ${req.failure()?.errorText}`));
   page.on("response", (res) => { if (res.status() >= 400) record(res.url(), `HTTP ${res.status()}: ${res.url()}`); });
   page.on("dialog", (dialog) => dialog.accept());
-  await page.goto(new URL("?api=local", baseUrl).href, { waitUntil: "networkidle" });
+  await page.goto(new URL("?api=local&autoplay=1", baseUrl).href, { waitUntil: "networkidle" });
   await page.waitForSelector("[data-choice]");
   return { context, page, problems };
 }
 
 const readSave = (page) => page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "null"), SAVE_KEY);
 
-test("the loading screen is present before JavaScript runs and leaves after the game renders", async () => {
-  const staticContext = await browser.newContext({ javaScriptEnabled: false });
-  const staticPage = await staticContext.newPage();
-  await staticPage.goto(new URL("?api=local", baseUrl).href, { waitUntil: "domcontentloaded" });
-  assert.equal(await staticPage.locator("#boot-screen").isVisible(), true, "the initial HTML contains a visible loading screen");
-  assert.match(await staticPage.locator("#boot-screen").innerText(), /NEATH.*BOUND/s);
-  assert.match(await staticPage.locator("#boot-screen").innerText(), /Waking the lamps beneath the city/i);
-  await staticContext.close();
+test("first visit shows the public landing page before loading the game", async () => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto(new URL("?api=local", baseUrl).href, { waitUntil: "domcontentloaded" });
 
-  const { context, page, problems } = await openGame();
-  assert.equal(await page.locator("#boot-screen").count(), 0, "the loading screen is removed after first render");
-  assert.equal(await page.locator("#app").getAttribute("aria-busy"), "false", "the app reports that initial loading is complete");
-  assert.deepEqual(problems, []);
+  assert.equal(await page.locator("#landing-screen").isVisible(), true);
+  assert.match(await page.locator("#landing-screen").innerText(), /NEATH.*BOUND/s);
+  assert.match(await page.locator("#landing-screen").innerText(), /Enter the city/i);
+  assert.equal(await page.locator(".game-shell").count(), 0, "the game module is not loaded before the player enters");
+  await context.close();
+});
+
+test("entering the city shows the loader until the game has rendered", async () => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.route(/\/src\/main\.js\?v=/, async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    await route.continue();
+  });
+  await page.goto(new URL("?api=local", baseUrl).href, { waitUntil: "domcontentloaded" });
+  await page.locator("#enter-city").click();
+
+  assert.equal(await page.locator("#landing-screen").isHidden(), true, "landing page leaves immediately after Enter");
+  assert.equal(await page.locator("#boot-screen").isVisible(), true, "loader covers module/game startup");
+  assert.match(await page.locator("#boot-screen").innerText(), /Waking the lamps beneath the city/i);
+
+  await page.waitForSelector("[data-choice]");
+  await page.waitForFunction(() => !document.querySelector("#boot-screen"));
+  assert.equal(await page.locator("#app").getAttribute("aria-busy"), "false");
   await context.close();
 });
 
