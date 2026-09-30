@@ -1,6 +1,6 @@
-import { config } from "../config.js?v=20260930-12";
-import { LocalGameService } from "./local-game-service.js?v=20260930-12";
-import { SupabaseGameService } from "./supabase-game-service.js?v=20260930-12";
+import { config } from "../config.js?v=20260930-13";
+import { LocalGameService } from "./local-game-service.js?v=20260930-13";
+import { SupabaseGameService } from "./supabase-game-service.js?v=20260930-13";
 
 // Online (Supabase) by default; ?api=local forces offline play.
 export function createGameService({ settings = config, search = globalThis.location?.search ?? "", storage = globalThis.localStorage } = {}) {
