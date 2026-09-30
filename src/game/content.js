@@ -38,7 +38,6 @@ export const locations = {
 
 export const stories = {
   "bell-under-water": {
-    once: true,
     title: "The Bell Under Water",
     kicker: "A sound from below",
     text: "At low tide, the quay reveals a stairway descending into black water. A bell tolls somewhere beneath the last step. The brass key in your pocket warms.",
@@ -47,7 +46,7 @@ export const stories = {
       {
         id: "descend",
         label: "Descend toward the bell",
-        requirements: [],
+        requirements: [{ type: "flag", id: "bell-under-water:descend", op: "!=", value: true }],
         challenge: { quality: "nerve", difficulty: 5 },
         success: "You find a submerged door and unlock it. Something on the other side learns your name.",
         failure: "The water closes over your head. You return with a pocketful of black sand.",
@@ -64,7 +63,7 @@ export const stories = {
       {
         id: "listen",
         label: "Listen for the pattern",
-        requirements: [],
+        requirements: [{ type: "flag", id: "bell-under-water:listen", op: "!=", value: true }],
         challenge: { quality: "nerve", difficulty: 5 },
         success: "The bell's rhythm maps a route through the city.",
         failure: "You hear only your own heartbeat, which is embarrassing but useful.",
@@ -126,7 +125,11 @@ export const stories = {
           { type: "echoes", amount: 6 },
           { type: "location", id: "velvet-market" }
         ],
-        failureEffects: [{ type: "location", id: "velvet-market" }]
+        failureEffects: [
+          { type: "echoes", amount: -2 },
+          { type: "menace", id: "scandal", amount: 1 },
+          { type: "location", id: "velvet-market" }
+        ]
       },
       {
         id: "study",
@@ -246,7 +249,7 @@ export const stories = {
     text: "The tide has come in carrying a porcelain cup. A dockworker asks whether you will pour it back into the sea, or drink what the sea has prepared.",
     tags: ["opportunity"],
     choices: [
-      { id: "pour", label: "Pour the tea into the tide", requirements: [], success: "The water settles. The dockworker gives you a name to use at the market.", successEffects: [{ type: "flag", id: "acquaintance-dockworker", value: true }, { type: "quality", id: "poise", amount: 1 }, { type: "location", id: "lantern-quay" }], failureEffects: [] },
+      { id: "pour", label: "Pour the tea into the tide", requirements: [], success: "The water settles. The dockworker gives you a name to use at the market.", successEffects: [{ type: "flag", id: "acquaintance-dockworker", value: true }, { type: "acquaintance", id: "dockworker" }, { type: "quality", id: "poise", amount: 1 }, { type: "location", id: "lantern-quay" }], failureEffects: [] },
       { id: "drink", label: "Drink the impossible tea", requirements: [], success: "You remember a shore that has never existed.", failure: "The cup tastes of every promise you have broken.", challenge: { quality: "nerve", difficulty: 5 }, successEffects: [{ type: "item", id: "tide-cup", amount: 1 }, { type: "menace", id: "dread", amount: 1 }, { type: "location", id: "hollow-archive" }], failureEffects: [{ type: "menace", id: "dread", amount: 1 }, { type: "location", id: "hollow-archive" }] }
     ]
   },
