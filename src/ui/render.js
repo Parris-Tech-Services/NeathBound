@@ -1,8 +1,23 @@
-import { availableChoices, availableStories, currentLocation, effectiveChallenge } from "../game/engine.js?v=20260930-14";
-import { locations } from "../game/content.js?v=20260930-14";
-import { loadPreferences } from "./preferences.js?v=20260930-14";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge } from "../game/engine.js?v=20260930-15";
+import { locations } from "../game/content.js?v=20260930-15";
+import { loadPreferences } from "./preferences.js?v=20260930-15";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
+
+const ITEM_DETAILS = {
+  "salted-map": { glyph: "≋", category: "Documents", description: "A salt-stiffened map whose hidden routes emerge when the city decides you are ready to see them." },
+  "brass-key": { glyph: "⚿", category: "Keys & Tools", description: "The warm brass key you woke holding. Near deep water, it seems to remember a lock." },
+  "black-sand": { glyph: "⌛", category: "Curiosities", description: "Heavy black grains gathered below the drowned stair. They settle into shapes when nobody is breathing." },
+  "archive-key": { glyph: "⌑", category: "Keys & Tools", description: "A narrow iron key from the Velvet Market. It pulls faintly toward the locked stacks of the Hollow Archive." },
+  "silver-thimble": { glyph: "◉", category: "Keys & Tools", description: "A tailor's silver thimble, bright enough to catch the light in places where there should be none." },
+  "red-thread-end": { glyph: "∞", category: "Curiosities", description: "The cut end of a red thread. It refuses to lie still and curls toward unfinished business." },
+  "bright-memory": { glyph: "✦", category: "Memories", description: "A recovered memory sharpened until it can be carried like an object. Looking at it too long feels like remembering twice." },
+  "unfinished-page": { glyph: "¶", category: "Documents", description: "A page in your own handwriting that stops halfway through a sentence you do not remember beginning." },
+  "tide-cup": { glyph: "♨", category: "Curiosities", description: "A porcelain cup returned by the tide. It smells faintly of a shore that has never existed." },
+  "ink-of-absence": { glyph: "✒", category: "Curiosities", description: "Ink made from catalogued darkness. On paper, it writes around a thing rather than naming it." },
+  "sun-seed": { glyph: "✿", category: "Garden & Light", description: "A clockwork seed that remembers sunlight. It is warm even under a stone sky." },
+  "small-sun": { glyph: "☼", category: "Garden & Light", description: "A thumb-sized borrowed sun in glass. Its light makes the Neath look briefly less certain of itself." }
+};
 
 export function render(app, state, handlers, outcome = null) {
   const location = currentLocation(state);
@@ -64,6 +79,22 @@ export function render(app, state, handlers, outcome = null) {
   const inventoryHtml = inventory.length
     ? inventory.map(([item, quantity]) => '<span>' + formatName(item) + (quantity > 1 ? ' ×' + quantity : '') + '</span>').join("")
     : "<small>Nothing of note.</small>";
+  const inventoryCount = inventory.reduce((total, [, quantity]) => total + quantity, 0);
+  const possessionCardsHtml = inventory.length
+    ? inventory.map(([item, quantity]) => {
+        const details = ITEM_DETAILS[item] ?? { glyph: "◆", category: "Curiosity", description: "Something the city has placed in your keeping. Its significance is not yet clear." };
+        return [
+          '<article class="possession-card" data-item="', escapeClass(item), '">',
+            '<div class="possession-glyph" aria-hidden="true">', escapeHtml(details.glyph), '</div>',
+            '<div class="possession-copy">',
+              '<div class="possession-heading"><h3>', escapeHtml(formatName(item)), '</h3><strong class="possession-quantity">×', quantity, '</strong></div>',
+              '<p class="possession-category">', escapeHtml(details.category), '</p>',
+              '<p>', escapeHtml(details.description), '</p>',
+            '</div>',
+          '</article>'
+        ].join("");
+      }).join("")
+    : '<div class="empty-possessions"><strong>Your pockets are empty.</strong><p>The city will remedy that soon enough.</p></div>';
 
   let outcomeHtml = "";
   if (outcome) {
@@ -114,9 +145,9 @@ export function render(app, state, handlers, outcome = null) {
         '<div class="brand">NEATH<span>◆</span>BOUND</div>',
         '<nav class="account-nav" aria-label="Account">',
           '<button class="text-link" data-action="reset">New life</button>',
-          '<a href="#journal">Journal</a>',
-          '<a href="#possessions">Possessions</a>',
-          '<a href="#stories">Stories</a>',
+          '<a href="#journal" data-view="story">Journal</a>',
+          '<a href="#possessions" data-view="possessions">Possessions</a>',
+          '<a href="#stories" data-view="story">Stories</a>',
         '</nav>',
       '</header>',
 
@@ -134,10 +165,10 @@ export function render(app, state, handlers, outcome = null) {
       '</section>',
 
       '<nav class="main-tabs" aria-label="Game sections">',
-        '<a class="active" href="#stories">STORY</a>',
-        '<a href="#journal">MESSAGES</a>',
-        '<a href="#character">MYSELF</a>',
-        '<a href="#possessions">POSSESSIONS</a>',
+        '<a class="active" href="#stories" data-view="story">STORY</a>',
+        '<a href="#journal" data-view="story">MESSAGES</a>',
+        '<a href="#character" data-view="story">MYSELF</a>',
+        '<a href="#possessions" data-view="possessions">POSSESSIONS</a>',
         '<a href="#possessions">BAZAAR</a>',
         '<a href="#character">FATE</a>',
         '<a href="#journal">PLANS</a>',
@@ -173,6 +204,7 @@ export function render(app, state, handlers, outcome = null) {
         '</aside>',
 
         '<main class="story-column" id="stories">',
+          '<div data-view-panel="story">',
           outcome
             ? outcomeHtml
             : [
@@ -195,6 +227,22 @@ export function render(app, state, handlers, outcome = null) {
           '<section class="journal parchment" id="journal">',
             '<h3>What the city remembers</h3>',
             '<ol>', journalHtml, '</ol>',
+          '</section>',
+          '</div>',
+          '<section class="possessions-page parchment" id="possessions" data-view-panel="possessions" hidden>',
+            '<div class="possessions-header">',
+              '<div>',
+                '<p class="possessions-kicker">Your belongings</p>',
+                '<h2>Possessions</h2>',
+                '<p>Things you have found, earned, borrowed, or failed to get rid of.</p>',
+              '</div>',
+              '<div class="possessions-totals">',
+                '<span><strong>', inventoryCount, '</strong> item', inventoryCount === 1 ? '' : 's', '</span>',
+                '<span><strong>', inventory.length, '</strong> kind', inventory.length === 1 ? '' : 's', '</span>',
+                '<span><strong>₠', state.echoes, '</strong> Echoes</span>',
+              '</div>',
+            '</div>',
+            '<div class="possessions-grid">', possessionCardsHtml, '</div>',
           '</section>',
         '</main>',
 
@@ -223,7 +271,7 @@ export function render(app, state, handlers, outcome = null) {
             '<p>', escapeHtml(glossaryNote), '</p>',
           '</section>',
 
-          '<section class="satchel" id="possessions">',
+          '<section class="satchel" id="possessions-summary">',
             '<h3>Possessions</h3>',
             '<div class="satchel-list">', inventoryHtml, '</div>',
           '</section>',
@@ -232,7 +280,7 @@ export function render(app, state, handlers, outcome = null) {
 
       '<footer class="game-footer">',
         '<span>© NeathBound · Original open-source fiction</span>',
-        '<nav><a href="#stories">Story</a><span>|</span><a href="#journal">Journal</a><span>|</span><a href="#possessions">Possessions</a></nav>',
+        '<nav><a href="#stories" data-view="story">Story</a><span>|</span><a href="#journal" data-view="story">Journal</a><span>|</span><a href="#possessions" data-view="possessions">Possessions</a></nav>',
       '</footer>',
     '</div>'
   ].join("");
@@ -247,6 +295,20 @@ export function render(app, state, handlers, outcome = null) {
   app.querySelector("[data-action=travel]").addEventListener("click", () => handlers.travel(app.querySelector("#travel-location").value));
   app.querySelectorAll("[data-action=edit-note]").forEach((button) => button.addEventListener("click", () => handlers.editNote(button.dataset.noteKey)));
   app.querySelector("[data-action=reset]").addEventListener("click", handlers.reset);
+
+  const setView = (view) => {
+    const activeView = view === "possessions" ? "possessions" : "story";
+    app.querySelectorAll("[data-view-panel]").forEach((panel) => {
+      panel.hidden = panel.dataset.viewPanel !== activeView;
+    });
+    app.querySelectorAll(".main-tabs [data-view]").forEach((link) => {
+      link.classList.toggle("active", link.dataset.view === activeView);
+    });
+  };
+  const viewFromHash = () => globalThis.location?.hash === "#possessions" ? "possessions" : "story";
+  app.querySelectorAll("[data-view]").forEach((link) => link.addEventListener("click", () => setView(link.dataset.view)));
+  globalThis.onhashchange = () => setView(viewFromHash());
+  setView(viewFromHash());
 }
 
 
