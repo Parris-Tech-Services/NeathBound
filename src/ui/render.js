@@ -1,5 +1,5 @@
 import { availableChoices, availableStories, currentLocation, effectiveChallenge } from "../game/engine.js?v=20260930-9";
-import { locations } from "../game/content.js?v=20260930-9";
+import { locations } from "../game/content.js?v=20260930-9";\nimport { bazaarStock, equipmentBonuses, itemDefinition } from "../game/items.js?v=20260930-9";
 import { loadPreferences } from "./preferences.js?v=20260930-9";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
@@ -13,14 +13,15 @@ export function render(app, state, handlers, ui = {}) {
   const locationNote = preferences.notes[`location:${state.locationId}`] ?? location.atmosphere;
   const glossaryNote = preferences.notes.glossary ?? "A quality is anything the city remembers about you: a talent, a rumour, an item, or a consequence.";
 
+  const bonuses = equipmentBonuses(state);
   const qualitiesHtml = Object.entries(state.qualities).map(([key, value]) => {
-    const width = Math.min(100, Math.max(8, value * 10));
+    const bonus = Number(bonuses[key] ?? 0);
     return [
       '<div class="quality-row quality-', escapeClass(key), '">',
       '<div class="quality-icon"><span>', icon[key] ?? "•", '</span></div>',
       '<div class="quality-main">',
-      '<div class="quality-title"><strong>', formatName(key), '</strong><span>', value, '</span></div>',
-      '<div class="quality-track"><span style="width:', width, '%"></span></div>',
+      '<div class="quality-title"><strong>', formatName(key), '</strong><span>', value, bonus ? '<em>+', bonus, '</em>' : '', '</span></div>',
+      '<small class="quality-rating">Base ', value, bonus ? ' · equipment +' + bonus + ' · effective ' + (Number(value) + bonus) : '', '</small>',
       '</div></div>'
     ].join("");
   }).join("");
@@ -72,8 +73,16 @@ export function render(app, state, handlers, ui = {}) {
     ? bookmarked.map((story) => '<article class="plan-card parchment"><h3>' + escapeHtml(story.title) + '</h3><p>' + escapeHtml(story.kicker ?? story.text) + '</p></article>').join("")
     : '<p class="empty-state">Bookmark a story to pin it here as a plan.</p>';
   const inventoryHtml = inventory.length
-    ? inventory.map(([item, quantity]) => '<span>' + formatName(item) + (quantity > 1 ? ' ×' + quantity : '') + '</span>').join("")
+    ? inventory.map(([itemId, quantity]) => {
+        const item = itemDefinition(itemId);
+        const equipped = Object.values(state.equipment ?? {}).includes(itemId);
+        return '<article class="inventory-card"><h3>' + escapeHtml(item.name) + (quantity > 1 ? ' ×' + quantity : '') + '</h3><p>' + escapeHtml(item.description) + '</p><small>' + escapeHtml(item.category) + (item.modifiers ? ' · ' + modifierText(item.modifiers) : '') + '</small><div class="item-actions">' + (item.equipSlot ? '<button data-transaction="equip" data-item="' + itemId + '"' + (pending ? ' disabled' : '') + '>' + (equipped ? 'UNEQUIP' : 'EQUIP') + '</button>' : '') + (item.sellValue > 0 ? '<button data-transaction="sell" data-item="' + itemId + '"' + (pending ? ' disabled' : '') + '>SELL ' + item.sellValue + '</button>' : '') + '</div></article>';
+      }).join("")
     : "<small>Nothing of note.</small>";
+  const bazaarHtml = bazaarStock.map((itemId) => {
+    const item = itemDefinition(itemId);
+    return '<article class="inventory-card shop-card"><h3>' + escapeHtml(item.name) + '</h3><p>' + escapeHtml(item.description) + '</p><small>' + modifierText(item.modifiers ?? {}) + '</small><button data-transaction="buy" data-item="' + itemId + '"' + ((state.echoes ?? 0) < item.price || pending ? ' disabled' : '') + '>BUY · ' + item.price + ' ECHOES</button></article>';
+  }).join("");
 
   app.innerHTML = [
         '<div class="game-shell outfit-', escapeClass(preferences.outfit), '">',
@@ -156,8 +165,8 @@ export function render(app, state, handlers, ui = {}) {
           view === "story" ? '</section>' : '',
           view === "messages" ? '<section class="screen-panel parchment"><h2>Messages & Journal</h2><p class="screen-intro">A record of what the city remembers.</p><ol class="journal-list">' + journalHtml + '</ol></section>' : '',
           view === "myself" ? '<section class="screen-panel parchment"><h2>Myself</h2><p class="screen-intro">Your qualities and the dangers following you.</p><div class="profile-grid"><div><h3>Qualities</h3>' + qualitiesHtml + '</div><div><h3>Menaces</h3><div class="menace-list">' + menaceHtml + '</div></div></div></section>' : '',
-          view === "possessions" ? '<section class="screen-panel parchment"><h2>Possessions</h2><p class="screen-intro">Everything currently carried by ' + escapeHtml(state.name) + '.</p><div class="inventory-grid">' + inventoryHtml + '</div></section>' : '',
-          view === "bazaar" ? '<section class="screen-panel parchment"><h2>The Exchange</h2><p class="screen-intro">Current balance: <strong>' + state.echoes + ' Echoes</strong>.</p><p>Only implemented trades are shown. More shops will appear as their stock gains real effects.</p></section>' : '',
+          view === "possessions" ? '<section class="screen-panel parchment"><h2>Possessions</h2><p class="screen-intro">Equip useful possessions or sell things you no longer need.</p><div class="inventory-grid">' + inventoryHtml + '</div></section>' : '',
+          view === "bazaar" ? '<section class="screen-panel parchment"><h2>The Exchange</h2><p class="screen-intro">Current balance: <strong>' + state.echoes + ' Echoes</strong>. Purchases change your effective qualities when equipped.</p><div class="inventory-grid">' + bazaarHtml + '</div></section>' : '',
           view === "plans" ? '<section class="screen-panel parchment"><h2>Plans</h2><p class="screen-intro">Stories you have bookmarked for later.</p><div class="plans-grid">' + plansHtml + '</div></section>' : '',
         '</main>',
 
@@ -200,7 +209,7 @@ export function render(app, state, handlers, ui = {}) {
     '</div>'
   ].join("");
 
-  app.querySelectorAll("[data-choice]").forEach((button) => button.addEventListener("click", () => handlers.choose(button.dataset.story, button.dataset.choice)));\n  app.querySelectorAll("[data-view]").forEach((link) => link.addEventListener("click", (event) => { event.preventDefault(); handlers.navigate(link.dataset.view); }));\n  app.querySelector("[data-action=continue]")?.addEventListener("click", handlers.continue);
+  app.querySelectorAll("[data-choice]").forEach((button) => button.addEventListener("click", () => handlers.choose(button.dataset.story, button.dataset.choice)));\n  app.querySelectorAll("[data-view]").forEach((link) => link.addEventListener("click", (event) => { event.preventDefault(); handlers.navigate(link.dataset.view); }));\n  app.querySelectorAll("[data-transaction]").forEach((button) => button.addEventListener("click", () => handlers.transact(button.dataset.transaction, button.dataset.item)));\n  app.querySelector("[data-action=continue]")?.addEventListener("click", handlers.continue);
   app.querySelectorAll("[data-action=bookmark]").forEach((button) => button.addEventListener("click", () => handlers.bookmark(button.dataset.story)));
   app.querySelector("[data-action=outfit]").addEventListener("change", (event) => handlers.outfit(event.target.value));
   app.querySelector("[data-action=travel]").addEventListener("click", () => handlers.travel(app.querySelector("#travel-location").value));
@@ -236,4 +245,10 @@ function renderOutcome(outcome) {
     ? '<p class="result-challenge">' + (outcome.success ? "You succeeded" : "You failed") + ' in a ' + escapeHtml(formatName(outcome.challenge.quality)) + ' challenge' + (outcome.total != null ? ' (' + outcome.total + ' vs ' + outcome.challenge.difficulty + ')' : '') + '.</p>'
     : '';
   return '<section class="action-result ' + (outcome.rejected ? 'rejected' : outcome.success ? 'success' : 'failure') + '" id="action-result" tabindex="-1" aria-live="assertive"><p class="eyebrow">' + (outcome.rejected ? 'THE CITY HAS MOVED ON' : outcome.success ? 'SUCCESS' : 'FAILURE') + '</p><h2>' + escapeHtml(outcome.title ?? "Result") + '</h2><p>' + escapeHtml(outcome.result ?? outcome.error ?? "") + '</p>' + challenge + (changeHtml ? '<ul class="result-changes">' + changeHtml + '</ul>' : '') + '<button data-action="continue">CONTINUE</button></section>';
+}
+
+
+function modifierText(modifiers) {
+  const parts = Object.entries(modifiers ?? {}).map(([key, value]) => `${formatName(key)} +${value}`);
+  return parts.length ? parts.join(" · ") : "No quality modifier";
 }
