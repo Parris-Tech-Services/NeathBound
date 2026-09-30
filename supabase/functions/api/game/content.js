@@ -4,28 +4,28 @@ export const locations = {
     region: "The Lower City",
     subtitle: "Where the tide carries messages in sealed bottles.",
     atmosphere: "Wet brass, coal smoke, and a bell that rings beneath the water.",
-    stories: ["bell-under-water", "cartographer-at-dusk", "tea-for-the-tide", "salt-on-the-map", "return-the-darkness", "the-cartographer-returns", "the-submerged-door"]
+    stories: ["bell-under-water", "cartographer-at-dusk", "tea-for-the-tide", "salt-on-the-map", "return-the-darkness", "the-cartographer-returns", "the-submerged-door", "wounds-at-the-quay"]
   },
   "velvet-market": {
     name: "The Velvet Market",
     region: "The Lower City",
     subtitle: "A bazaar for memories, rumours, and perfectly ordinary knives.",
     atmosphere: "Every stall has a curtain. Every curtain has a shadow behind it.",
-    stories: ["borrowed-face", "red-thread", "market-gossip", "the-sand-reader", "unwritten-ink", "the-debt-collector", "the-loose-end"]
+    stories: ["borrowed-face", "red-thread", "market-gossip", "the-sand-reader", "unwritten-ink", "the-debt-collector", "the-loose-end", "too-many-questions"]
   },
   "hollow-archive": {
     name: "The Hollow Archive",
     region: "The Lower City",
     subtitle: "A library where the books remember who borrowed them.",
     atmosphere: "Dust hangs in the air like a second, slower snowfall.",
-    stories: ["index-of-lost-things", "the-quiet-librarian", "catalogue-the-dark", "the-locked-stacks", "finish-the-page", "an-entry-in-the-index", "the-margin-note"]
+    stories: ["index-of-lost-things", "the-quiet-librarian", "catalogue-the-dark", "the-locked-stacks", "finish-the-page", "an-entry-in-the-index", "the-margin-note", "the-night-at-your-window"]
   },
   "clockwork-gardens": {
     name: "The Clockwork Gardens",
     region: "The High Galleries",
     subtitle: "A greenhouse where the flowers keep appointments.",
     atmosphere: "Brass leaves click together in the warm, artificial wind.",
-    stories: ["garden-appointment", "borrowed-sunlight", "plant-the-sun-seed", "the-seedling-dawn", "the-memory-graft", "the-gardeners-thanks"]
+    stories: ["garden-appointment", "borrowed-sunlight", "plant-the-sun-seed", "the-seedling-dawn", "the-memory-graft", "the-gardeners-thanks", "a-ruined-invitation"]
   },
   "glass-observatory": {
     name: "The Glass Observatory",
@@ -1067,6 +1067,74 @@ export const stories = {
           { type: "location", id: "velvet-market" }
         ],
         failureEffects: []
+      }
+    ]
+  },
+  "wounds-at-the-quay": {
+    title: "The Red Room by the Water",
+    kicker: "Wounds 5 or more",
+    text: "A lamp burns red above a door beside the quay. Everyone knows what the red room is for, and everyone pretends they have never used it.",
+    requirements: [{ type: "menace", id: "wounds", op: ">=", value: 5 }],
+    choices: [
+      {
+        id: "submit-to-stitches",
+        label: "Let the red-room surgeon do what is necessary",
+        challenge: { quality: "nerve", difficulty: 6 },
+        success: "The surgeon works without conversation. When you stand again, pain has retreated to somewhere more manageable.",
+        failure: "You leave early. The stitches are adequate; your dignity less so.",
+        successEffects: [{ type: "menace", id: "wounds", amount: -3 }],
+        failureEffects: [{ type: "menace", id: "wounds", amount: -1 }]
+      }
+    ]
+  },
+  "too-many-questions": {
+    title: "Too Many Questions",
+    kicker: "Suspicion 5 or more",
+    text: "Three market constables have begun asking after somebody matching your description. The descriptions disagree, which is the only encouraging part.",
+    requirements: [{ type: "menace", id: "suspicion", op: ">=", value: 5 }],
+    choices: [
+      {
+        id: "seed-rumours",
+        label: "Give them four better suspects",
+        challenge: { quality: "shadow", difficulty: 7 },
+        success: "By supper, the constables are pursuing four mutually exclusive versions of you.",
+        failure: "One of the false descriptions is unfortunately more accurate than the original.",
+        successEffects: [{ type: "menace", id: "suspicion", amount: -3 }, { type: "echoes", amount: -2 }],
+        failureEffects: [{ type: "menace", id: "suspicion", amount: 1 }]
+      }
+    ]
+  },
+  "the-night-at-your-window": {
+    title: "The Night at Your Window",
+    kicker: "Dread 5 or more",
+    text: "Something has been standing outside your window for three nights. The Archive insists your room has no exterior wall.",
+    requirements: [{ type: "menace", id: "dread", op: ">=", value: 5 }],
+    choices: [
+      {
+        id: "name-it",
+        label: "Open the curtain and give the thing a name",
+        challenge: { quality: "insight", difficulty: 7 },
+        success: "Names are handles. Once you have one, the fear becomes small enough to move.",
+        failure: "The thing accepts the name. You are less certain it was yours to give.",
+        successEffects: [{ type: "menace", id: "dread", amount: -3 }, { type: "momentum", amount: 1 }],
+        failureEffects: [{ type: "menace", id: "dread", amount: 1 }]
+      }
+    ]
+  },
+  "a-ruined-invitation": {
+    title: "A Ruined Invitation",
+    kicker: "Scandal 5 or more",
+    text: "Your name has been struck from three guest lists and added to a fourth in red ink. The gardeners are trying very hard not to notice.",
+    requirements: [{ type: "menace", id: "scandal", op: ">=", value: 5 }],
+    choices: [
+      {
+        id: "make-an-entrance",
+        label: "Attend the fourth invitation magnificently",
+        challenge: { quality: "poise", difficulty: 7 },
+        success: "By midnight the story has changed. You were never disgraced; you were daring.",
+        failure: "It is a memorable evening, which is not the same thing as a successful one.",
+        successEffects: [{ type: "menace", id: "scandal", amount: -3 }],
+        failureEffects: [{ type: "menace", id: "scandal", amount: 1 }]
       }
     ]
   }
