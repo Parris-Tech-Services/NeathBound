@@ -1,5 +1,5 @@
-import { resolveChoice, resetState } from "../game/engine.js?v=20260930-15";
-import { loadState, saveState } from "../game/state.js?v=20260930-15";
+import { resolveChoice, resetState } from "../game/engine.js?v=20260930-16";
+import { loadState, saveState } from "../game/state.js?v=20260930-16";
 
 export class LocalGameService {
   constructor(storage = globalThis.localStorage) {
