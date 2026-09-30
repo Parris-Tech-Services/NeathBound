@@ -6,7 +6,7 @@ const app = await readFile(new URL("../src/main.js", import.meta.url), "utf8");
 const service = await readFile(new URL("../src/services/index.js", import.meta.url), "utf8");
 const worker = await readFile(new URL("../worker/index.js", import.meta.url), "utf8");
 
-assert.match(html, /Neathbound/);
+assert.match(html, /NeathBound/i);
 assert.match(html, /src\/main\.js/);
 assert.match(app, /createGameService/);
 assert.match(service, /LocalGameService/);
@@ -14,4 +14,4 @@ assert.match(service, /RemoteGameService/);
 assert.match(worker, /resolveChoice/);
 assert.match(worker, /\/api\//);
 
-console.log("Neathbound static smoke check passed");
+console.log("NeathBound static smoke check passed");

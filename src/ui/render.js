@@ -1,45 +1,173 @@
-import { locations } from "../game/content.js";
 import { availableChoices, availableStories, currentLocation } from "../game/engine.js";
 
-const icon = { nerve: "✦", insight: "◈", poise: "◇", shadow: "◌" };
-const menaceIcon = { dread: "☽", scandal: "♢", wounds: "†", suspicion: "!" };
+const icon = { nerve: "◉", insight: "◆", poise: "✦" };
 
 export function render(app, state, handlers) {
   const location = currentLocation(state);
   const stories = availableStories(state);
-  const unlocked = Object.entries(locations).filter(([id]) => (state.unlockedLocations ?? []).includes(id));
   const inventory = Object.entries(state.items ?? {}).filter(([, quantity]) => quantity > 0);
-  app.innerHTML = `<div class="shell">
-    <header class="masthead"><div><p class="eyebrow">A city beneath the world</p><h1>NEATHBOUND</h1></div><div class="header-actions"><span class="save-note" aria-live="polite">Saved locally · actions never run out</span><button data-action="reset" class="quiet-button">New life</button></div></header>
-    <nav class="top-nav" aria-label="Game sections"><button class="nav-tab active">Story</button><button class="nav-tab" data-action="map">Map</button><button class="nav-tab" data-action="journal">Journal</button><span class="nav-spacer"></span><span class="free-actions">∞ Free actions</span></nav>
-    <div class="layout">
-      <aside class="sidebar" aria-label="Character details"><div class="portrait"><span>✶</span></div><h2>${escapeHtml(state.name)}</h2><p class="muted">A visitor without a surface</p><div class="currency"><span>Echoes</span><strong>${state.echoes}</strong></div>
-        <div class="qualities"><h3>Qualities</h3>${Object.entries(state.qualities).map(([key, value]) => `<div class="quality"><span>${icon[key] ?? "•"} ${formatName(key)}</span><b>${value}</b></div>`).join("")}</div>
-        <div class="menaces"><h3>Menaces</h3>${Object.entries(state.menaces ?? {}).map(([key, value]) => `<div class="quality menace"><span>${menaceIcon[key] ?? "!"} ${formatName(key)}</span><b>${value}</b></div>`).join("")}</div>
-        <div class="satchel"><h3>Possessions</h3><p>${inventory.length ? inventory.map(([item, quantity]) => `<span class="tag">${formatName(item)}${quantity > 1 ? ` ×${quantity}` : ""}</span>`).join("") : `<span class="muted">Empty, for now.</span>`}</p></div>
-      </aside>
-      <main class="main-column">
-        <section class="location-card"><div><p class="eyebrow">${location.region} · You are here</p><h2>${location.name}</h2><p>${location.subtitle}</p></div><p class="atmosphere">${location.atmosphere}</p></section>
-        <section class="stories"><div class="section-heading"><div><p class="eyebrow">Storylets and opportunities</p><h2>Stories</h2></div><span class="unlimited">∞ play without waiting</span></div>${stories.map((story) => storyCard(state, story)).join("")}</section>
-        <section class="map-panel" data-panel="map" hidden><div class="section-heading"><div><p class="eyebrow">Travel</p><h2>The city</h2></div></div><div class="location-list">${unlocked.map(([id, place]) => locationButton(id, place, state)).join("")}</div></section>
-        <section class="journal" data-panel="journal"><div class="section-heading"><div><p class="eyebrow">Your history</p><h2>Journal</h2></div></div><ol>${state.journal.map((entry) => `<li>${escapeHtml(entry)}</li>`).join("")}</ol></section>
-      </main>
-      <aside class="right-rail" aria-label="City navigation"><section class="rail-section"><p class="eyebrow">Your lodgings</p><h3>The Unmoored Room</h3><p class="rail-copy">A borrowed key, a narrow bed, and a view of the underground weather.</p><button class="rail-link" data-action="journal">Open journal <span>→</span></button></section><section class="rail-section"><p class="eyebrow">Known places</p>${unlocked.map(([id, place]) => `<button class="rail-location ${id === state.locationId ? "current" : ""}" data-location="${id}"><span>${place.name}</span><small>${place.region}</small></button>`).join("")}</section><section class="rail-section"><p class="eyebrow">A small reminder</p><p class="rail-copy">Every choice leaves a mark. There is always another choice.</p></section></aside>
-    </div><footer><span>Neathbound is original open-source fiction.</span><span>Play at your own pace. No waiting.</span></footer>
-  </div>`;
+
+  const qualitiesHtml = Object.entries(state.qualities).map(([key, value]) => {
+    const width = Math.min(100, Math.max(8, value * 10));
+    return [
+      '<div class="quality-row">',
+      '<div class="quality-icon">', icon[key] ?? "•", '</div>',
+      '<div class="quality-main">',
+      '<div class="quality-title"><strong>', formatName(key), '</strong><span>', value, '</span></div>',
+      '<div class="quality-track"><span style="width:', width, '%"></span></div>',
+      '</div></div>'
+    ].join("");
+  }).join("");
+
+  const storiesHtml = stories.map((story) => {
+    const available = new Set(availableChoices(state, story.id).map((choice) => choice.id));
+    const choicesHtml = story.choices.map((choice) => {
+      const challenge = choice.challenge
+        ? [
+            '<div class="challenge-line">',
+            '<span class="challenge-icon">', icon[choice.challenge.quality] ?? "•", '</span>',
+            '<span><strong>', formatName(choice.challenge.quality), ' challenge</strong><br>',
+            '<small>Difficulty ', choice.challenge.difficulty, '</small></span></div>'
+          ].join("")
+        : '<div class="challenge-line simple"><span class="challenge-icon">◆</span><span><strong>A straightforward choice</strong><br><small>No challenge roll</small></span></div>';
+
+      return [
+        '<div class="choice-row">',
+        '<div class="choice-copy"><strong>', choice.label, '</strong>', challenge, '</div>',
+        '<button class="go-button" data-story="', story.id, '" data-choice="', choice.id, '" ',
+        available.has(choice.id) ? "" : "disabled",
+        '>GO</button></div>'
+      ].join("");
+    }).join("");
+
+    return [
+      '<article class="storylet parchment">',
+      '<div class="story-art" aria-hidden="true"></div>',
+      '<div class="story-body">',
+      '<button class="bookmark" type="button" aria-label="Bookmark story">◆</button>',
+      '<h3>', story.title, '</h3>',
+      '<p>', story.text, '</p>',
+      '<div class="story-choices">', choicesHtml, '</div>',
+      '</div></article>'
+    ].join("");
+  }).join("");
+
+  const journalHtml = state.journal.map((entry) => '<li>' + escapeHtml(entry) + '</li>').join("");
+  const inventoryHtml = inventory.length
+    ? inventory.map(([item, quantity]) => '<span>' + formatName(item) + (quantity > 1 ? ' ×' + quantity : '') + '</span>').join("")
+    : "<small>Nothing of note.</small>";
+
+  app.innerHTML = [
+    '<div class="game-shell">',
+      '<header class="topbar">',
+        '<div class="brand">NEATH<span>◆</span>BOUND</div>',
+        '<nav class="account-nav" aria-label="Account">',
+          '<button class="text-link" data-action="reset">New life</button>',
+          '<a href="#journal">Journal</a>',
+          '<a href="#possessions">Possessions</a>',
+          '<a href="#stories">Stories</a>',
+        '</nav>',
+      '</header>',
+
+      '<section class="city-banner" aria-label="NeathBound city skyline">',
+        '<div class="skyline-far"></div>',
+        '<div class="skyline-near"></div>',
+        '<div class="city-arch"></div>',
+        '<div class="city-lamp left"></div>',
+        '<div class="city-lamp right"></div>',
+      '</section>',
+
+      '<nav class="main-tabs" aria-label="Game sections">',
+        '<a class="active" href="#stories">STORY</a>',
+        '<a href="#journal">MESSAGES</a>',
+        '<a href="#character">MYSELF</a>',
+        '<a href="#possessions">POSSESSIONS</a>',
+        '<a href="#stories">BAZAAR</a>',
+        '<a href="#stories">FATE</a>',
+        '<a href="#journal">PLANS</a>',
+      '</nav>',
+
+      '<div class="game-grid">',
+        '<aside class="left-rail" id="character" aria-label="Character details">',
+          '<section class="candle-block">',
+            '<div class="candle"></div>',
+            '<div><strong>Actions</strong><div>∞</div><small>Unlimited</small></div>',
+          '</section>',
+
+          '<section class="side-section">',
+            '<div class="side-icon">◇</div>',
+            '<div><strong>Fate</strong><div>0</div><small>No waiting or payment gates.</small></div>',
+          '</section>',
+
+          '<section class="side-section">',
+            '<div class="side-icon">₠</div>',
+            '<div><strong>Echoes</strong><div>', state.echoes, '</div></div>',
+          '</section>',
+
+          '<section class="outfit">',
+            '<label for="outfit">Outfit</label>',
+            '<select id="outfit" aria-label="Outfit"><option>Morning Outfit</option></select>',
+          '</section>',
+
+          '<section class="qualities-list">', qualitiesHtml, '</section>',
+        '</aside>',
+
+        '<main class="story-column" id="stories">',
+          '<section class="featured-story parchment">',
+            '<div class="feature-art" aria-hidden="true"><span>⌕</span></div>',
+            '<div>',
+              '<h2>', location.name, '</h2>',
+              '<p>', location.subtitle, '</p>',
+              '<p class="feature-note"><strong>', location.atmosphere, '</strong></p>',
+            '</div>',
+          '</section>',
+
+          '<section class="story-stack">', storiesHtml, '</section>',
+
+          '<section class="journal parchment" id="journal">',
+            '<h3>What the city remembers</h3>',
+            '<ol>', journalHtml, '</ol>',
+          '</section>',
+        '</main>',
+
+        '<aside class="right-rail">',
+          '<section class="welcome-panel">',
+            '<p>It&apos;s <strong class="user-name">', escapeHtml(state.name), '</strong>!</p>',
+            '<h2>Welcome to</h2>',
+            '<h3>', location.name, '.</h3>',
+            '<p class="welcome-tail">delicious stranger!</p>',
+            '<button class="travel-button" disabled>TRAVEL</button>',
+          '</section>',
+
+          '<section class="promo-card">',
+            '<div class="promo-symbol" aria-hidden="true">✦</div>',
+            '<div class="promo-title">NEATHBOUND</div>',
+            '<div class="promo-sub">DESCEND DEEPER</div>',
+          '</section>',
+
+          '<section class="glossary parchment">',
+            '<button class="edit-dot" type="button" aria-label="Edit note">✎</button>',
+            '<h3>What is a quality?</h3>',
+            '<p>A quality is anything the city remembers about you: a talent, a rumour, an item, or a consequence.</p>',
+          '</section>',
+
+          '<section class="satchel" id="possessions">',
+            '<h3>Possessions</h3>',
+            '<div class="satchel-list">', inventoryHtml, '</div>',
+          '</section>',
+        '</aside>',
+      '</div>',
+    '</div>'
+  ].join("");
+
   app.querySelectorAll("[data-choice]").forEach((button) => button.addEventListener("click", () => handlers.choose(button.dataset.story, button.dataset.choice)));
   app.querySelector("[data-action=reset]").addEventListener("click", handlers.reset);
-  app.querySelectorAll("[data-action=map]").forEach((button) => button.addEventListener("click", () => togglePanel(app, "map")));
-  app.querySelectorAll("[data-action=journal]").forEach((button) => button.addEventListener("click", () => togglePanel(app, "journal")));
-  app.querySelectorAll("[data-location]").forEach((button) => button.addEventListener("click", () => handlers.travel(button.dataset.location)));
 }
 
-function storyCard(state, story) {
-  const available = new Set(availableChoices(state, story.id).map((choice) => choice.id));
-  return `<article class="story-card"><p class="kicker">${story.kicker}${story.tags?.includes("opportunity") ? " · opportunity" : ""}</p><h3>${story.title}</h3><p>${story.text}</p><div class="choices">${story.choices.map((choice) => { const challenge = choice.challenge ? `<small>${icon[choice.challenge.quality ?? choice.challenge.stat] ?? "•"} ${formatName(choice.challenge.quality ?? choice.challenge.stat)} challenge · ${choice.challenge.difficulty}</small>` : ""; return `<button class="choice" data-story="${story.id}" data-choice="${choice.id}" ${available.has(choice.id) ? "" : "disabled"}><span>${choice.label}${challenge}</span><span>→</span></button>`; }).join("")}</div></article>`;
+function formatName(value) {
+  return value.split("-").map((part) => part[0].toUpperCase() + part.slice(1)).join(" ");
 }
 
-function locationButton(id, place, state) { return `<button class="location-button ${id === state.locationId ? "current" : ""}" data-location="${id}"><span><b>${place.name}</b><small>${place.region}</small></span><span>→</span></button>`; }
-function togglePanel(app, panel) { app.querySelectorAll("[data-panel]").forEach((node) => { node.hidden = panel !== node.dataset.panel; }); app.querySelector(".stories").hidden = panel !== "story"; app.querySelectorAll(".nav-tab").forEach((tab) => tab.classList.toggle("active", tab.textContent.toLowerCase() === panel)); }
-function formatName(value) { return value.split("-").map((part) => part[0].toUpperCase() + part.slice(1)).join(" "); }
-function escapeHtml(value) { return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[char]); }
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[char]);
+}
