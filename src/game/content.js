@@ -1,4 +1,11 @@
 export const locations = {
+  "the-lair": {
+    name: "The Lair",
+    subtitle: "A sealed municipal undercroft.",
+    region: "Unknown",
+    atmosphere: "Dust, damp, and the smell of old stone.",
+    stories: ["lair-escape", "lair-inspect-door", "lair-listen"]
+  },
   "lantern-quay": {
     name: "Lantern Quay",
     region: "The Lower City",
@@ -78,6 +85,94 @@ export const menaceAreas = {
 };
 
 export const stories = {
+  "lair-escape": {
+    id: "lair-escape",
+    title: "A Way Out",
+    text: "The heavy iron door is locked. There must be a way out.",
+    once: true,
+    choices: [
+      {
+        id: "force",
+        label: "Force the lock",
+        challenge: { quality: "nerve", difficulty: 1 },
+        success: "The mechanism gives way with a screech. The door swings open.",
+        successEffects: [
+          { type: "progress", id: "nerve", points: 2 },
+          { type: "location", id: "lantern-quay" },
+          { type: "unlock-location", id: "lantern-quay" },
+          { type: "flag", id: "tutorial.story", value: true },
+          { type: "flag", id: "tutorial.myself", value: true },
+          { type: "flag", id: "tutorial.possessions", value: true },
+          { type: "flag", id: "tutorial.travel", value: true },
+          { type: "items", id: "brass-key", delta: 1 }
+        ],
+        failure: "The lock is stubborn, but you're learning its weaknesses.",
+        failureEffects: [
+          { type: "progress", id: "nerve", points: 1 }
+        ]
+      },
+      {
+        id: "pick",
+        label: "Pick the lock",
+        challenge: { quality: "insight", difficulty: 1 },
+        success: "You study the tumblers and slip the lock open.",
+        successEffects: [
+          { type: "progress", id: "insight", points: 2 },
+          { type: "location", id: "lantern-quay" },
+          { type: "unlock-location", id: "lantern-quay" },
+          { type: "flag", id: "tutorial.story", value: true },
+          { type: "flag", id: "tutorial.myself", value: true },
+          { type: "flag", id: "tutorial.possessions", value: true },
+          { type: "flag", id: "tutorial.travel", value: true },
+          { type: "items", id: "brass-key", delta: 1 }
+        ],
+        failure: "You can't quite get the angle right, but it's close.",
+        failureEffects: [
+          { type: "progress", id: "insight", points: 1 }
+        ]
+      }
+    ]
+  },
+  "lair-inspect-door": {
+    id: "lair-inspect-door",
+    title: "Inspect the Door",
+    text: "It is thick iron, damp and rusted.",
+    choices: [
+      {
+        id: "examine",
+        label: "Look closely",
+        challenge: { quality: "poise", difficulty: 1 },
+        success: "You remain calm and notice a loose hinge.",
+        successEffects: [
+          { type: "progress", id: "poise", points: 2 }
+        ],
+        failure: "The rust obscures everything.",
+        failureEffects: [
+          { type: "progress", id: "poise", points: 1 }
+        ]
+      }
+    ]
+  },
+  "lair-listen": {
+    id: "lair-listen",
+    title: "Listen to the Dark",
+    text: "Is there anything out there?",
+    choices: [
+      {
+        id: "listen",
+        label: "Stay perfectly still",
+        challenge: { quality: "shadow", difficulty: 1 },
+        success: "You hear the sound of water dripping and distant gears.",
+        successEffects: [
+          { type: "progress", id: "shadow", points: 2 }
+        ],
+        failure: "Your own breathing is too loud.",
+        failureEffects: [
+          { type: "progress", id: "shadow", points: 1 }
+        ]
+      }
+    ]
+  },
   "bell-under-water": {
     once: true,
     title: "The Bell Under Water",
@@ -1286,5 +1381,56 @@ export const stories = {
         failureEffects: []
       }
     ]
+  }
+};
+
+export const cards = {
+  "card-a-stranger-approaches": {
+    id: "card-a-stranger-approaches",
+    title: "A Stranger Approaching",
+    text: "Someone steps from the mist, holding a rusted lamp.",
+    weight: 10,
+    requirements: null,
+    choices: [
+      {
+        id: "listen",
+        label: "Listen to them",
+        challenge: { quality: "insight", difficulty: 3 },
+        success: "They whisper a secret of the city.",
+        successEffects: [{ type: "progress", id: "insight", points: 2 }, { type: "echoes", delta: 1 }],
+        failure: "They mutter nonsense and vanish.",
+        failureEffects: [{ type: "progress", id: "insight", points: 1 }]
+      },
+      {
+        id: "ignore",
+        label: "Walk past",
+        challenge: false,
+        success: "You ignore them and keep your peace.",
+        successEffects: [{ type: "menaces", id: "scandal", delta: -1 }]
+      }
+    ]
+  },
+  "card-lost-echoes": {
+    id: "card-lost-echoes",
+    title: "Glint in the Muck",
+    text: "Something catches the scant light near your boots.",
+    weight: 8,
+    requirements: null,
+    choices: [
+      {
+        id: "take",
+        label: "Take it",
+        challenge: false,
+        success: "A handful of stray Echoes.",
+        successEffects: [{ type: "echoes", delta: 2 }]
+      }
+    ]
+  }
+};
+
+export const decks = {
+  "whispers": {
+    id: "whispers",
+    cardIds: ["card-a-stranger-approaches", "card-lost-echoes"]
   }
 };

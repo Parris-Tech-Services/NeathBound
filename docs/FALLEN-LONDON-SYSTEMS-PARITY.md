@@ -57,7 +57,7 @@ NeathBound equivalent:
 - small feature strip: story-driven, browser-based, choices persist
 - preserve current immediate loader after the CTA
 
-Status: TODO
+Status: DONE
 
 ## 1. Opening tutorial location
 
@@ -87,7 +87,7 @@ NeathBound equivalent:
   - tutorial.cards
 - only show tabs once introduced
 
-Status: TODO
+Status: DONE
 
 ## 2. Arrival / staged interface unlock
 
@@ -107,7 +107,7 @@ NeathBound:
   6. Plans
 - each unlock is attached to an original story event, not a popup-only tutorial
 
-Status: TODO
+Status: DONE
 
 ## 3. Four parallel early-game progression tracks
 
