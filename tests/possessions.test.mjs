@@ -60,6 +60,7 @@ test("the salted map reveals the route to the gardens once", () => {
   assert.ok(availableStories(start).some((story) => story.id === "salt-on-the-map"));
   const { state } = resolveChoice(start, "salt-on-the-map", "soak", SUCCEED);
   assert.equal(state.locationId, "clockwork-gardens");
+  assert.ok(state.unlockedLocations.includes("clockwork-gardens"), "the gardens become a travel destination");
   assert.equal(state.items["salted-map"], 1, "the starting map is kept");
   state.locationId = "lantern-quay";
   assert.equal(storyAvailable(state, "salt-on-the-map"), false);
@@ -171,9 +172,50 @@ test("being bound into the index opens a repeatable archive storylet", () => {
 });
 
 test("every new possession storylet is listed at exactly one location", () => {
-  const ids = ["salt-on-the-map", "the-sand-reader", "the-locked-stacks", "finish-the-page", "return-the-darkness", "plant-the-sun-seed", "the-seedling-dawn", "the-memory-graft", "unwritten-ink", "the-cartographer-returns", "the-debt-collector", "an-entry-in-the-index", "the-gardeners-thanks"];
+  const ids = ["salt-on-the-map", "the-sand-reader", "the-locked-stacks", "finish-the-page", "return-the-darkness", "plant-the-sun-seed", "the-seedling-dawn", "the-memory-graft", "unwritten-ink", "the-cartographer-returns", "the-debt-collector", "an-entry-in-the-index", "the-gardeners-thanks", "the-margin-note", "survey-the-stone-sky", "the-lamp-that-fell-upward", "the-far-crack"];
   for (const id of ids) {
     const homes = Object.values(locations).filter((location) => location.stories.includes(id));
     assert.equal(homes.length, 1, `${id} should appear at exactly one location`);
   }
+});
+
+test("tea for the tide raises dread as a menace, not a quality", () => {
+  const { state } = resolveChoice(initialState(), "tea-for-the-tide", "drink", FAIL);
+  assert.equal(state.menaces.dread, 1);
+  assert.equal(state.qualities.dread, undefined);
+});
+
+test("reading your own index entry leads up to the glass observatory", () => {
+  let state = stateWith("hollow-archive", {}, { "bound-into-the-index": true });
+  assert.equal(storyAvailable(state, "the-margin-note"), false);
+  state = resolveChoice(state, "an-entry-in-the-index", "look-yourself-up", SUCCEED).state;
+  assert.equal(storyAvailable(state, "the-margin-note"), true);
+  state = resolveChoice(state, "the-margin-note", "follow-upward", SUCCEED).state;
+  assert.equal(state.locationId, "glass-observatory");
+  assert.ok(state.unlockedLocations.includes("glass-observatory"));
+});
+
+test("the far crack answers once, and the small sun can signal the surface", () => {
+  let state = stateWith("glass-observatory", { "small-sun": 1 });
+  assert.equal(storyAvailable(state, "the-far-crack"), false);
+  state = resolveChoice(state, "survey-the-stone-sky", "take-the-lens", SUCCEED).state;
+  assert.equal(storyAvailable(state, "the-far-crack"), true);
+  state = resolveChoice(state, "the-far-crack", "signal", SUCCEED).state;
+  assert.equal(state.items["small-sun"], undefined);
+  assert.equal(state.flags["signalled-the-surface"], true);
+  assert.equal(storyAvailable(state, "the-far-crack"), false);
+});
+
+test("every location a storylet can send the player to is reachable by travel afterwards", () => {
+  const start = new Set(initialState().unlockedLocations);
+  const unlocked = new Set(start);
+  for (const story of Object.values(stories)) {
+    for (const choice of story.choices) {
+      for (const effect of [...(choice.successEffects ?? []), ...(choice.failureEffects ?? [])]) {
+        if (effect.type === "unlock-location") unlocked.add(effect.id);
+      }
+      if (choice.reward?.unlock) unlocked.add(choice.reward.unlock);
+    }
+  }
+  for (const locationId of Object.keys(locations)) assert.ok(unlocked.has(locationId), `${locationId} can never be unlocked for travel`);
 });
