@@ -113,6 +113,23 @@ test("New life resets the character", async () => {
   await context.close();
 });
 
+test("Possessions opens a dedicated inventory view and Story returns to play", async () => {
+  const { context, page, problems } = await openGame();
+  await page.locator(".main-tabs [data-view=possessions]").click();
+
+  await assert.doesNotReject(() => page.locator("#possessions").waitFor({ state: "visible" }));
+  assert.equal(await page.locator("[data-view-panel=story]").isHidden(), true, "story view is hidden while possessions is open");
+  assert.match(await page.locator("#possessions").innerText(), /Salted Map/);
+  assert.match(await page.locator("#possessions").innerText(), /Brass Key/);
+  assert.match(await page.locator("#possessions").innerText(), /Documents/);
+
+  await page.locator(".main-tabs [data-view=story]").click();
+  assert.equal(await page.locator("[data-view-panel=story]").isVisible(), true, "Story returns to the playable view");
+  assert.equal(await page.locator("#possessions").isHidden(), true, "possessions view closes");
+  assert.deepEqual(problems, []);
+  await context.close();
+});
+
 test("accessibility audit (axe-core)", async (t) => {
   const { context, page } = await openGame();
   const axeSource = await readFile(createRequire(import.meta.url).resolve("axe-core/axe.min.js"), "utf8");
