@@ -1,5 +1,5 @@
 import { locations, stories } from "./content.js";
-import { cloneState, initialState } from "./state.js";
+import { cloneState, newPlayerState } from "./state.js";
 import { applyEffects, requirementsMet, resolveChallenge } from "./rules.js";
 
 export function currentLocation(state) {
@@ -130,7 +130,7 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
 }
 
 export function resetState() {
-  return initialState();
+  return newPlayerState();
 }
 
 export function describeChanges(before, after) {
