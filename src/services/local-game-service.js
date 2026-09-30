@@ -1,5 +1,5 @@
-import { resolveChoice, resetState } from "../game/engine.js?v=20260930-18";
-import { loadState, saveState } from "../game/state.js?v=20260930-18";
+import { resolveChoice, resetState, travelBlockedReason } from "../game/engine.js?v=20260930-19";
+import { loadState, saveState } from "../game/state.js?v=20260930-19";
 
 export class LocalGameService {
   constructor(storage = globalThis.localStorage) {
@@ -26,6 +26,8 @@ export class LocalGameService {
     if (Number.isInteger(expectedRevision) && expectedRevision !== Number(this.state.revision ?? 0)) {
       return { error: "This save changed in another tab.", state: this.state };
     }
+    const blocked = travelBlockedReason(this.state);
+    if (blocked) return { error: blocked, state: this.state };
     if (!this.state.unlockedLocations.includes(locationId)) return this.state;
     const revision = Number(this.state.revision ?? 0) + 1;
     this.state = {

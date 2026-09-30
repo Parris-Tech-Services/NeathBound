@@ -1,6 +1,6 @@
-import { availableChoices, availableStories, currentLocation, effectiveChallenge } from "../game/engine.js?v=20260930-18";
-import { locations } from "../game/content.js?v=20260930-18";
-import { loadPreferences } from "./preferences.js?v=20260930-18";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge } from "../game/engine.js?v=20260930-19";
+import { locations } from "../game/content.js?v=20260930-19";
+import { loadPreferences } from "./preferences.js?v=20260930-19";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
 
@@ -84,7 +84,7 @@ export function render(app, state, handlers, outcome = null) {
             '<div class="challenge-line">',
             '<span class="challenge-icon">', icon[challengeQuality] ?? "•", '</span>',
             '<span><strong>', formatName(challengeQuality), ' challenge</strong>',
-            '<small>Difficulty ', resolvedChallenge.difficulty, '</small></span></div>'
+            '<small>', escapeHtml(challengeSummary(state, resolvedChallenge)), '</small></span></div>'
           ].join("")
         : '<div class="challenge-line simple"><span class="challenge-icon">◆</span><span><strong>A straightforward choice</strong><small>No challenge roll</small></span></div>';
 
@@ -179,8 +179,8 @@ export function render(app, state, handlers, outcome = null) {
     const challengeQuality = outcome.challenge?.quality ?? outcome.challenge?.stat;
     const verdict = outcome.challenge
       ? outcome.success
-        ? `You succeeded in a ${formatName(challengeQuality)} challenge! (${outcome.total} vs ${outcome.challenge.difficulty}${outcome.usedMomentum ? ", with Momentum" : ""})`
-        : `Your ${formatName(challengeQuality)} challenge failed. (${outcome.total} vs ${outcome.challenge.difficulty})`
+        ? `You succeeded in a ${formatName(challengeQuality)} challenge! (${outcomeOdds(outcome)}${outcome.usedMomentum ? ", with Momentum" : ""})`
+        : `Your ${formatName(challengeQuality)} challenge failed. (${outcomeOdds(outcome)})`
       : "";
 
     const changesList = (outcome.changes ?? []).map((change) => {
@@ -522,6 +522,18 @@ function locationArtSvg(locationId) {
       '<text x="52" y="157" font-size="17" letter-spacing="2.4" fill="rgba(249,238,211,.82)" font-family="Georgia,serif">', escapeHtml(label.toUpperCase()), '</text>',
     '</svg>'
   ].join("");
+}
+
+// "Very modest · 80% chance (difficulty 5)"
+function challengeSummary(state, challenge) {
+  const info = describeChallenge(state, challenge);
+  return `${info.label} · ${info.percent}% chance (difficulty ${challenge.difficulty})`;
+}
+
+function outcomeOdds(outcome) {
+  const odds = outcome.percent !== undefined ? `${outcome.label}, ${outcome.percent}% chance` : "";
+  const roll = outcome.total !== null && outcome.total !== undefined ? `${outcome.total} vs ${outcome.challenge.difficulty}` : "";
+  return [roll, odds].filter(Boolean).join("; ");
 }
 
 function formatName(value) {
