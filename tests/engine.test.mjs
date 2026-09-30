@@ -1,41 +1,58 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { resolveChoice } from "../src/game/engine.js";
+import { choiceAvailable, resolveChoice, storyAvailable } from "../src/game/engine.js";
 import { initialState } from "../src/game/state.js";
 
 test("actions never consume a finite action resource", () => {
   const result = resolveChoice(initialState(), "bell-under-water", "listen", () => 0.9);
   assert.equal(result.state.echoes, 12);
   assert.equal(result.state.qualities.insight, 3);
+  assert.equal("actions" in result.state, false);
 });
 
-test("challenge success grants the configured reward", () => {
-  const state = initialState();
-  const result = resolveChoice(state, "bell-under-water", "descend", () => 0.9);
+test("challenge success applies configured effects", () => {
+  const result = resolveChoice(initialState(), "bell-under-water", "descend", () => 0.9);
   assert.equal(result.success, true);
-  assert.ok(result.state.items.includes("black-sand"));
+  assert.equal(result.state.items["black-sand"], 1);
   assert.equal(result.state.locationId, "hollow-archive");
+  assert.equal(result.state.echoes, 20);
 });
 
-test("challenge failure still advances the story", () => {
-  const result = resolveChoice(initialState(), "index-of-lost-things", "read", () => 0);
+test("challenge failure applies failure effects and still advances the story", () => {
+  const result = resolveChoice(initialState(), "bell-under-water", "descend", () => 0);
   assert.equal(result.success, false);
   assert.equal(result.state.locationId, "hollow-archive");
+  assert.equal(result.state.items["black-sand"], 1);
+  assert.equal(result.state.echoes, 12);
   assert.match(result.state.journal[0], /failure/);
 });
 
 test("required-item storylets stay locked until discovered", () => {
   const locked = resolveChoice(initialState(), "garden-appointment", "attend", () => 0.9);
-  assert.match(locked.error, /requires/);
-  const equipped = { ...initialState(), items: [...initialState().items, "tide-cup"] };
+  assert.match(locked.error, /not available/i);
+  const equipped = { ...initialState(), locationId: "clockwork-gardens", items: { ...initialState().items, "tide-cup": 1 }, unlockedLocations: ["lantern-quay", "velvet-market", "hollow-archive", "clockwork-gardens"] };
   const unlocked = resolveChoice(equipped, "garden-appointment", "attend", () => 0.9);
   assert.equal(unlocked.success, true);
-  assert.ok(unlocked.state.items.includes("sun-seed"));
+  assert.equal(unlocked.state.items["sun-seed"], 1);
 });
 
 test("opportunity rewards can unlock a new region and raise a menace", () => {
-  const result = resolveChoice(initialState(), "market-gossip", "trade-rumour", () => 0.9);
+  const state = { ...initialState(), locationId: "velvet-market" };
+  const result = resolveChoice(state, "market-gossip", "trade-rumour", () => 0.9);
   assert.equal(result.state.locationId, "clockwork-gardens");
   assert.ok(result.state.unlockedLocations.includes("clockwork-gardens"));
   assert.equal(result.state.menaces.suspicion, 1);
+});
+
+test("a choice from another location is rejected server-style", () => {
+  const result = resolveChoice(initialState(), "borrowed-face", "wear", () => 0.9);
+  assert.match(result.error, /not available/i);
+  assert.equal(result.state.locationId, "lantern-quay");
+});
+
+test("story and choice availability are explicit predicates", () => {
+  const state = initialState();
+  assert.equal(storyAvailable(state, "bell-under-water"), true);
+  assert.equal(storyAvailable(state, "borrowed-face"), false);
+  assert.equal(choiceAvailable(state, "bell-under-water", "descend"), true);
 });

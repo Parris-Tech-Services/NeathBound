@@ -1,32 +1,37 @@
-import { resolveChoice, resetState } from "./game/engine.js";
-import { loadState, saveState } from "./game/state.js";
+import { createGameService } from "./services/index.js";
 import { render } from "./ui/render.js";
 
-let state = loadState();
 const app = document.querySelector("#app");
+const service = createGameService();
 
-function draw() {
-  saveState(state);
+async function draw(state = await service.getState()) {
   render(app, state, {
-    choose(storyId, choiceId) {
-      const outcome = resolveChoice(state, storyId, choiceId);
-      if (outcome.error) return;
-      state = outcome.state;
-      draw();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    async choose(storyId, choiceId) {
+      try {
+        const outcome = await service.choose(storyId, choiceId);
+        if (outcome.error) return;
+        await draw(outcome.state ?? outcome);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (error) { showError(error); }
     },
-    travel(locationId) {
-      if (!state.unlockedLocations.includes(locationId)) return;
-      state = { ...state, locationId, journal: [`Travelled to ${locationId.replaceAll("-", " ")}.`, ...state.journal].slice(0, 30) };
-      draw();
+    async travel(locationId) {
+      if (typeof service.travel !== "function") return;
+      try { await draw(await service.travel(locationId)); } catch (error) { showError(error); }
     },
-    reset() {
-      if (window.confirm("Begin a new life? Your local story will be replaced.")) {
-        state = resetState();
-        draw();
-      }
+    async reset() {
+      if (!window.confirm("Begin a new life? Your story will be replaced.")) return;
+      try { await draw((await service.reset()).state ?? await service.getState()); } catch (error) { showError(error); }
     }
   });
 }
 
-draw();
+function showError(error) {
+  console.error(error);
+  const message = document.createElement("p");
+  message.className = "runtime-error";
+  message.setAttribute("role", "alert");
+  message.textContent = `The city is temporarily unreachable: ${error.message}`;
+  app.prepend(message);
+}
+
+draw().catch(showError);
