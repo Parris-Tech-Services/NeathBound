@@ -11,6 +11,7 @@
     "api": "node server/index.mjs",
     "api:test": "node --test server/tests/*.test.mjs",
     "validate:content": "node tools/validate-content.mjs",
-    "sync:engine": "node scripts/sync-engine.mjs"
+    "sync:engine": "node scripts/sync-engine.mjs",
+    "test:e2e": "node --test tests/e2e/play.e2e.mjs"
   }
 }
