@@ -425,7 +425,7 @@ export function render(app, state, handlers, outcome = null) {
   app.querySelector("[data-action=onwards]")?.addEventListener("click", handlers.onwards);
   app.querySelectorAll("[data-action=bookmark]").forEach((button) => button.addEventListener("click", () => handlers.bookmark(button.dataset.story)));
   app.querySelectorAll("[data-action=outfit]").forEach((select) => select.addEventListener("change", (event) => handlers.outfit(event.target.value)));
-  app.querySelector("[data-action=travel]").addEventListener("click", () => handlers.travel(app.querySelector("#travel-location").value));
+  app.querySelector("[data-action=travel]")?.addEventListener("click", () => handlers.travel(app.querySelector("#travel-location")?.value));
   app.querySelectorAll("[data-action=edit-note]").forEach((button) => button.addEventListener("click", () => handlers.editNote(button.dataset.noteKey)));
   app.querySelector("[data-action=reset]").addEventListener("click", handlers.reset);
 
