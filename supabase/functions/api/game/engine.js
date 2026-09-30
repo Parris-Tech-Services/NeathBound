@@ -1,4 +1,5 @@
 import { locations, stories } from "./content.js";
+import { bazaarStock, itemDefinition } from "./items.js";
 import { cloneState, initialState } from "./state.js";
 import { applyEffects, requirementsMet, resolveChallenge } from "./rules.js";
 
@@ -30,6 +31,7 @@ export function storyAvailable(state, storyId, context = {}) {
   if (!story) return false;
   if (!currentLocation(state).stories.includes(storyId)) return false;
   if (story.once && state.flags[`story-complete:${storyId}`]) return false;
+  if (story.tags?.includes("opportunity") && !state.hand?.includes(storyId)) return false;
   return requirementsMet(state, requirementsFor(story), context);
 }
 
@@ -72,31 +74,30 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
   const challenge = effectiveChallenge(story, choice);
   const check = resolveChallenge(next, challenge, random);
   const success = check.success;
-  const resultText = success
-    ? choice.success
-    : (choice.failure ?? "The city refuses to explain itself.");
+  const resultText = success ? choice.success : (choice.failure ?? "The city refuses to explain itself.");
 
   applyEffects(next, success ? (choice.successEffects ?? []) : (choice.failureEffects ?? []));
   next.flags[`${storyId}:${choiceId}`] = true;
   if (story.once) next.flags[`story-complete:${storyId}`] = true;
-  next.revision = Number(next.revision ?? 0) + 1;\n  next.flags["__revision"] = next.revision;
+  if (story.tags?.includes("opportunity")) {
+    next.hand = (next.hand ?? []).filter((id) => id !== storyId);
+    if (!next.discard.includes(storyId)) next.discard.push(storyId);
+    syncOpportunityState(next);
+  }
+  advanceRevision(next);
 
   const changes = describeChanges(before, next);
-  const challengeText = challenge
-    ? ` (${success ? "success" : "failure"}: ${check.total} vs ${challenge.difficulty})`
-    : "";
+  const challengeText = challenge ? ` (${success ? "success" : "failure"}: ${check.total} vs ${challenge.difficulty})` : "";
   const journalText = `${story.title}: ${resultText}${challengeText}`;
   next.journal = [journalText, ...next.journal].slice(0, 100);
-  next.events = [{
-    id: `${Date.now()}-${storyId}-${choiceId}-${next.revision}`,
-    at: new Date().toISOString(),
+  appendEvent(next, {
     storyId,
     choiceId,
     title: story.title,
     outcome: success ? "success" : "failure",
     text: resultText,
     changes
-  }, ...(next.events ?? [])].slice(0, 250);
+  });
 
   return {
     state: next,
@@ -108,8 +109,113 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     roll: check.roll,
     total: check.total,
     challenge,
+    baseQuality: check.baseQuality,
+    bonus: check.bonus,
     changes
   };
+}
+
+export function buyItem(state, itemId) {
+  const next = cloneState(state);
+  if (!bazaarStock.includes(itemId)) return { state: next, error: "That item is not sold here." };
+  const item = itemDefinition(itemId);
+  const price = Number(item.price ?? 0);
+  if (price <= 0) return { state: next, error: "That item has no purchase price." };
+  if (Number(next.echoes ?? 0) < price) return { state: next, error: `You need ${price} Echoes to buy ${item.name}.` };
+
+  const before = cloneState(next);
+  next.echoes -= price;
+  next.items[itemId] = Number(next.items[itemId] ?? 0) + 1;
+  advanceRevision(next);
+  return transaction(before, next, `Bought ${item.name}`, `You purchase ${item.name} for ${price} Echoes.`);
+}
+
+export function sellItem(state, itemId) {
+  const next = cloneState(state);
+  const quantity = Number(next.items?.[itemId] ?? 0);
+  const item = itemDefinition(itemId);
+  const value = Number(item.sellValue ?? 0);
+  if (quantity < 1) return { state: next, error: `You do not have ${item.name}.` };
+  if (value <= 0) return { state: next, error: `${item.name} cannot be sold.` };
+
+  const before = cloneState(next);
+  next.items[itemId] = quantity - 1;
+  if (next.items[itemId] <= 0) delete next.items[itemId];
+  for (const [slot, equippedId] of Object.entries(next.equipment ?? {})) {
+    if (equippedId === itemId && !next.items[itemId]) next.equipment[slot] = null;
+  }
+  next.echoes += value;
+  syncEquipment(next);
+  advanceRevision(next);
+  return transaction(before, next, `Sold ${item.name}`, `You sell ${item.name} for ${value} Echoes.`);
+}
+
+export function equipItem(state, itemId) {
+  const next = cloneState(state);
+  const item = itemDefinition(itemId);
+  if (Number(next.items?.[itemId] ?? 0) < 1) return { state: next, error: `You do not own ${item.name}.` };
+  if (!item.equipSlot) return { state: next, error: `${item.name} cannot be equipped.` };
+
+  const before = cloneState(next);
+  next.equipment[item.equipSlot] = next.equipment[item.equipSlot] === itemId ? null : itemId;
+  syncEquipment(next);
+  advanceRevision(next);
+  const equipped = Boolean(next.equipment[item.equipSlot]);
+  return transaction(
+    before,
+    next,
+    equipped ? `Equipped ${item.name}` : `Unequipped ${item.name}`,
+    equipped ? `${item.name} is now equipped.` : `${item.name} has been removed.`
+  );
+}
+
+export function drawOpportunity(state, random = Math.random, context = {}) {
+  const next = cloneState(state);
+  if ((next.hand ?? []).length >= 3) return { state: next, error: "Your opportunity hand is full." };
+
+  const candidates = currentLocation(next).stories
+    .filter((id) => stories[id]?.tags?.includes("opportunity"))
+    .filter((id) => !next.hand.includes(id))
+    .filter((id) => requirementsMet(next, requirementsFor(stories[id]), context));
+
+  let pool = candidates.filter((id) => !next.discard.includes(id));
+  if (!pool.length) {
+    next.discard = next.discard.filter((id) => !candidates.includes(id));
+    pool = candidates;
+  }
+  if (!pool.length) return { state: next, error: "There are no eligible opportunities here right now." };
+
+  const before = cloneState(next);
+  const picked = pool[Math.floor(random() * pool.length)];
+  next.hand.push(picked);
+  next.lastDraw = picked;
+  syncOpportunityState(next);
+  advanceRevision(next);
+  return transaction(before, next, "Opportunity drawn", `${stories[picked].title} has entered your hand.`);
+}
+
+export function discardOpportunity(state, storyId) {
+  const next = cloneState(state);
+  if (!next.hand.includes(storyId)) return { state: next, error: "That opportunity is not in your hand." };
+  const before = cloneState(next);
+  next.hand = next.hand.filter((id) => id !== storyId);
+  if (!next.discard.includes(storyId)) next.discard.push(storyId);
+  syncOpportunityState(next);
+  advanceRevision(next);
+  return transaction(before, next, "Opportunity discarded", `${stories[storyId]?.title ?? "The card"} has been discarded.`);
+}
+
+export function recoverMenace(state, menaceId) {
+  const next = cloneState(state);
+  if (!(menaceId in (next.menaces ?? {}))) return { state: next, error: "That menace is unknown." };
+  if (Number(next.menaces[menaceId] ?? 0) <= 0) return { state: next, error: `${title(menaceId)} is already at zero.` };
+  if (Number(next.echoes ?? 0) < 3) return { state: next, error: "You need 3 Echoes for a quiet recovery." };
+
+  const before = cloneState(next);
+  next.echoes -= 3;
+  next.menaces[menaceId] = Math.max(0, Number(next.menaces[menaceId]) - 2);
+  advanceRevision(next);
+  return transaction(before, next, `Recover from ${title(menaceId)}`, "A little time, privacy and practical help take the edge off.");
 }
 
 export function resetState() {
@@ -125,19 +231,49 @@ export function describeChanges(before, after) {
   };
 
   if (Number(before.echoes ?? 0) !== Number(after.echoes ?? 0)) {
-    changes.push({ type: "echoes", id: "echoes", label: "Echoes", before: Number(before.echoes ?? 0), after: Number(after.echoes ?? 0), delta: Number(after.echoes ?? 0) - Number(before.echoes ?? 0) });
+    changes.push({
+      type: "echoes",
+      id: "echoes",
+      label: "Echoes",
+      before: Number(before.echoes ?? 0),
+      after: Number(after.echoes ?? 0),
+      delta: Number(after.echoes ?? 0) - Number(before.echoes ?? 0)
+    });
   }
-
   for (const key of new Set([...Object.keys(before.qualities ?? {}), ...Object.keys(after.qualities ?? {})])) numeric("qualities", key, title(key));
   for (const key of new Set([...Object.keys(before.menaces ?? {}), ...Object.keys(after.menaces ?? {})])) numeric("menaces", key, title(key));
   for (const key of new Set([...Object.keys(before.items ?? {}), ...Object.keys(after.items ?? {})])) numeric("items", key, title(key));
-
   if (before.locationId !== after.locationId) {
     changes.push({ type: "location", id: after.locationId, label: "Location", before: before.locationId, after: after.locationId });
   }
   return changes;
 }
 
+function transaction(before, next, titleText, resultText) {
+  const changes = describeChanges(before, next);
+  appendEvent(next, { storyId: null, choiceId: null, title: titleText, outcome: "success", text: resultText, changes });
+  return { state: next, title: titleText, result: resultText, success: true, changes };
+}
+
+function appendEvent(state, event) {
+  const entry = {
+    id: `${Date.now()}-${event.storyId ?? "system"}-${event.choiceId ?? "event"}-${state.revision}`,
+    at: new Date().toISOString(),
+    ...event
+  };
+  state.events = [entry, ...(state.events ?? [])].slice(0, 250);
+  state.flags["__events"] = state.events;
+}
+
+function syncEquipment(state) {
+  state.flags["__equipment"] = { ...(state.equipment ?? {}) };
+}
+
+function advanceRevision(state) {
+  state.revision = Number(state.revision ?? 0) + 1;
+  state.flags["__revision"] = state.revision;
+}
+
 function title(value) {
-  return String(value).split("-").map((part) => part ? part[0].toUpperCase() + part.slice(1) : "").join(" ");
+  return String(value ?? "").split("-").map((part) => part ? part[0].toUpperCase() + part.slice(1) : "").join(" ");
 }
