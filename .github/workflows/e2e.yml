@@ -1,0 +1,31 @@
+# Plays the site in a real browser (Chromium via Playwright) on every push and
+# PR, and reports an axe-core accessibility audit in the run summary.
+# Playwright and axe-core are installed only here (--no-save), so the game
+# itself stays dependency-free.
+name: Browser tests
+on:
+  push:
+    branches: ["main", "feature/**", "qa/**"]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install test-only tools
+        run: |
+          npm install --no-save --no-audit --no-fund playwright@1 axe-core@4
+          npx playwright install --with-deps chromium
+      - name: Play the game in Chromium
+        env:
+          E2E_REPORT: e2e-report.md
+        run: npm run test:e2e
+      - name: Browser test report
+        if: always()
+        run: cat e2e-report.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || echo "No browser test report was produced." >> "$GITHUB_STEP_SUMMARY"

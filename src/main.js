@@ -1,6 +1,6 @@
-import { createGameService } from "./services/index.js?v=20260930-10";
-import { render } from "./ui/render.js?v=20260930-10";
-import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20260930-10";
+import { createGameService } from "./services/index.js?v=20260930-12";
+import { render } from "./ui/render.js?v=20260930-12";
+import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20260930-12";
 
 const app = document.querySelector("#app");
 const service = createGameService();

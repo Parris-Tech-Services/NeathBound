@@ -88,7 +88,7 @@ test("a failed attempt at the locked stacks keeps the key for another try", () =
 
 test("stitching the page needs the silver thimble and spends both", () => {
   const withoutThimble = stateWith("hollow-archive", { "unfinished-page": 1 });
-  assert.match(resolveChoice(withoutThimble, "finish-the-page", "stitch-page", SUCCEED).error, /not available/);
+  assert.match(resolveChoice(withoutThimble, "finish-the-page", "stitch-page", SUCCEED).error, /no longer available/);
   const { state } = resolveChoice(stateWith("hollow-archive", { "unfinished-page": 1, "silver-thimble": 1 }), "finish-the-page", "stitch-page", SUCCEED);
   assert.equal(state.items["unfinished-page"], undefined);
   assert.equal(state.items["silver-thimble"], undefined);
@@ -120,7 +120,7 @@ test("the sun seed grows a dawn whose morning must be returned", () => {
 
 test("the memory can only be gifted after keeping the flower's appointment", () => {
   const start = stateWith("clockwork-gardens", { "bright-memory": 1 });
-  assert.match(resolveChoice(start, "the-memory-graft", "gift-to-flower", SUCCEED).error, /not available/);
+  assert.match(resolveChoice(start, "the-memory-graft", "gift-to-flower", SUCCEED).error, /no longer available/);
   const kept = stateWith("clockwork-gardens", { "bright-memory": 1 }, { "garden-appointment:attend": true });
   const { state } = resolveChoice(kept, "the-memory-graft", "gift-to-flower", SUCCEED);
   assert.equal(state.items["bright-memory"], undefined);
@@ -172,7 +172,7 @@ test("being bound into the index opens a repeatable archive storylet", () => {
 });
 
 test("every new possession storylet is listed at exactly one location", () => {
-  const ids = ["salt-on-the-map", "the-sand-reader", "the-locked-stacks", "finish-the-page", "return-the-darkness", "plant-the-sun-seed", "the-seedling-dawn", "the-memory-graft", "unwritten-ink", "the-cartographer-returns", "the-debt-collector", "an-entry-in-the-index", "the-gardeners-thanks", "the-margin-note", "survey-the-stone-sky", "the-lamp-that-fell-upward", "the-far-crack"];
+  const ids = ["salt-on-the-map", "the-sand-reader", "the-locked-stacks", "finish-the-page", "return-the-darkness", "plant-the-sun-seed", "the-seedling-dawn", "the-memory-graft", "unwritten-ink", "the-cartographer-returns", "the-debt-collector", "an-entry-in-the-index", "the-gardeners-thanks", "the-margin-note", "survey-the-stone-sky", "the-lamp-that-fell-upward", "the-far-crack", "the-submerged-door", "the-loose-end"];
   for (const id of ids) {
     const homes = Object.values(locations).filter((location) => location.stories.includes(id));
     assert.equal(homes.length, 1, `${id} should appear at exactly one location`);
@@ -218,4 +218,27 @@ test("every location a storylet can send the player to is reachable by travel af
     }
   }
   for (const locationId of Object.keys(locations)) assert.ok(unlocked.has(locationId), `${locationId} can never be unlocked for travel`);
+});
+
+test("the brass key goes back to its door only after the bell has been answered", () => {
+  const start = initialState();
+  assert.equal(storyAvailable(start, "the-submerged-door"), false);
+  const descended = resolveChoice(start, "bell-under-water", "descend", SUCCEED).state;
+  descended.locationId = "lantern-quay";
+  assert.equal(storyAvailable(descended, "the-submerged-door"), true);
+  const failed = resolveChoice(descended, "the-submerged-door", "leave-key", FAIL).state;
+  assert.equal(failed.items["brass-key"], 1, "a failed attempt keeps the key");
+  const { state } = resolveChoice(descended, "the-submerged-door", "leave-key", SUCCEED);
+  assert.equal(state.items["brass-key"], undefined);
+  assert.equal(state.flags["returned-the-brass-key"], true);
+  assert.equal(storyAvailable(state, "the-submerged-door"), false);
+});
+
+test("cutting the red thread leaves a loose end that leads somewhere", () => {
+  let state = stateWith("velvet-market");
+  state = resolveChoice(state, "red-thread", "cut", SUCCEED).state;
+  assert.equal(state.items["red-thread-end"], 1);
+  assert.equal(storyAvailable(state, "the-loose-end"), true);
+  state = resolveChoice(state, "the-loose-end", "tie-finger", SUCCEED).state;
+  assert.equal(state.items["red-thread-end"], undefined);
 });

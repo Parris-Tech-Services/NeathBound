@@ -4,14 +4,14 @@ export const locations = {
     region: "The Lower City",
     subtitle: "Where the tide carries messages in sealed bottles.",
     atmosphere: "Wet brass, coal smoke, and a bell that rings beneath the water.",
-    stories: ["bell-under-water", "cartographer-at-dusk", "tea-for-the-tide", "salt-on-the-map", "return-the-darkness", "the-cartographer-returns"]
+    stories: ["bell-under-water", "cartographer-at-dusk", "tea-for-the-tide", "salt-on-the-map", "return-the-darkness", "the-cartographer-returns", "the-submerged-door"]
   },
   "velvet-market": {
     name: "The Velvet Market",
     region: "The Lower City",
     subtitle: "A bazaar for memories, rumours, and perfectly ordinary knives.",
     atmosphere: "Every stall has a curtain. Every curtain has a shadow behind it.",
-    stories: ["borrowed-face", "red-thread", "market-gossip", "the-sand-reader", "unwritten-ink", "the-debt-collector"]
+    stories: ["borrowed-face", "red-thread", "market-gossip", "the-sand-reader", "unwritten-ink", "the-debt-collector", "the-loose-end"]
   },
   "hollow-archive": {
     name: "The Hollow Archive",
@@ -38,6 +38,7 @@ export const locations = {
 
 export const stories = {
   "bell-under-water": {
+    once: true,
     title: "The Bell Under Water",
     kicker: "A sound from below",
     text: "At low tide, the quay reveals a stairway descending into black water. A bell tolls somewhere beneath the last step. The brass key in your pocket warms.",
@@ -76,6 +77,7 @@ export const stories = {
     ]
   },
   "cartographer-at-dusk": {
+    once: true,
     title: "The Cartographer at Dusk",
     kicker: "A map with an appetite",
     text: "A one-eyed cartographer offers you a map that redraws itself whenever you blink. She wants a true name in exchange for the eastern road.",
@@ -106,6 +108,7 @@ export const stories = {
     ]
   },
   "borrowed-face": {
+    once: true,
     title: "A Borrowed Face",
     kicker: "The tailor's invitation",
     text: "A tailor has stitched a face from moonlit silk. It resembles you, but happier. Wearing it would open every door in the market—and close one behind you.",
@@ -139,6 +142,7 @@ export const stories = {
     ]
   },
   "red-thread": {
+    once: true,
     title: "The Red Thread",
     kicker: "A bargain in three knots",
     text: "A child in a red coat asks you to follow a thread through the market. She promises it leads to whatever you have misplaced.",
@@ -161,7 +165,8 @@ export const stories = {
         requirements: [],
         success: "The market exhales. You keep the loose end; it may be useful.",
         successEffects: [
-          { type: "echoes", amount: 10 },
+          { type: "item", id: "red-thread-end", amount: 1 },
+          { type: "echoes", amount: 4 },
           { type: "location", id: "velvet-market" }
         ],
         failureEffects: []
@@ -169,6 +174,7 @@ export const stories = {
     ]
   },
   "index-of-lost-things": {
+    once: true,
     title: "The Index of Lost Things",
     kicker: "A volume that knows you",
     text: "The archive's index opens to a page describing the thing you miss most. The entry is written in ink that is still wet.",
@@ -202,6 +208,7 @@ export const stories = {
     ]
   },
   "the-quiet-librarian": {
+    once: true,
     title: "The Quiet Librarian",
     kicker: "A question without a mouth",
     text: "The librarian points to three shelves: what you were, what you are, and what the city expects you to become. Only one shelf is dusty.",
@@ -247,10 +254,30 @@ export const stories = {
     title: "Market Gossip",
     kicker: "A rumour with clean shoes",
     text: "Three merchants are whispering about a door that only opens for people who have been seen in the wrong place. They notice you listening.",
-    tags: ["opportunity"],
+    tags: ["opportunity", "repeatable"],
     choices: [
-      { id: "trade-rumour", label: "Trade a rumour of your own", success: "The merchants accept the exchange and point you toward the Gardens.", reward: { echoes: 7, unlock: "clockwork-gardens", menace: ["suspicion", 1] }, target: "clockwork-gardens" },
-      { id: "leave", label: "Leave before they learn your name", success: "You leave with your name intact and your pockets lighter by one secret.", reward: { quality: ["shadow", 1] }, target: "velvet-market" }
+      {
+        id: "trade-rumour",
+        label: "Trade a rumour of your own",
+        success: "The merchants accept the exchange and point you toward the Gardens.",
+        successEffects: [
+          { type: "echoes", amount: 4 },
+          { type: "unlock-location", id: "clockwork-gardens" },
+          { type: "menace", id: "suspicion", amount: 1 },
+          { type: "location", id: "clockwork-gardens" }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "leave",
+        label: "Leave before they learn your name",
+        success: "You leave with your name intact and your pockets lighter by one secret.",
+        successEffects: [
+          { type: "quality", id: "shadow", amount: 1 },
+          { type: "location", id: "velvet-market" }
+        ],
+        failureEffects: []
+      }
     ]
   },
   "catalogue-the-dark": {
@@ -259,29 +286,99 @@ export const stories = {
     text: "A shelf has been filled with darkness instead of books. The archive will pay you in echoes if you assign each patch a proper title.",
     challenge: { quality: "insight", difficulty: 7 },
     choices: [
-      { id: "catalogue", label: "Give the darkness its titles", success: "The shelf becomes legible. The archive records your name with a respectful error.", failure: "The darkness gives you a title instead.", reward: { echoes: 15, item: "ink-of-absence" }, target: "hollow-archive" },
-      { id: "close-shelf", label: "Close the shelf", success: "Some knowledge is safer when it remains unindexed.", reward: { menace: ["suspicion", -1] }, target: "lantern-quay" }
+      {
+        id: "catalogue",
+        label: "Give the darkness its titles",
+        success: "The shelf becomes legible. The archive records your name with a respectful error.",
+        failure: "The darkness gives you a title instead.",
+        successEffects: [
+          { type: "echoes", amount: 15 },
+          { type: "item", id: "ink-of-absence", amount: 1 },
+          { type: "location", id: "hollow-archive" }
+        ],
+        failureEffects: [
+          { type: "menace", id: "dread", amount: 1 },
+          { type: "location", id: "hollow-archive" }
+        ]
+      },
+      {
+        id: "close-shelf",
+        label: "Close the shelf",
+        challenge: false,
+        success: "Some knowledge is safer when it remains unindexed.",
+        successEffects: [
+          { type: "menace", id: "suspicion", amount: -1 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      }
     ]
   },
   "garden-appointment": {
+    once: true,
     title: "The Garden Appointment",
     kicker: "A flower expects you",
     text: "A clockwork flower has scheduled a meeting for you at the far end of the glasshouse. It has sent three reminders and one threat.",
     requirements: [{ type: "item", id: "tide-cup", op: ">=", value: 1 }],
     challenge: { quality: "poise", difficulty: 6 },
     choices: [
-      { id: "attend", label: "Attend the appointment", success: "The flower offers a seed that remembers the sun.", failure: "You arrive late. The flower makes a note of it.", reward: { item: "sun-seed", quality: ["poise", 1] }, target: "clockwork-gardens" },
-      { id: "apologise", label: "Send an apology by moth", success: "The flower accepts. For now.", reward: { menace: ["scandal", -1] }, target: "velvet-market" }
+      {
+        id: "attend",
+        label: "Attend the appointment",
+        success: "The flower offers a seed that remembers the sun.",
+        failure: "You arrive late. The flower makes a note of it.",
+        successEffects: [
+          { type: "item", id: "sun-seed", amount: 1 },
+          { type: "quality", id: "poise", amount: 1 },
+          { type: "location", id: "clockwork-gardens" }
+        ],
+        failureEffects: [
+          { type: "menace", id: "scandal", amount: 1 },
+          { type: "location", id: "clockwork-gardens" }
+        ]
+      },
+      {
+        id: "apologise",
+        label: "Send an apology by moth",
+        challenge: false,
+        success: "The flower accepts. For now.",
+        successEffects: [
+          { type: "menace", id: "scandal", amount: -1 },
+          { type: "location", id: "velvet-market" }
+        ],
+        failureEffects: []
+      }
     ]
   },
   "borrowed-sunlight": {
+    once: true,
     title: "Borrowed Sunlight",
     kicker: "A dangerous luxury",
     text: "A glass jar contains a thumb-sized sun. The gardener offers it to you for one night, provided you promise to return the darkness it displaces.",
     tags: ["opportunity"],
     choices: [
-      { id: "borrow", label: "Borrow the small sun", success: "The city looks almost kind in its light.", reward: { item: "small-sun", echoes: 9, menace: ["dread", 1] }, target: "lantern-quay" },
-      { id: "refuse-sun", label: "Refuse the bargain", success: "The gardener approves of your caution.", reward: { quality: ["nerve", 1] }, target: "clockwork-gardens" }
+      {
+        id: "borrow",
+        label: "Borrow the small sun",
+        success: "The city looks almost kind in its light.",
+        successEffects: [
+          { type: "item", id: "small-sun", amount: 1 },
+          { type: "echoes", amount: 9 },
+          { type: "menace", id: "dread", amount: 1 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "refuse-sun",
+        label: "Refuse the bargain",
+        success: "The gardener approves of your caution.",
+        successEffects: [
+          { type: "quality", id: "nerve", amount: 1 },
+          { type: "location", id: "clockwork-gardens" }
+        ],
+        failureEffects: []
+      }
     ]
   },
   "salt-on-the-map": {
@@ -894,6 +991,80 @@ export const stories = {
           { type: "echoes", amount: 8 },
           { type: "flag", id: "far-crack-answered", value: true },
           { type: "location", id: "glass-observatory" }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
+  "the-submerged-door": {
+    once: true,
+    title: "The Submerged Door",
+    kicker: "The key remembers the lock",
+    text: "Since you went down the drowned stair, the brass key you woke holding has grown heavy whenever you pass the water. It knows the door below better than you do.",
+    requirements: [
+      { type: "item", id: "brass-key", op: ">=", value: 1 },
+      { type: "flag", id: "bell-under-water:descend", op: "==", value: true }
+    ],
+    choices: [
+      {
+        id: "leave-key",
+        label: "Go back down and leave the key in its lock",
+        requirements: [],
+        challenge: { quality: "nerve", difficulty: 6 },
+        success: "The door accepts the key with a sigh of old water. Behind it, a narrow hall is lined with keys exactly like yours, each labelled with a name. There is an empty hook with your name on it. You leave the key where it belongs, and feel lighter than you have since waking.",
+        failure: "The cold turns you back before the last step. The key stays in your pocket, patient as ever.",
+        successEffects: [
+          { type: "item", id: "brass-key", amount: -1 },
+          { type: "quality", id: "nerve", amount: 1 },
+          { type: "echoes", amount: 10 },
+          { type: "flag", id: "returned-the-brass-key", value: true },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: [{ type: "location", id: "lantern-quay" }]
+      },
+      {
+        id: "keep-key",
+        label: "Keep it. You are not ready to be hung on a hook.",
+        requirements: [],
+        success: "You close your hand around the key until it cools. Whatever waits below can go on waiting.",
+        successEffects: [
+          { type: "quality", id: "poise", amount: 1 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
+  "the-loose-end": {
+    title: "The Loose End",
+    kicker: "Something still tied to you",
+    text: "You kept the cut end of the red thread. It will not lie flat in your pocket; it keeps curling toward the market's inner curtains, as if the knot it lost is still somewhere nearby.",
+    requirements: [{ type: "item", id: "red-thread-end", op: ">=", value: 1 }],
+    choices: [
+      {
+        id: "follow-end",
+        label: "Let the loose end lead you",
+        requirements: [],
+        challenge: { quality: "insight", difficulty: 5 },
+        success: "It leads you behind a curtain to a stall selling mended things. The stallholder ties your thread back into a larger red weave, thanks you for returning a missing stitch, and pays you for your trouble.",
+        failure: "It leads you in a slow circle back to where you started. The thread seems pleased with itself.",
+        successEffects: [
+          { type: "item", id: "red-thread-end", amount: -1 },
+          { type: "echoes", amount: 9 },
+          { type: "quality", id: "insight", amount: 1 },
+          { type: "location", id: "velvet-market" }
+        ],
+        failureEffects: [{ type: "location", id: "velvet-market" }]
+      },
+      {
+        id: "tie-finger",
+        label: "Tie it round your finger, so you do not forget",
+        requirements: [],
+        success: "It knots itself neatly. For the rest of the day you remember every name you hear, and forget none of them afterwards.",
+        successEffects: [
+          { type: "item", id: "red-thread-end", amount: -1 },
+          { type: "quality", id: "poise", amount: 1 },
+          { type: "location", id: "velvet-market" }
         ],
         failureEffects: []
       }

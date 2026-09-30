@@ -39,6 +39,24 @@ offline play. Editing `src/game/` and merging to `main` redeploys the API
 `server/` is an optional local Node + SQLite API from the earlier migration
 plan. The game does not use it; the Supabase function is the online backend.
 
+## Testing
+
+```bash
+npm test          # rules, backend API, content and module-integrity checks (no browser)
+npm run smoke     # static smoke check
+npm run test:e2e  # plays the site in Chromium; needs: npm i --no-save playwright axe-core && npx playwright install chromium
+```
+
+`npm test` includes a module-integrity check: every import reachable from
+`index.html` must exist, and each module must use a single `?v=` version
+(two versions make the browser run the module twice).
+
+CI runs the browser test on every push and PR (`e2e.yml`) and, after each
+GitHub Pages deploy, against the live site (`live-check.yml`), including an
+API health check. Both publish a report with an axe-core accessibility audit
+and any third-party assets that failed to load. These two are reported, not
+enforced; failures of the game's own files fail the run.
+
 ## Five parallel agent lanes
 
 The repository is split into five modular lanes described in
