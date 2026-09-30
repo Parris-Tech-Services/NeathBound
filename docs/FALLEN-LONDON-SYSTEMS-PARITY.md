@@ -250,7 +250,7 @@ NeathBound:
 - each location has its own escape/recovery storylets
 - no permanent death/game over
 
-Status: DATA EXISTS, CONSEQUENCE GAMEPLAY MISSING
+Status: DONE (consequence locations and recovery storylets fully integrated).
 
 ## 10. Long-form Ambition equivalent
 
