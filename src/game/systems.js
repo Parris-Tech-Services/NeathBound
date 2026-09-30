@@ -198,6 +198,8 @@ export function mutateSystemAction(state, action, payload = {}) {
     case "unequip": return unequip(state, payload.slot);
     case "use": return use(state, payload.itemId);
     case "recover": return recover(state, payload.menaceId);
+    case "save-outfit": return saveOutfit(state, payload.outfitId);
+    case "apply-outfit": return applyOutfit(state, payload.outfitId);
     default: return { error: "Unknown action." };
   }
 }
@@ -261,4 +263,28 @@ function recover(state, menaceId) {
 
 function title(value) {
   return String(value ?? "").split("-").filter(Boolean).map((part) => part[0].toUpperCase() + part.slice(1)).join(" ");
+}
+
+
+function saveOutfit(state, outfitId) {
+  if (!["morning-outfit", "working-outfit", "dangerous-outfit"].includes(outfitId)) {
+    return { error: "Unknown outfit." };
+  }
+  state.savedOutfits ??= {};
+  state.savedOutfits[outfitId] = { ...(state.equipped ?? {}) };
+  state.activeOutfit = outfitId;
+  return { title: "Outfit", text: `You save your current equipment as ${title(outfitId)}.` };
+}
+
+function applyOutfit(state, outfitId) {
+  const outfit = state.savedOutfits?.[outfitId];
+  if (!outfit || typeof outfit !== "object") return { error: "That outfit has not been saved yet." };
+  for (const itemId of Object.values(outfit)) {
+    if (itemId && (state.items?.[itemId] ?? 0) < 1) {
+      return { error: `You no longer possess ${itemInfo(itemId).name}.` };
+    }
+  }
+  state.equipped = { ...outfit };
+  state.activeOutfit = outfitId;
+  return { title: "Outfit", text: `You change into ${title(outfitId)}.` };
 }
