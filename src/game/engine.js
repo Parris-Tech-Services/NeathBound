@@ -1,6 +1,6 @@
-import { locations, menaceAreas, stories } from "./content.js?v=20260930-19";
-import { cloneState, initialState } from "./state.js?v=20260930-19";
-import { applyEffects, awardProgress, describeChallenge, requirementsMet, resolveChallenge } from "./rules.js?v=20260930-19";
+import { locations, menaceAreas, stories } from "./content.js?v=20260930-20";
+import { cloneState, initialState } from "./state.js?v=20260930-20";
+import { applyEffects, awardProgress, describeChallenge, requirementsMet, resolveChallenge } from "./rules.js?v=20260930-20";
 
 export { describeChallenge };
 
