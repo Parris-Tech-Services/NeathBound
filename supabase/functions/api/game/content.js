@@ -1,10 +1,17 @@
 export const locations = {
+  "the-lair": {
+    name: "The Lair",
+    region: "Below the Lower City",
+    subtitle: "A sealed undercroft for people the city has misplaced.",
+    atmosphere: "Cold stone, old iron, and one lamp that refuses to go out.",
+    stories: ["wake-in-the-lair", "the-way-out"]
+  },
   "lantern-quay": {
     name: "Lantern Quay",
     region: "The Lower City",
     subtitle: "Where the tide carries messages in sealed bottles.",
     atmosphere: "Wet brass, coal smoke, and a bell that rings beneath the water.",
-    stories: ["bell-under-water", "cartographer-at-dusk", "tea-for-the-tide", "salt-on-the-map", "return-the-darkness", "the-cartographer-returns", "the-submerged-door"]
+    stories: ["first-night-name", "first-night-belongings", "first-night-roads", "bell-under-water", "cartographer-at-dusk", "tea-for-the-tide", "salt-on-the-map", "return-the-darkness", "the-cartographer-returns", "the-submerged-door"]
   },
   "velvet-market": {
     name: "The Velvet Market",
@@ -37,6 +44,147 @@ export const locations = {
 };
 
 export const stories = {
+  "wake-in-the-lair": {
+    title: "Wake Beneath the Lamp",
+    kicker: "There must be a way out",
+    text: "You wake on a stone bench beneath a green-glass lamp. The door has no handle on your side. Four details insist on being noticed: loose mortar, a listening pipe, footsteps beyond the wall, and a strip of darkness under the door.",
+    tags: ["tutorial"],
+    requirements: [{ type: "flag", id: "tutorial:escape-ready", op: "!=", value: true }],
+    choices: [
+      {
+        id: "force",
+        label: "Test the door until something gives",
+        challenge: { quality: "nerve", difficulty: 4 },
+        success: "The hinges complain louder than you do. One pin shifts. The door is not open yet, but now you know it can be.",
+        failure: "The iron wins this round. Your shoulder learns something useful about leverage.",
+        successEffects: [{ type: "quality", id: "nerve", amount: 1 }, { type: "flag", id: "tutorial:escape-ready", value: true }],
+        failureEffects: [{ type: "quality", id: "nerve", amount: 1 }, { type: "momentum", amount: 1 }]
+      },
+      {
+        id: "study",
+        label: "Study the room as if it were evidence",
+        challenge: { quality: "insight", difficulty: 4 },
+        success: "The mortar beside the frame is newer than the wall. Someone repaired the cell in a hurry, and left you a weakness.",
+        failure: "The room offers no revelation, but the pattern of scratches around the latch begins to make sense.",
+        successEffects: [{ type: "quality", id: "insight", amount: 1 }, { type: "flag", id: "tutorial:escape-ready", value: true }],
+        failureEffects: [{ type: "quality", id: "insight", amount: 1 }, { type: "momentum", amount: 1 }]
+      },
+      {
+        id: "speak",
+        label: "Address whoever is listening through the pipe",
+        challenge: { quality: "poise", difficulty: 4 },
+        success: "A breath answers from the pipe. Then a key scrapes across the floor from the other side. Someone has decided you are interesting.",
+        failure: "No one answers. Still, you hear the exact moment the unseen listener stops pretending not to be there.",
+        successEffects: [{ type: "quality", id: "poise", amount: 1 }, { type: "flag", id: "tutorial:escape-ready", value: true }],
+        failureEffects: [{ type: "quality", id: "poise", amount: 1 }, { type: "momentum", amount: 1 }]
+      },
+      {
+        id: "vanish",
+        label: "Use the darkness beneath the door",
+        challenge: { quality: "shadow", difficulty: 4 },
+        success: "The lamp flickers. In that instant you are at the hinge, fingers inside the gap, lifting the latch where the warder cannot see.",
+        failure: "You do not vanish. But you discover exactly how little of you the corridor can see.",
+        successEffects: [{ type: "quality", id: "shadow", amount: 1 }, { type: "flag", id: "tutorial:escape-ready", value: true }],
+        failureEffects: [{ type: "quality", id: "shadow", amount: 1 }, { type: "momentum", amount: 1 }]
+      }
+    ]
+  },
+  "the-way-out": {
+    once: true,
+    title: "The Door Above",
+    kicker: "The city is on the other side",
+    text: "The lock is beaten, understood, persuaded, or deceived. Beyond it, a narrow stair climbs toward the sound of water and commerce.",
+    tags: ["tutorial"],
+    requirements: [{ type: "flag", id: "tutorial:escape-ready", op: "==", value: true }],
+    choices: [
+      {
+        id: "leave",
+        label: "Climb toward the city",
+        success: "You emerge behind a shuttered warehouse. Ahead, Lantern Quay glitters on black water. No one stops you. That feels less reassuring than it should.",
+        successEffects: [
+          { type: "flag", id: "tutorial:escaped", value: true },
+          { type: "unlock-location", id: "lantern-quay" },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
+  "first-night-name": {
+    once: true,
+    title: "A Name for the Ledger",
+    kicker: "The city would like to know who escaped",
+    text: "A quay clerk has a ledger open before you. The page already contains a blank space exactly the size of your name.",
+    tags: ["tutorial"],
+    requirements: [
+      { type: "flag", id: "tutorial:escaped", op: "==", value: true },
+      { type: "flag", id: "tutorial:myself", op: "!=", value: true }
+    ],
+    choices: [
+      {
+        id: "sign",
+        label: "Let the city record you",
+        success: "The ink dries before the pen touches paper. Whatever else is uncertain, the city now has a place to put what it learns about you.",
+        successEffects: [
+          { type: "flag", id: "tutorial:myself", value: true },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
+  "first-night-belongings": {
+    once: true,
+    title: "What Was Left With You",
+    kicker: "Two things survived the Lair",
+    text: "The clerk slides over a sealed packet recovered with you: a brass key and a map stiff with salt. Neither is listed on the inventory sheet.",
+    tags: ["tutorial"],
+    requirements: [
+      { type: "flag", id: "tutorial:myself", op: "==", value: true },
+      { type: "flag", id: "tutorial:possessions", op: "!=", value: true }
+    ],
+    choices: [
+      {
+        id: "take",
+        label: "Take back what is yours",
+        success: "The key is warm. The map is damp. The city has begun returning questions instead of answers.",
+        successEffects: [
+          { type: "item", id: "salted-map", amount: 1 },
+          { type: "item", id: "brass-key", amount: 1 },
+          { type: "flag", id: "tutorial:possessions", value: true },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
+  "first-night-roads": {
+    once: true,
+    title: "The Ways Beneath",
+    kicker: "Lantern Quay is only the beginning",
+    text: "A ferryman marks two routes on your salted map: one toward curtained stalls, another toward shelves cut into the stone. The city is wider than the Lair wanted you to believe.",
+    tags: ["tutorial"],
+    requirements: [
+      { type: "flag", id: "tutorial:possessions", op: "==", value: true },
+      { type: "flag", id: "tutorial:travel", op: "!=", value: true }
+    ],
+    choices: [
+      {
+        id: "learn",
+        label: "Learn the first routes",
+        success: "The Velvet Market and Hollow Archive are now within reach. Your first night beneath the city has properly begun.",
+        successEffects: [
+          { type: "unlock-location", id: "velvet-market" },
+          { type: "unlock-location", id: "hollow-archive" },
+          { type: "flag", id: "tutorial:travel", value: true },
+          { type: "flag", id: "tutorial:complete", value: true },
+          { type: "echoes", amount: 12 },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
   "bell-under-water": {
     once: true,
     title: "The Bell Under Water",
