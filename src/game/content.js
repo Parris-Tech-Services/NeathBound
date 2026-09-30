@@ -4,28 +4,28 @@ export const locations = {
     region: "The Lower City",
     subtitle: "Where the tide carries messages in sealed bottles.",
     atmosphere: "Wet brass, coal smoke, and a bell that rings beneath the water.",
-    stories: ["bell-under-water", "cartographer-at-dusk", "tea-for-the-tide", "salt-on-the-map", "return-the-darkness"]
+    stories: ["bell-under-water", "cartographer-at-dusk", "tea-for-the-tide", "salt-on-the-map", "return-the-darkness", "the-cartographer-returns"]
   },
   "velvet-market": {
     name: "The Velvet Market",
     region: "The Lower City",
     subtitle: "A bazaar for memories, rumours, and perfectly ordinary knives.",
     atmosphere: "Every stall has a curtain. Every curtain has a shadow behind it.",
-    stories: ["borrowed-face", "red-thread", "market-gossip", "the-sand-reader", "unwritten-ink"]
+    stories: ["borrowed-face", "red-thread", "market-gossip", "the-sand-reader", "unwritten-ink", "the-debt-collector"]
   },
   "hollow-archive": {
     name: "The Hollow Archive",
     region: "The Lower City",
     subtitle: "A library where the books remember who borrowed them.",
     atmosphere: "Dust hangs in the air like a second, slower snowfall.",
-    stories: ["index-of-lost-things", "the-quiet-librarian", "catalogue-the-dark", "the-locked-stacks", "finish-the-page"]
+    stories: ["index-of-lost-things", "the-quiet-librarian", "catalogue-the-dark", "the-locked-stacks", "finish-the-page", "an-entry-in-the-index"]
   },
   "clockwork-gardens": {
     name: "The Clockwork Gardens",
     region: "The High Galleries",
     subtitle: "A greenhouse where the flowers keep appointments.",
     atmosphere: "Brass leaves click together in the warm, artificial wind.",
-    stories: ["garden-appointment", "borrowed-sunlight", "plant-the-sun-seed", "the-seedling-dawn", "the-memory-graft"]
+    stories: ["garden-appointment", "borrowed-sunlight", "plant-the-sun-seed", "the-seedling-dawn", "the-memory-graft", "the-gardeners-thanks"]
   }
 };
 
@@ -468,15 +468,12 @@ export const stories = {
     title: "The Seed that Remembers the Sun",
     kicker: "A gift from a punctual flower",
     text: "The seed in your pocket is warm and faintly impatient. There is an empty bed of brass filings in the middle of the glasshouse, just its size.",
-    requirements: [
-      { type: "item", id: "sun-seed", op: ">=", value: 1 },
-      { type: "flag", id: "plant-the-sun-seed:plant", op: "!=", value: true }
-    ],
+    requirements: [{ type: "item", id: "sun-seed", op: ">=", value: 1 }],
     choices: [
       {
         id: "plant",
         label: "Plant it in the brass bed",
-        requirements: [],
+        requirements: [{ type: "flag", id: "plant-the-sun-seed:plant", op: "!=", value: true }],
         success: "It takes root with a sound like a watch being wound. By the time you have washed your hands, it has put up a green shoot and something that is almost a sunrise.",
         successEffects: [
           { type: "item", id: "sun-seed", amount: -1 },
@@ -598,6 +595,160 @@ export const stories = {
           { type: "item", id: "ink-of-absence", amount: -1 },
           { type: "echoes", amount: 11 },
           { type: "location", id: "velvet-market" }
+        ],
+        failureEffects: []
+      }
+    ]
+  },
+  "the-cartographer-returns": {
+    title: "The Cartographer Returns",
+    kicker: "She noticed what you did to the map",
+    text: "The one-eyed cartographer is waiting at the top of the quay steps. \"You washed the salt off,\" she says, not quite accusing. \"Nobody washes the salt off. May I see what was underneath?\"",
+    requirements: [
+      { type: "flag", id: "map-route-known", op: "==", value: true },
+      { type: "flag", id: "cartographer-reckoned", op: "!=", value: true }
+    ],
+    choices: [
+      {
+        id: "give-map",
+        label: "Give her the salted map",
+        requirements: [{ type: "item", id: "salted-map", op: ">=", value: 1 }],
+        success: "She holds it up to a lamp for a long time. Then she pays you more than it is worth and less than it means, and folds it away somewhere near her heart.",
+        successEffects: [
+          { type: "item", id: "salted-map", amount: -1 },
+          { type: "echoes", amount: 10 },
+          { type: "flag", id: "cartographer-reckoned", value: true },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "describe-route",
+        label: "Describe the route, but keep the map",
+        requirements: [],
+        challenge: { quality: "poise", difficulty: 5 },
+        success: "You tell it well enough that she draws it from your description without a single correction. She nods at you the way one professional nods at another.",
+        failure: "Your description wanders. She draws a very beautiful map of somewhere that does not exist and thanks you for it anyway.",
+        successEffects: [
+          { type: "quality", id: "poise", amount: 1 },
+          { type: "flag", id: "cartographer-reckoned", value: true },
+          { type: "location", id: "lantern-quay" }
+        ],
+        failureEffects: [
+          { type: "flag", id: "cartographer-reckoned", value: true },
+          { type: "location", id: "lantern-quay" }
+        ]
+      }
+    ]
+  },
+  "the-debt-collector": {
+    title: "The Debt Collector",
+    kicker: "Someone else read the ledgers too",
+    text: "A collector in a coat of stitched receipts falls into step beside you. \"You've been in the locked stacks,\" he murmurs. \"Then you know who owes what. Knowledge like that is a debt of its own.\"",
+    requirements: [
+      { type: "flag", id: "read-the-debt-ledgers", op: "==", value: true },
+      { type: "flag", id: "collector-answered", op: "!=", value: true }
+    ],
+    choices: [
+      {
+        id: "settle-stranger",
+        label: "Quietly settle a stranger's small debt",
+        requirements: [{ type: "echoes", op: ">=", value: 5 }],
+        success: "You pick a name you will never meet and pay what it owes. The collector crosses it out with visible reluctance and leaves you alone for good.",
+        successEffects: [
+          { type: "echoes", amount: -5 },
+          { type: "quality", id: "poise", amount: 1 },
+          { type: "flag", id: "collector-answered", value: true },
+          { type: "location", id: "velvet-market" }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "sell-secrets",
+        label: "Sell him what you read",
+        requirements: [],
+        challenge: { quality: "shadow", difficulty: 4 },
+        success: "You name three debts he did not know about. He pays you from a pocket full of other people's money and pretends you never met.",
+        failure: "He already knew all three, and now he knows you tried to sell them. He smiles, writes something down and moves on.",
+        successEffects: [
+          { type: "echoes", amount: 16 },
+          { type: "quality", id: "shadow", amount: 1 },
+          { type: "flag", id: "collector-answered", value: true },
+          { type: "location", id: "velvet-market" }
+        ],
+        failureEffects: [
+          { type: "flag", id: "collector-answered", value: true },
+          { type: "location", id: "velvet-market" }
+        ]
+      }
+    ]
+  },
+  "an-entry-in-the-index": {
+    title: "An Entry in the Index",
+    kicker: "You are catalogued now",
+    text: "Since your page was bound into the Index of Lost Things, readers have started requesting you. A slip on the librarian's desk bears your name, a shelf mark and a waiting list.",
+    requirements: [{ type: "flag", id: "bound-into-the-index", op: "==", value: true }],
+    choices: [
+      {
+        id: "be-borrowed",
+        label: "Let a reader borrow you for an afternoon",
+        requirements: [],
+        success: "An old man asks you what it was like to forget everything. You tell him honestly. He weeps a little, thanks you, and leaves a donation for the archive in your name.",
+        successEffects: [
+          { type: "echoes", amount: 8 },
+          { type: "quality", id: "insight", amount: 1 },
+          { type: "location", id: "hollow-archive" }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "look-yourself-up",
+        label: "Look yourself up",
+        requirements: [],
+        challenge: { quality: "insight", difficulty: 7 },
+        success: "Your entry lists a date of arrival, a place of origin that has been carefully rubbed out, and a note in the margin: \"Returned early. Handle kindly.\"",
+        failure: "Your entry is currently on loan. The librarian cannot say to whom.",
+        successEffects: [
+          { type: "flag", id: "read-own-entry", value: true },
+          { type: "echoes", amount: 6 },
+          { type: "location", id: "hollow-archive" }
+        ],
+        failureEffects: [{ type: "location", id: "hollow-archive" }]
+      }
+    ]
+  },
+  "the-gardeners-thanks": {
+    title: "The Gardener's Thanks",
+    kicker: "A promise kept is remembered",
+    text: "The gardener has put the jar of returned darkness on a high shelf, between a jar of rain and a jar of silence. \"People always borrow the light,\" she says. \"Hardly anyone brings back the dark. Ask me for something.\"",
+    requirements: [
+      { type: "flag", id: "kept-the-sun-promise", op: "==", value: true },
+      { type: "flag", id: "gardener-thanked", op: "!=", value: true }
+    ],
+    choices: [
+      {
+        id: "ask-purpose",
+        label: "Ask what the darkness is for",
+        requirements: [],
+        success: "\"For sleeping,\" she says. \"Somebody has to. The city lends its dark to whoever needs it most, and forgets to ask for it back.\" You leave understanding the lamps a little better.",
+        successEffects: [
+          { type: "quality", id: "insight", amount: 1 },
+          { type: "echoes", amount: 6 },
+          { type: "flag", id: "gardener-thanked", value: true },
+          { type: "location", id: "clockwork-gardens" }
+        ],
+        failureEffects: []
+      },
+      {
+        id: "ask-work",
+        label: "Ask to help tend the gardens",
+        requirements: [],
+        success: "She hands you a pair of brass shears and shows you which leaves are telling the time wrongly. It is careful, quiet work, and she pays you for it fairly.",
+        successEffects: [
+          { type: "quality", id: "poise", amount: 1 },
+          { type: "echoes", amount: 10 },
+          { type: "flag", id: "gardener-thanked", value: true },
+          { type: "location", id: "clockwork-gardens" }
         ],
         failureEffects: []
       }

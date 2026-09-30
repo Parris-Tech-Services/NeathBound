@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { locations, stories } from "../src/game/content.js";
-import { availableStories, resolveChoice, storyAvailable } from "../src/game/engine.js";
+import { availableStories, choiceAvailable, resolveChoice, storyAvailable } from "../src/game/engine.js";
 import { initialState } from "../src/game/state.js";
 
 const SUCCEED = () => 0.99;
@@ -99,8 +99,12 @@ test("the sun seed grows a dawn whose morning must be returned", () => {
   assert.equal(storyAvailable(state, "the-seedling-dawn"), false);
   state = resolveChoice(state, "plant-the-sun-seed", "plant", SUCCEED).state;
   assert.equal(state.items["sun-seed"], undefined);
-  assert.equal(storyAvailable(state, "plant-the-sun-seed"), false);
   assert.equal(storyAvailable(state, "the-seedling-dawn"), true);
+
+  state.items["sun-seed"] = 1;
+  assert.equal(choiceAvailable(state, "plant-the-sun-seed", "plant"), false, "only one seed can be planted");
+  assert.equal(choiceAvailable(state, "plant-the-sun-seed", "swallow"), true, "spare seeds are still usable");
+  delete state.items["sun-seed"];
 
   state = resolveChoice(state, "the-seedling-dawn", "harvest", SUCCEED).state;
   assert.equal(state.items["small-sun"], 1);
@@ -122,8 +126,52 @@ test("the memory can only be gifted after keeping the flower's appointment", () 
   assert.equal(state.qualities.poise, kept.qualities.poise + 2);
 });
 
+const payoffs = [
+  { story: "the-cartographer-returns", location: "lantern-quay", flag: "map-route-known", once: "cartographer-reckoned", choice: "describe-route" },
+  { story: "the-debt-collector", location: "velvet-market", flag: "read-the-debt-ledgers", once: "collector-answered", choice: "sell-secrets" },
+  { story: "the-gardeners-thanks", location: "clockwork-gardens", flag: "kept-the-sun-promise", once: "gardener-thanked", choice: "ask-work" }
+];
+
+for (const payoff of payoffs) {
+  test(`${payoff.story} reacts to ${payoff.flag} and then retires`, () => {
+    assert.equal(storyAvailable(stateWith(payoff.location), payoff.story), false);
+    const primed = stateWith(payoff.location, {}, { [payoff.flag]: true });
+    assert.equal(storyAvailable(primed, payoff.story), true);
+    for (const random of [SUCCEED, FAIL]) {
+      const { state, error } = resolveChoice(primed, payoff.story, payoff.choice, random);
+      assert.equal(error, undefined);
+      assert.equal(state.flags[payoff.once], true);
+      assert.equal(storyAvailable(state, payoff.story), false, "payoff plays once, win or lose");
+    }
+  });
+}
+
+test("the debt collector's charity needs echoes to spend", () => {
+  const broke = stateWith("velvet-market", {}, { "read-the-debt-ledgers": true });
+  broke.echoes = 4;
+  assert.equal(choiceAvailable(broke, "the-debt-collector", "settle-stranger"), false);
+  broke.echoes = 5;
+  const { state } = resolveChoice(broke, "the-debt-collector", "settle-stranger", SUCCEED);
+  assert.equal(state.echoes, 0);
+});
+
+test("the full salted-map arc ends with the cartographer", () => {
+  let state = resolveChoice(initialState(), "salt-on-the-map", "soak", SUCCEED).state;
+  state.locationId = "lantern-quay";
+  assert.equal(storyAvailable(state, "the-cartographer-returns"), true);
+  state = resolveChoice(state, "the-cartographer-returns", "give-map", SUCCEED).state;
+  assert.equal(state.items["salted-map"], undefined);
+  assert.equal(storyAvailable(state, "the-cartographer-returns"), false);
+});
+
+test("being bound into the index opens a repeatable archive storylet", () => {
+  const indexed = stateWith("hollow-archive", {}, { "bound-into-the-index": true });
+  const once = resolveChoice(indexed, "an-entry-in-the-index", "be-borrowed", SUCCEED).state;
+  assert.equal(storyAvailable(once, "an-entry-in-the-index"), true);
+});
+
 test("every new possession storylet is listed at exactly one location", () => {
-  const ids = ["salt-on-the-map", "the-sand-reader", "the-locked-stacks", "finish-the-page", "return-the-darkness", "plant-the-sun-seed", "the-seedling-dawn", "the-memory-graft", "unwritten-ink"];
+  const ids = ["salt-on-the-map", "the-sand-reader", "the-locked-stacks", "finish-the-page", "return-the-darkness", "plant-the-sun-seed", "the-seedling-dawn", "the-memory-graft", "unwritten-ink", "the-cartographer-returns", "the-debt-collector", "an-entry-in-the-index", "the-gardeners-thanks"];
   for (const id of ids) {
     const homes = Object.values(locations).filter((location) => location.stories.includes(id));
     assert.equal(homes.length, 1, `${id} should appear at exactly one location`);
