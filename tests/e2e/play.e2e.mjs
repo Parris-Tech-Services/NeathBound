@@ -123,7 +123,7 @@ test("Possessions opens a dedicated inventory view and Story returns to play", a
   assert.match(await page.locator("#possessions").innerText(), /Brass Key/);
   assert.match(await page.locator("#possessions").innerText(), /DOCUMENTS/i);
 
-  await page.locator(".main-tabs [data-view=story]").click();
+  await page.locator(".main-tabs a[href=\"#stories\"]").click();
   assert.equal(await page.locator("[data-view-panel=story]").isVisible(), true, "Story returns to the playable view");
   assert.equal(await page.locator("#possessions").isHidden(), true, "possessions view closes");
   assert.deepEqual(problems, []);
