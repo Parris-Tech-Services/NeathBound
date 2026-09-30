@@ -4,7 +4,7 @@
 // suffixes are stripped for Deno. `npm test` fails if the copies drift.
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 
-export const SHARED_MODULES = ["engine.js", "rules.js", "state.js", "content.js", "decks.js"];
+export const SHARED_MODULES = ["engine.js", "rules.js", "state.js", "content.js", "decks.js", "systems.js", "opportunities.js"];
 export const stripVersions = (source) => source.replace(/(from\s+["'][^"'?]+\.js)\?v=[^"']*(["'])/g, "$1$2");
 
 const src = new URL("../src/game/", import.meta.url);
