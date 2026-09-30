@@ -29,7 +29,7 @@ test("challenge failure applies failure effects and still advances the story", (
 
 test("required-item storylets stay locked until discovered", () => {
   const locked = resolveChoice(initialState(), "garden-appointment", "attend", () => 0.9);
-  assert.match(locked.error, /not available/i);
+  assert.match(locked.error, /no longer available/i);
   const equipped = { ...initialState(), locationId: "clockwork-gardens", items: { ...initialState().items, "tide-cup": 1 }, unlockedLocations: ["lantern-quay", "velvet-market", "hollow-archive", "clockwork-gardens"] };
   const unlocked = resolveChoice(equipped, "garden-appointment", "attend", () => 0.9);
   assert.equal(unlocked.success, true);
@@ -46,7 +46,7 @@ test("opportunity rewards can unlock a new region and raise a menace", () => {
 
 test("a choice from another location is rejected server-style", () => {
   const result = resolveChoice(initialState(), "borrowed-face", "wear", () => 0.9);
-  assert.match(result.error, /not available/i);
+  assert.match(result.error, /no longer available/i);
   assert.equal(result.state.locationId, "lantern-quay");
 });
 

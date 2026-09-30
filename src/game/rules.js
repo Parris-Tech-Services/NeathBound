@@ -11,10 +11,12 @@ export function valueForRequirement(state, requirement, context = {}) {
   switch (requirement.type) {
     case "quality":
       return state.qualities?.[requirement.id] ?? 0;
+    case "menace":
+      return state.menaces?.[requirement.id] ?? 0;
     case "item":
       return state.items?.[requirement.id] ?? 0;
     case "flag":
-      return Boolean(state.flags?.[requirement.id]);
+      return state.flags?.[requirement.id];
     case "echoes":
       return state.echoes ?? 0;
     case "location":
@@ -39,10 +41,14 @@ export function requirementsMet(state, requirements = [], context = {}) {
 export function applyEffect(state, effect) {
   switch (effect.type) {
     case "quality":
-      state.qualities[effect.id] = (state.qualities[effect.id] ?? 0) + Number(effect.amount ?? 0);
+      state.qualities[effect.id] = Math.max(0, (state.qualities[effect.id] ?? 0) + Number(effect.amount ?? 0));
       break;
     case "set-quality":
-      state.qualities[effect.id] = Number(effect.value ?? 0);
+      state.qualities[effect.id] = Math.max(0, Number(effect.value ?? 0));
+      break;
+    case "menace":
+      state.menaces ??= {};
+      state.menaces[effect.id] = Math.max(0, (state.menaces[effect.id] ?? 0) + Number(effect.amount ?? 0));
       break;
     case "echoes":
       state.echoes = Math.max(0, (state.echoes ?? 0) + Number(effect.amount ?? 0));
@@ -59,13 +65,13 @@ export function applyEffect(state, effect) {
     case "location":
       state.locationId = effect.id;
       break;
-    case "menace":
-      state.menaces ??= {};
-      state.menaces[effect.id] = Math.max(0, (state.menaces[effect.id] ?? 0) + Number(effect.amount ?? 0));
-      break;
     case "unlock-location":
       state.unlockedLocations ??= [];
       if (!state.unlockedLocations.includes(effect.id)) state.unlockedLocations.push(effect.id);
+      break;
+    case "acquaintance":
+      state.acquaintances ??= [];
+      if (!state.acquaintances.includes(effect.id)) state.acquaintances.push(effect.id);
       break;
     default:
       throw new Error(`Unknown effect type: ${effect.type}`);
@@ -79,7 +85,7 @@ export function applyEffects(state, effects = []) {
 }
 
 export function resolveChallenge(state, challenge, random = Math.random) {
-  if (!challenge) return { success: true, roll: null, total: null };
+  if (!challenge) return { success: true, roll: null, total: null, quality: null };
   const die = Math.floor(random() * 10) + 1;
   const quality = state.qualities?.[challenge.quality] ?? 0;
   const total = die + quality;
