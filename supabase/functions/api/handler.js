@@ -10,11 +10,11 @@
 //   GET  /api/journal                                       journal
 //   POST /api/reset                                         new life
 //   POST /api/storylets/:storyId/branches/:choiceId/choose  resolve a choice
-import { availableChoices, availableStories, currentLocation, resolveChoice } from "./game/engine.js";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge, resolveChoice } from "./game/engine.js";
 import { locations } from "./game/content.js";
 import { initialState, normaliseState } from "./game/state.js";
 
-export async function handle({ method, path, userId }, { repo, random = Math.random }) {
+export async function handle({ method, path, userId, body = {} }, { repo, random = Math.random }) {
   const route = normalise(path);
 
   const loadOrCreate = async () => {
@@ -52,14 +52,21 @@ export async function handle({ method, path, userId }, { repo, random = Math.ran
   const travel = route.match(/^\/api\/travel\/([^/]+)$/);
   if (method === "POST" && travel) {
     const state = await loadOrCreate();
+    const expectedRevision = Number(body?.expectedRevision);
+    if (Number.isInteger(expectedRevision) && expectedRevision !== Number(state.revision ?? 0)) {
+      return { status: 409, body: { error: "This save changed in another tab.", state } };
+    }
     const locationId = decodeURIComponent(travel[1]);
     if (!state.unlockedLocations.includes(locationId) || !locations[locationId]) {
       return { status: 409, body: { error: "That location is not unlocked.", state } };
     }
+    const revision = Number(state.revision ?? 0) + 1;
     const next = {
       ...state,
+      revision,
+      flags: { ...state.flags, __revision: revision },
       locationId,
-      journal: [`Travelled to ${locationId.replaceAll("-", " ")}.`, ...state.journal].slice(0, 30)
+      journal: [`Travelled to ${locationId.replaceAll("-", " ")}.`, ...state.journal].slice(0, 100)
     };
     await repo.savePlayer(userId, next);
     return ok(next);
@@ -68,8 +75,21 @@ export async function handle({ method, path, userId }, { repo, random = Math.ran
   const choose = route.match(/^\/api\/storylets\/([^/]+)\/branches\/([^/]+)\/choose$/);
   if (method === "POST" && choose) {
     const [state, ctx] = await Promise.all([loadOrCreate(), context()]);
+    const expectedRevision = Number(body?.expectedRevision);
+    if (Number.isInteger(expectedRevision) && expectedRevision !== Number(state.revision ?? 0)) {
+      return { status: 409, body: { error: "This save changed in another tab.", state } };
+    }
+
     const outcome = resolveChoice(state, decodeURIComponent(choose[1]), decodeURIComponent(choose[2]), random, ctx);
     if (outcome.error) return { status: 409, body: { error: outcome.error, state } };
+
+    if (Number.isInteger(expectedRevision)) {
+      const latest = normaliseState(await repo.loadPlayer(userId));
+      if (Number(latest.revision ?? 0) !== expectedRevision) {
+        return { status: 409, body: { error: "This save changed while that action was resolving.", state: latest } };
+      }
+    }
+
     await repo.savePlayer(userId, outcome.state);
     return ok(outcome);
   }
@@ -94,7 +114,7 @@ function publicStory(story, state, context) {
       id: choice.id,
       label: choice.label,
       available: available.has(choice.id),
-      challenge: choice.challenge ?? null
+      challenge: effectiveChallenge(story, choice)
     }))
   };
 }

@@ -1,6 +1,6 @@
-import { availableChoices, availableStories, currentLocation } from "../game/engine.js?v=20260930-13";
-import { locations } from "../game/content.js?v=20260930-13";
-import { loadPreferences } from "./preferences.js?v=20260930-13";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge } from "../game/engine.js?v=20260930-14";
+import { locations } from "../game/content.js?v=20260930-14";
+import { loadPreferences } from "./preferences.js?v=20260930-14";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
 
@@ -28,13 +28,14 @@ export function render(app, state, handlers, outcome = null) {
   const storiesHtml = stories.map((story) => {
     const available = new Set(availableChoices(state, story.id).map((choice) => choice.id));
     const choicesHtml = story.choices.map((choice) => {
-      const challengeQuality = choice.challenge?.quality ?? choice.challenge?.stat;
-      const challenge = choice.challenge
+      const resolvedChallenge = effectiveChallenge(story, choice);
+      const challengeQuality = resolvedChallenge?.quality ?? resolvedChallenge?.stat;
+      const challenge = resolvedChallenge
         ? [
             '<div class="challenge-line">',
             '<span class="challenge-icon">', icon[challengeQuality] ?? "•", '</span>',
             '<span><strong>', formatName(challengeQuality), ' challenge</strong>',
-            '<small>Difficulty ', choice.challenge.difficulty, '</small></span></div>'
+            '<small>Difficulty ', resolvedChallenge.difficulty, '</small></span></div>'
           ].join("")
         : '<div class="challenge-line simple"><span class="challenge-icon">◆</span><span><strong>A straightforward choice</strong><small>No challenge roll</small></span></div>';
 
@@ -66,27 +67,43 @@ export function render(app, state, handlers, outcome = null) {
 
   let outcomeHtml = "";
   if (outcome) {
-    const successText = outcome.challenge ? 
-      (outcome.success ? '<p style="color: var(--teal-deep); font-weight: bold; margin-bottom: 0.5rem;">You succeeded in a ' + formatName(outcome.challenge.quality) + ' challenge!</p>' 
-                       : '<p style="color: var(--purple); font-weight: bold; margin-bottom: 0.5rem;">You failed a ' + formatName(outcome.challenge.quality) + ' challenge...</p>')
+    const challengeQuality = outcome.challenge?.quality ?? outcome.challenge?.stat;
+    const verdict = outcome.challenge
+      ? outcome.success
+        ? `You succeeded in a ${formatName(challengeQuality)} challenge! (${outcome.total} vs ${outcome.challenge.difficulty}${outcome.usedMomentum ? ", with Momentum" : ""})`
+        : `Your ${formatName(challengeQuality)} challenge failed. (${outcome.total} vs ${outcome.challenge.difficulty})`
       : "";
 
-    const changesList = (outcome.changes || []).map(change => {
-      if (typeof change === "string") return '<li>' + escapeHtml(change) + '</li>';
-      if (change.message) return '<li>' + escapeHtml(change.message) + '</li>';
-      const name = formatName(change.id || change.quality || change.item);
-      const amount = change.amount || change.delta || 1;
-      if (amount > 0) return '<li>' + name + ' is increasing... You&apos;ve gained ' + amount + ' &times; ' + name + '</li>';
-      if (amount < 0) return '<li>' + name + ' is dropping... You&apos;ve lost ' + Math.abs(amount) + ' &times; ' + name + '</li>';
-      return '<li>' + name + ' has updated.</li>';
+    const changesList = (outcome.changes ?? []).map((change) => {
+      const name = formatName(change.label ?? change.id);
+      if (change.message) return '<li class="outcome-change occurrence">' + escapeHtml(change.message) + '</li>';
+      if (change.type === "echoes") {
+        const verb = change.delta > 0 ? "gained" : "lost";
+        return '<li class="outcome-change ' + (change.delta > 0 ? "gain" : "loss") + '">You&apos;ve ' + verb + ' ' + Math.abs(change.delta) + ' x Echoes (new total ' + change.after + ').</li>';
+      }
+      if (change.type === "items") {
+        const verb = change.delta > 0 ? "gained" : "lost";
+        return '<li class="outcome-change ' + (change.delta > 0 ? "gain" : "loss") + '">You&apos;ve ' + verb + ' ' + Math.abs(change.delta) + ' x ' + escapeHtml(name) + ' (new total ' + change.after + ').</li>';
+      }
+      if (change.type === "qualities") {
+        const direction = change.delta > 0 ? "increased" : "decreased";
+        return '<li class="outcome-change ' + (change.delta > 0 ? "gain" : "loss") + '">Your ' + escapeHtml(name) + ' quality has ' + direction + ' to ' + change.after + '.</li>';
+      }
+      if (change.type === "menaces") {
+        const direction = change.delta > 0 ? "increased" : "decreased";
+        return '<li class="outcome-change ' + (change.delta > 0 ? "loss" : "gain") + '">Your ' + escapeHtml(name) + ' menace has ' + direction + ' to ' + change.after + '.</li>';
+      }
+      if (change.type === "momentum") return '<li class="outcome-change">Momentum is now ' + change.after + '.</li>';
+      return '<li class="outcome-change">' + escapeHtml(name) + ' changed.</li>';
     }).join("");
 
     outcomeHtml = [
-      '<section class="parchment" style="margin-bottom: 2rem; padding: 1.5rem; border: 2px solid var(--paper-edge);">',
-      '<h3 style="margin-top: 0;">Outcome</h3>',
-      successText,
-      '<p>', escapeHtml(outcome.result || ""), '</p>',
-      changesList ? '<ul style="margin-top: 1rem; padding-left: 1.5rem; margin-bottom: 0;">' + changesList + '</ul>' : '',
+      '<section class="outcome-panel parchment" aria-live="polite">',
+      '<h2>', escapeHtml(outcome.title ?? "Outcome"), '</h2>',
+      verdict ? '<p class="outcome-verdict ' + (outcome.success ? 'success' : 'failure') + '">' + escapeHtml(verdict) + '</p>' : '',
+      '<p class="outcome-text">', escapeHtml(outcome.result ?? ""), '</p>',
+      changesList ? '<ul class="outcome-changes">' + changesList + '</ul>' : '',
+      '<button class="outcome-onwards" type="button" data-action="onwards">Onwards</button>',
       '</section>'
     ].join("");
   }
@@ -156,21 +173,24 @@ export function render(app, state, handlers, outcome = null) {
         '</aside>',
 
         '<main class="story-column" id="stories">',
-          outcomeHtml,
-          '<section class="story-board">',
-            '<div class="board-inner">',
-              '<section class="featured-story">',
-                '<div class="feature-art feature-art-', escapeClass(state.locationId), '" aria-hidden="true">', locationArtSvg(state.locationId), '</div>',
-                '<div class="feature-copy">',
-                  '<button class="edit-dot" type="button" data-action="edit-note" data-note-key="location:', state.locationId, '" aria-label="Edit location note">✎</button>',
-                  '<h2>', escapeHtml(location.name), '</h2>',
-                  '<p>', escapeHtml(location.subtitle), '</p>',
-                  '<p class="feature-note"><strong>', escapeHtml(locationNote), '</strong></p>',
-                '</div>',
-              '</section>',
-              '<section class="story-stack">', storiesHtml, '</section>',
-            '</div>',
-          '</section>',
+          outcome
+            ? outcomeHtml
+            : [
+                '<section class="story-board">',
+                  '<div class="board-inner">',
+                    '<section class="featured-story">',
+                      '<div class="feature-art feature-art-', escapeClass(state.locationId), '" aria-hidden="true">', locationArtSvg(state.locationId), '</div>',
+                      '<div class="feature-copy">',
+                        '<button class="edit-dot" type="button" data-action="edit-note" data-note-key="location:', state.locationId, '" aria-label="Edit location note">✎</button>',
+                        '<h2>', escapeHtml(location.name), '</h2>',
+                        '<p>', escapeHtml(location.subtitle), '</p>',
+                        '<p class="feature-note"><strong>', escapeHtml(locationNote), '</strong></p>',
+                      '</div>',
+                    '</section>',
+                    '<section class="story-stack">', storiesHtml, '</section>',
+                  '</div>',
+                '</section>'
+              ].join(""),
 
           '<section class="journal parchment" id="journal">',
             '<h3>What the city remembers</h3>',
@@ -217,7 +237,11 @@ export function render(app, state, handlers, outcome = null) {
     '</div>'
   ].join("");
 
-  app.querySelectorAll("[data-choice]").forEach((button) => button.addEventListener("click", () => handlers.choose(button.dataset.story, button.dataset.choice)));
+  app.querySelectorAll("[data-choice]").forEach((button) => {
+    button.dataset.originallyDisabled = String(button.disabled);
+    button.addEventListener("click", () => handlers.choose(button.dataset.story, button.dataset.choice));
+  });
+  app.querySelector("[data-action=onwards]")?.addEventListener("click", handlers.onwards);
   app.querySelectorAll("[data-action=bookmark]").forEach((button) => button.addEventListener("click", () => handlers.bookmark(button.dataset.story)));
   app.querySelector("[data-action=outfit]").addEventListener("change", (event) => handlers.outfit(event.target.value));
   app.querySelector("[data-action=travel]").addEventListener("click", () => handlers.travel(app.querySelector("#travel-location").value));

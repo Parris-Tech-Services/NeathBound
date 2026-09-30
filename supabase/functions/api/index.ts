@@ -52,8 +52,9 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
     const result = await handle(
-      { method: req.method, path: new URL(req.url).pathname, userId: auth.user.id },
+      { method: req.method, path: new URL(req.url).pathname, userId: auth.user.id, body },
       { repo }
     );
     return new Response(JSON.stringify(result.body), { status: result.status, headers });

@@ -1,6 +1,6 @@
-import { locations, stories } from "./content.js?v=20260930-13";
-import { cloneState, initialState } from "./state.js?v=20260930-13";
-import { applyEffects, requirementsMet, resolveChallenge } from "./rules.js?v=20260930-13";
+import { locations, stories } from "./content.js?v=20260930-14";
+import { cloneState, initialState } from "./state.js?v=20260930-14";
+import { applyEffects, requirementsMet, resolveChallenge } from "./rules.js?v=20260930-14";
 
 export function currentLocation(state) {
   return locations[state.locationId] ?? locations["lantern-quay"];
@@ -93,6 +93,7 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     next.discard = [...(next.discard ?? []), storyId];
   }
   next.revision = Number(next.revision ?? 0) + 1;
+  next.flags.__revision = next.revision;
 
   const changes = describeChanges(before, next);
   const challengeText = challenge
