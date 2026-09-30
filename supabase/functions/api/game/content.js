@@ -11,7 +11,7 @@ export const locations = {
     region: "The Lower City",
     subtitle: "A bazaar for memories, rumours, and perfectly ordinary knives.",
     atmosphere: "Every stall has a curtain. Every curtain has a shadow behind it.",
-    stories: ["borrowed-face", "red-thread", "market-gossip", "the-sand-reader", "unwritten-ink", "the-debt-collector"]
+    stories: ["borrowed-face", "red-thread", "market-gossip", "a-loose-end", "the-sand-reader", "unwritten-ink", "the-debt-collector"]
   },
   "hollow-archive": {
     name: "The Hollow Archive",
@@ -31,7 +31,6 @@ export const locations = {
 
 export const stories = {
   "bell-under-water": {
-    once: true,
     title: "The Bell Under Water",
     kicker: "A sound from below",
     text: "At low tide, the quay reveals a stairway descending into black water. A bell tolls somewhere beneath the last step. The brass key in your pocket warms.",
@@ -40,11 +39,15 @@ export const stories = {
       {
         id: "descend",
         label: "Descend toward the bell",
-        requirements: [],
+        requirements: [
+          { type: "item", id: "brass-key", op: ">=", value: 1 },
+          { type: "flag", id: "bell-under-water:descend", op: "!=", value: true }
+        ],
         challenge: { quality: "nerve", difficulty: 5 },
-        success: "You find a submerged door and unlock it. Something on the other side learns your name.",
+        success: "You find a submerged door and unlock it. The brass key dissolves into warm filings as something on the other side learns your name.",
         failure: "The water closes over your head. You return with a pocketful of black sand.",
         successEffects: [
+          { type: "item", id: "brass-key", amount: -1 },
           { type: "echoes", amount: 8 },
           { type: "item", id: "black-sand", amount: 1 },
           { type: "location", id: "hollow-archive" }
@@ -57,7 +60,7 @@ export const stories = {
       {
         id: "listen",
         label: "Listen for the pattern",
-        requirements: [],
+        requirements: [{ type: "flag", id: "bell-under-water:listen", op: "!=", value: true }],
         challenge: { quality: "nerve", difficulty: 5 },
         success: "The bell's rhythm maps a route through the city.",
         failure: "You hear only your own heartbeat, which is embarrassing but useful.",
@@ -245,6 +248,45 @@ export const stories = {
     choices: [
       { id: "pour", label: "Pour the tea into the tide", requirements: [], success: "The water settles. The dockworker gives you a name to use at the market.", successEffects: [{ type: "flag", id: "acquaintance-dockworker", value: true }, { type: "acquaintance", id: "dockworker" }, { type: "quality", id: "poise", amount: 1 }, { type: "location", id: "lantern-quay" }], failureEffects: [] },
       { id: "drink", label: "Drink the impossible tea", requirements: [], success: "You remember a shore that has never existed.", failure: "The cup tastes of every promise you have broken.", challenge: { quality: "nerve", difficulty: 5 }, successEffects: [{ type: "item", id: "tide-cup", amount: 1 }, { type: "menace", id: "dread", amount: 1 }, { type: "location", id: "hollow-archive" }], failureEffects: [{ type: "menace", id: "dread", amount: 1 }, { type: "location", id: "hollow-archive" }] }
+    ]
+  },
+  "a-loose-end": {
+    once: true,
+    title: "A Loose End",
+    kicker: "Every cut thread leads somewhere",
+    text: "The severed red thread has been tugging at your pocket since you cut it. In the Velvet Market it pulls toward a shuttered stall whose sign simply says LOST PROPERTY.",
+    requirements: [{ type: "item", id: "red-thread-end", op: ">=", value: 1 }],
+    choices: [
+      {
+        id: "follow-loose-end",
+        label: "Let the loose end choose the way",
+        requirements: [],
+        challenge: { quality: "shadow", difficulty: 5 },
+        success: "The thread slips under the shutter and returns tied around a small purse. Nobody inside admits to owning it.",
+        failure: "The thread leads you in three circles and finally knots itself around your wrist, embarrassed.",
+        successEffects: [
+          { type: "item", id: "red-thread-end", amount: -1 },
+          { type: "echoes", amount: 8 },
+          { type: "quality", id: "shadow", amount: 1 },
+          { type: "location", id: "velvet-market" }
+        ],
+        failureEffects: [
+          { type: "menace", id: "suspicion", amount: 1 },
+          { type: "location", id: "velvet-market" }
+        ]
+      },
+      {
+        id: "return-thread",
+        label: "Return it to the child in red",
+        requirements: [],
+        success: "She winds the loose end back onto her spool. \"Not everything lost wants finding,\" she tells you, and pays you in a secret instead of coin.",
+        successEffects: [
+          { type: "item", id: "red-thread-end", amount: -1 },
+          { type: "quality", id: "insight", amount: 1 },
+          { type: "location", id: "velvet-market" }
+        ],
+        failureEffects: []
+      }
     ]
   },
   "market-gossip": {
