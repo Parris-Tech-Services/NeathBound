@@ -1,4 +1,4 @@
-const operators = {
+import { equipmentBonuses } from "./items.js";\n\nconst operators = {
   "==": (actual, expected) => actual === expected,
   "!=": (actual, expected) => actual !== expected,
   ">": (actual, expected) => Number(actual) > Number(expected),
