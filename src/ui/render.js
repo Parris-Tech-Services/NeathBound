@@ -170,10 +170,10 @@ export function render(app, state, handlers, outcome = null, activeTab = "story"
         '</aside>',
 
         '<main class="story-column" id="stories">',
-          activeTab === "story"
-            ? (outcome
-                ? outcomeHtml
-                : [
+          outcome
+            ? outcomeHtml
+            : activeTab === "story"
+              ? [
                     renderOpportunityPanel(state),
                     '<section class="story-board">',
                       '<div class="board-inner">',
@@ -193,8 +193,8 @@ export function render(app, state, handlers, outcome = null, activeTab = "story"
                       '<h3>What the city remembers</h3>',
                       '<ol>', journalHtml, '</ol>',
                     '</section>'
-                  ].join(""))
-            : renderScreen(activeTab, state, preferences),
+                  ].join("")
+              : renderScreen(activeTab, state, preferences),
         '</main>',
         '<aside class="right-rail">',
           '<section class="welcome-panel">',
