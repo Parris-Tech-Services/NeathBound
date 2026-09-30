@@ -1,5 +1,5 @@
 import { availableChoices, availableStories, currentLocation, resolveChoice } from "../src/game/engine.js";
-import { createPlayer, ensurePlayer, resetPlayer, savePlayer } from "./repository.js";
+import { createPlayer, ensurePlayer, loadWorldQualities, resetPlayer, savePlayer } from "./repository.js";
 
 const PLAYER_HEADER = "x-neathbound-player";
 const PLAYER_ID_PATTERN = /^[A-Za-z0-9-]{8,100}$/;
@@ -16,8 +16,8 @@ function playerIdFrom(request) {
   return PLAYER_ID_PATTERN.test(value) ? value : null;
 }
 
-function publicStory(story, state) {
-  const available = new Set(availableChoices(state, story.id).map((choice) => choice.id));
+function publicStory(story, state, context) {
+  const available = new Set(availableChoices(state, story.id, context).map((choice) => choice.id));
   return {
     id: story.id,
     title: story.title,
@@ -34,6 +34,10 @@ function publicStory(story, state) {
 
 async function getState(env, playerId) {
   return ensurePlayer(env.DB, playerId);
+}
+
+async function narrativeContext(env) {
+  return { worldQualities: await loadWorldQualities(env.DB) };
 }
 
 async function handleApi(request, env, url) {
@@ -53,17 +57,21 @@ async function handleApi(request, env, url) {
     return json(await getState(env, playerId));
   }
 
+  if (request.method === "GET" && url.pathname === "/api/world") {
+    return json({ worldQualities: await loadWorldQualities(env.DB) });
+  }
+
   if (request.method === "GET" && url.pathname === "/api/location") {
-    const state = await getState(env, playerId);
+    const [state, context] = await Promise.all([getState(env, playerId), narrativeContext(env)]);
     return json({
       location: currentLocation(state),
-      stories: availableStories(state).map((story) => publicStory(story, state))
+      stories: availableStories(state, context).map((story) => publicStory(story, state, context))
     });
   }
 
   if (request.method === "GET" && url.pathname === "/api/storylets") {
-    const state = await getState(env, playerId);
-    return json(availableStories(state).map((story) => publicStory(story, state)));
+    const [state, context] = await Promise.all([getState(env, playerId), narrativeContext(env)]);
+    return json(availableStories(state, context).map((story) => publicStory(story, state, context)));
   }
 
   if (request.method === "GET" && url.pathname === "/api/journal") {
@@ -82,8 +90,8 @@ async function handleApi(request, env, url) {
   if (request.method === "POST" && chooseMatch) {
     const storyId = decodeURIComponent(chooseMatch[1]);
     const choiceId = decodeURIComponent(chooseMatch[2]);
-    const state = await getState(env, playerId);
-    const outcome = resolveChoice(state, storyId, choiceId);
+    const [state, context] = await Promise.all([getState(env, playerId), narrativeContext(env)]);
+    const outcome = resolveChoice(state, storyId, choiceId, Math.random, context);
 
     if (outcome.error) {
       return json({ error: outcome.error }, { status: 409 });
