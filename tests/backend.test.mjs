@@ -71,6 +71,41 @@ test("travel changes location only when the destination is unlocked", async () =
   assert.equal(locked.body.state.locationId, "velvet-market");
 });
 
+
+
+test("system actions are server-authoritative and revision-checked", async () => {
+  const repo = fakeRepo();
+  await call(repo, "GET", "/api/player");
+  const before = repo.players.get("u1");
+  before.echoes = 30;
+  repo.players.set("u1", structuredClone(before));
+
+  const buy = await handle(
+    {
+      method: "POST",
+      path: "/api/action/buy",
+      userId: "u1",
+      body: { itemId: "dock-coat", expectedRevision: before.revision }
+    },
+    { repo, random: () => 0.9 }
+  );
+  assert.equal(buy.status, 200);
+  assert.equal(buy.body.state.items["dock-coat"], 1);
+  assert.equal(buy.body.state.echoes, 12);
+
+  const stale = await handle(
+    {
+      method: "POST",
+      path: "/api/action/buy",
+      userId: "u1",
+      body: { itemId: "bandage-roll", expectedRevision: before.revision }
+    },
+    { repo, random: () => 0.9 }
+  );
+  assert.equal(stale.status, 409);
+  assert.equal(stale.body.state.items["bandage-roll"], undefined);
+});
+
 test("route normalisation accepts Supabase and local prefixes", () => {
   assert.equal(normalise("/api/player/"), "/api/player");
   assert.equal(normalise("/functions/v1/api/player"), "/api/player");
