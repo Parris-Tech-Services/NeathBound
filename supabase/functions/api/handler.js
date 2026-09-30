@@ -57,7 +57,10 @@ export async function handle({ method, path, userId, body = {} }, { repo, random
       return { status: 409, body: { error: "This save changed in another tab.", state } };
     }
     const locationId = decodeURIComponent(travel[1]);
-    if (!state.unlockedLocations.includes(locationId) || !locations[locationId]) {
+    if (state.flags?.["tutorial:travel"] !== true) {
+      return { status: 409, body: { error: "Travel is not available yet.", state } };
+    }
+    if (!state.unlockedLocations.includes(locationId) || !locations[locationId] || locationId === "the-lair") {
       return { status: 409, body: { error: "That location is not unlocked.", state } };
     }
     const revision = Number(state.revision ?? 0) + 1;
