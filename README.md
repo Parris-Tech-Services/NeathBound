@@ -14,8 +14,19 @@ npm run dev
 
 Then open <http://localhost:4173>.
 
-Actions are deliberately unlimited. There are no energy timers, payment gates,
-accounts, or network services. Progress is saved locally in the browser.
+Actions are deliberately unlimited. There are no energy timers or payment
+gates. The current Phase 0 build stores progress locally in the browser.
+
+## Backend direction
+
+NeathBound is moving toward a free-to-host, server-authoritative
+quality-based-narrative architecture: static browser client, JSON API,
+relational persistence, predicate-driven storylets, and server-side choice
+resolution.
+
+The implementation plan and free hosting target are documented in
+[`docs/FREE_QBN_BACKEND.md`](docs/FREE_QBN_BACKEND.md). The existing static
+game remains the working baseline while the migration is staged.
 
 ## Five parallel agent lanes
 
