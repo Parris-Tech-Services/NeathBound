@@ -1,4 +1,4 @@
-import { availableStories, currentLocation, resolveChoice } from "../src/game/engine.js";
+import { availableChoices, availableStories, currentLocation, resolveChoice } from "../src/game/engine.js";
 import { createPlayer, ensurePlayer, resetPlayer, savePlayer } from "./repository.js";
 
 const PLAYER_HEADER = "x-neathbound-player";
@@ -17,6 +17,7 @@ function playerIdFrom(request) {
 }
 
 function publicStory(story, state) {
+  const available = new Set(availableChoices(state, story.id).map((choice) => choice.id));
   return {
     id: story.id,
     title: story.title,
@@ -25,6 +26,7 @@ function publicStory(story, state) {
     choices: story.choices.map((choice) => ({
       id: choice.id,
       label: choice.label,
+      available: available.has(choice.id),
       challenge: choice.challenge ?? null
     }))
   };
