@@ -18,51 +18,10 @@ function currentView() {
 async function draw(state = currentState) {
   currentState = state ?? await service.getState();
   render(app, currentState, {
-    async choose(storyId, choiceId) {
-      if (pending) return;
-      pending = true;
-      notice = null;
-      outcome = null;
-      await draw(currentState);
-      try {
-        const response = await service.choose(storyId, choiceId, currentState.revision ?? 0);
-        currentState = response.state ?? currentState;
-        if (response.error) {
-          notice = response.error;
-          outcome = {
-            title: "That choice could not be played",
-            result: response.error,
-            success: false,
-            rejected: true,
-            changes: []
-          };
-        } else {
-          outcome = response;
-        }
-      } catch (error) {
-        notice = error.message;
-      } finally {
-        pending = false;
-        await draw(currentState);
-        queueMicrotask(() => app.querySelector("#action-result")?.focus());
-      }
-    },
-    async travel(locationId) {
-      if (pending) return;
-      pending = true;
-      notice = null;
-      await draw(currentState);
-      try {
-        const response = await service.travel(locationId, currentState.revision ?? 0);
-        currentState = response.state ?? response;
-        if (response.error) notice = response.error;
-      } catch (error) {
-        notice = error.message;
-      } finally {
-        pending = false;
-        await draw(currentState);
-      }
-    },
+    choose: (storyId, choiceId) => runAction(() => service.choose(storyId, choiceId, currentState.revision ?? 0)),
+    travel: (locationId) => runAction(() => service.travel(locationId, currentState.revision ?? 0), { focusResult: false }),
+    transact: (kind, itemId) => runAction(() => service[kind](itemId, currentState.revision ?? 0)),
+    recover: (menaceId) => runAction(() => service.recover(menaceId, currentState.revision ?? 0)),
     continue() {
       outcome = null;
       notice = null;
@@ -92,28 +51,6 @@ async function draw(state = currentState) {
     navigate(view) {
       globalThis.location.hash = view;
     },
-    async transact(kind, itemId) {
-      if (pending) return;
-      pending = true;
-      outcome = null;
-      notice = null;
-      await draw(currentState);
-      try {
-        const response = await service[kind](itemId, currentState.revision ?? 0);
-        currentState = response.state ?? currentState;
-        if (response.error) {
-          outcome = { title: "Transaction refused", result: response.error, rejected: true, success: false, changes: [] };
-        } else {
-          outcome = response;
-        }
-      } catch (error) {
-        notice = error.message;
-      } finally {
-        pending = false;
-        await draw(currentState);
-        queueMicrotask(() => app.querySelector("#action-result")?.focus());
-      }
-    },
     async reset() {
       if (pending || !window.confirm("Begin a new life? Your story will be replaced.")) return;
       pending = true;
@@ -136,6 +73,35 @@ async function draw(state = currentState) {
     notice,
     mode: service.mode ?? "local"
   });
+}
+
+async function runAction(action, { focusResult = true } = {}) {
+  if (pending) return;
+  pending = true;
+  notice = null;
+  outcome = null;
+  await draw(currentState);
+  try {
+    const response = await action();
+    currentState = response?.state ?? currentState;
+    if (response?.error) {
+      outcome = {
+        title: "That action could not be completed",
+        result: response.error,
+        success: false,
+        rejected: true,
+        changes: []
+      };
+    } else if (response?.result || response?.title) {
+      outcome = response;
+    }
+  } catch (error) {
+    notice = error.message;
+  } finally {
+    pending = false;
+    await draw(currentState);
+    if (focusResult) queueMicrotask(() => app.querySelector("#action-result")?.focus());
+  }
 }
 
 function showError(error) {
