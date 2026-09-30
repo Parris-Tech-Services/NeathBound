@@ -3,6 +3,8 @@ import {
   availableStories,
   buyItem,
   currentLocation,
+  discardOpportunity,
+  drawOpportunity,
   effectiveChallenge,
   equipItem,
   recoverMenace,
@@ -91,6 +93,27 @@ export async function handle({ method, path, userId, body = {} }, { repo, random
     const stale = revisionMismatch(body, state);
     if (stale) return ok({ error: stale, state, rejected: true });
     const result = recoverMenace(state, decodeURIComponent(recover[1]));
+    if (result.error) return ok({ ...result, rejected: true });
+    await repo.savePlayer(userId, result.state);
+    return ok(result);
+  }
+
+  if (method === "POST" && route === "/api/opportunities/draw") {
+    const [state, ctx] = await Promise.all([loadOrCreate(), context()]);
+    const stale = revisionMismatch(body, state);
+    if (stale) return ok({ error: stale, state, rejected: true });
+    const result = drawOpportunity(state, random, ctx);
+    if (result.error) return ok({ ...result, rejected: true });
+    await repo.savePlayer(userId, result.state);
+    return ok(result);
+  }
+
+  const discard = route.match(/^\/api\/opportunities\/discard\/([^/]+)$/);
+  if (method === "POST" && discard) {
+    const state = await loadOrCreate();
+    const stale = revisionMismatch(body, state);
+    if (stale) return ok({ error: stale, state, rejected: true });
+    const result = discardOpportunity(state, decodeURIComponent(discard[1]));
     if (result.error) return ok({ ...result, rejected: true });
     await repo.savePlayer(userId, result.state);
     return ok(result);
