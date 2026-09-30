@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "neathbound",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-09-30",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "neathbound",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "preview_database_id": "neathbound-local"
+    }
+  ]
+}
