@@ -370,7 +370,7 @@ NeathBound:
 - tier upgrades
 - late-game profession activities
 
-Status: NOT IMPLEMENTED
+Status: DONE (Trades implemented, including weekly stipends, UI, and tier tracking).
 
 ## 17. Investigations / projects / preparations
 
@@ -393,7 +393,7 @@ Generic Activity engine:
   - Influence
   - Pursue
 
-Status: NOT IMPLEMENTED AS GENERAL ENGINE
+Status: DONE (Generic progress engine implemented using repeatable preparation-building cash-out activities).
 
 ## 18. Repeatable carousels
 
@@ -407,7 +407,7 @@ NeathBound:
 - not narrative clones; original loops using generic Activity engine
 - balance around optional optimization rather than mandatory grind
 
-Status: NOT IMPLEMENTED
+Status: DONE (Repeatable Smuggling Operations added as a preparation-building cash-out carousel in Lantern Quay).
 
 ## 19. Travel / map
 

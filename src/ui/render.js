@@ -174,7 +174,19 @@ const inventoryHtml = inventory.length
     `;
   }).join("");
 
-  const qualityCardsHtml = Object.entries(state.qualities ?? {}).filter(([id]) => !id.startsWith("obligations-") && !id.startsWith("standing-")).map(([id, value]) => {
+  
+  const activeTradeId = Object.keys(state.qualities ?? {}).find(id => id.startsWith("trade-") && id !== "trade-tier");
+  const activeTrade = activeTradeId ? trades[activeTradeId.replace("trade-", "")] : null;
+  const tradeHtml = activeTrade ? `
+    <div class="trade-card">
+      <h4>${escapeHtml(activeTrade.name)} (Tier ${state.qualities["trade-tier"] || 1})</h4>
+      <p>${escapeHtml(activeTrade.description)}</p>
+      <p><small>Next stipend: ${state.flags?.["last-stipend-claim"] ? (Date.now() - state.flags["last-stipend-claim"] >= 604800000 ? "Ready to claim" : "Wait a week") : "Ready to claim"}</small></p>
+    </div>
+  ` : `<p><em>Unbound. You have not pledged your labour to any trade.</em></p>`;
+
+  const qualityCardsHtml = Object.entries(state.qualities ?? {}).filter(([id]) => !id.startsWith("obligations-") && !id.startsWith("standing-") && !id.startsWith("trade-")).map(([id, value]) => {
+
 
     const details = QUALITY_DETAILS[id] ?? { glyph: "◆", description: "A quality the city has learned to associate with you." };
     const width = Math.min(100, Math.max(4, Number(value) * 10));
@@ -458,6 +470,11 @@ possessionCardsHtml,
             '</section>',
 
             (circlesHtml ? '<section class="myself-section"><div class="myself-section-heading"><div><p class="myself-kicker">Society</p><h3>Circles</h3></div><p>Standing and obligations.</p></div><div class="circles-grid">' + circlesHtml + '</div></section>' : ''),
+
+            '<section class="myself-section">',
+              '<div class="myself-section-heading"><div><p class="myself-kicker">Labour</p><h3>Trades</h3></div><p>How you earn your keep.</p></div>',
+              '<div class="trade-grid">', tradeHtml, '</div>',
+            '</section>',
 
             '<section class="myself-section">',
               '<div class="myself-section-heading"><div><p class="myself-kicker">Consequences</p><h3>Menaces</h3></div><p>Trouble has a way of keeping its own accounts.</p></div>',

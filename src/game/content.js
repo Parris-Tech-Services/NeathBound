@@ -9,6 +9,13 @@ export const circles = {
   roof_surveyors: { name: "The Roof Surveyors", description: "They look down on everyone else." }
 };
 
+
+export const trades = {
+  "ink-smuggler": { name: "Ink Smuggler", description: "You move unwritten words across the city.", tier: 1, payment: [{ type: "obols", amount: 15 }, { type: "item", id: "glimmering-shard", amount: 10 }] },
+  "lamp-trimmer": { name: "Lamp Trimmer", description: "You maintain the boundaries of the dark.", tier: 1, payment: [{ type: "obols", amount: 10 }, { type: "item", id: "radiant-crystal", amount: 2 }] },
+  "roof-spotter": { name: "Roof Spotter", description: "You watch the cavern roof for falling things.", tier: 1, payment: [{ type: "obols", amount: 20 }] }
+};
+
 export const itemCategories = {
   curiosity: "Curiosities",
   resource: "Resources",
@@ -69,7 +76,7 @@ export const locations = {
     region: "The Lower City",
     subtitle: "Where the tide carries messages in sealed bottles.",
     atmosphere: "Wet brass, coal smoke, and a bell that rings beneath the water.",
-    stories: ["bell-under-water", "cartographer-at-dusk", "tea-for-the-tide", "salt-on-the-map", "return-the-darkness", "the-cartographer-returns", "the-submerged-door", "lie-low-on-the-barges"]
+    stories: ["bell-under-water", "cartographer-at-dusk", "tea-for-the-tide", "salt-on-the-map", "return-the-darkness", "the-cartographer-returns", "the-submerged-door", "lie-low-on-the-barges", "guild-hall", "smuggling-operations"]
   },
   "velvet-market": {
     name: "The Velvet Market",
@@ -143,6 +150,61 @@ export const menaceAreas = {
 };
 
 export const stories = {
+  "smuggling-operations": {
+    title: "Smuggling Operations",
+    kicker: "A repeatable activity",
+    text: "The docks are busy. If you know the right people, you can move goods without the city noticing. Build your Preparation to 5 to cash out.",
+    tags: ["always-available"],
+    choices: [
+      {
+        id: "bribe-a-dockworker",
+        label: "Bribe a dockworker",
+        requirements: [{ type: "obols", op: ">=", value: 5 }],
+        success: "A few coins buy silence and a safe route.",
+        successEffects: [{ type: "obols", amount: -5 }, { type: "quality", id: "preparation", amount: 1 }]
+      },
+      {
+        id: "sneak-past-patrols",
+        label: "Sneak past the patrols",
+        challenge: { quality: "shadow", difficulty: 4 },
+        success: "You find a gap in their rounds.",
+        failure: "They spot you. You have to run.",
+        successEffects: [{ type: "quality", id: "preparation", amount: 2 }],
+        failureEffects: [{ type: "menace", id: "suspicion", amount: 1 }]
+      },
+      {
+        id: "conclude-smuggling",
+        label: "Execute the operation",
+        requirements: [{ type: "quality", id: "preparation", op: ">=", value: 5 }],
+        success: "The goods are moved. The client pays.",
+        successEffects: [{ type: "set-quality", id: "preparation", value: 0 }, { type: "obols", amount: 25 }, { type: "item", id: "radiant-crystal", amount: 2 }]
+      }
+    ]
+  },
+
+  "guild-hall": {
+    title: "The Guilds of the Neath",
+    kicker: "Trades and Labour",
+    text: "Here, time is measured in sweat and ink. Adopt a trade, or claim your weekly recompense if you already have one.",
+    tags: ["always-available"],
+    choices: [
+      {
+        id: "claim-stipend",
+        label: "Claim your weekly stipend",
+        requirements: [{ type: "quality", id: "trade-tier", op: ">=", value: 1 }, { type: "time-since-flag", id: "last-stipend-claim", op: ">=", value: 604800000 }],
+        success: "You collect your pay. It will have to last the week.",
+        successEffects: [{ type: "set-time-flag", id: "last-stipend-claim" }, { type: "obols", amount: 15 }, { type: "item", id: "glimmering-shard", amount: 5 }]
+      },
+      {
+        id: "adopt-ink-smuggler",
+        label: "Become an Ink Smuggler",
+        requirements: [{ type: "quality", id: "standing-archivists", op: ">=", value: 1 }],
+        success: "The Archivists provide the ink; you provide the discretion.",
+        successEffects: [{ type: "set-quality", id: "trade-ink-smuggler", value: 1 }, { type: "set-quality", id: "trade-tier", value: 1 }, { type: "set-time-flag", id: "last-stipend-claim" }]
+      }
+    ]
+  },
+
   "circle-diplomacy": {
     title: "A Meeting of Circles",
     kicker: "Standing and Obligations",

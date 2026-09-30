@@ -25,6 +25,8 @@ export function valueForRequirement(state, requirement, context = {}) {
       return state.locationId;
     case "world-quality":
       return context.worldQualities?.[requirement.id] ?? state.worldQualities?.[requirement.id] ?? 0;
+    case "time-since-flag":
+      return Date.now() - Number(state.flags?.[requirement.id] ?? 0);
     default:
       return undefined;
   }
