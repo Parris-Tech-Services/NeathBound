@@ -8,7 +8,7 @@ const renderSource = fs.readFileSync(new URL("../src/ui/render.js", import.meta.
 function keysFromMap(name) {
   const match = renderSource.match(new RegExp(`const ${name} = \\\{([\\s\\S]*?)\\n\\};`));
   assert.ok(match, `${name} must exist in render.js`);
-  return new Set([...match[1].matchAll(/^\\s*"([^"]+)":/gm)].map((entry) => entry[1]));
+  return new Set([...match[1].matchAll(/^\s*"([^"]+)":/gm)].map((entry) => entry[1]));
 }
 
 test("every current location has dedicated artwork", () => {
