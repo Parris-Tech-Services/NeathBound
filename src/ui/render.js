@@ -1,4 +1,4 @@
-import { availableChoices, availableStories, currentLocation } from "../game/engine.js";
+import { availableChoices, availableStories, currentLocation } from "../game/engine.js?v=20260930-5";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦" };
 
