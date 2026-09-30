@@ -53,3 +53,27 @@ Source page: https://commons.wikimedia.org/wiki/File:Old_Books_in_the_library.jp
 These files are used only as cropped, filtered visual material for original
 NeathBound story cards. No Fallen London artwork, logos or protected assets are
 included.
+
+## Additional location and story imagery
+
+**Cromer pier at night.jpg**  
+Author: diego_torres  
+Source: Wikimedia Commons  
+License: CC0 1.0 Universal / public-domain dedication  
+Source page: https://commons.wikimedia.org/wiki/File:Cromer_pier_at_night.jpg  
+Used for Lantern Quay.
+
+**Diving Bell (PSF).png**  
+Author/source: Pearson Scott Foresman archives  
+Source: Wikimedia Commons  
+License: Public domain  
+Source page: https://commons.wikimedia.org/wiki/File:Diving_Bell_(PSF).png  
+Used for The Bell Under Water.
+
+**Portolan map by Battista Beccario (1426).jpg**  
+Author: Battista Beccario  
+Source: Wikimedia Commons  
+License: Public domain  
+Source page: https://commons.wikimedia.org/wiki/File:Portolan_map_by_Battista_Beccario_(1426).jpg  
+Used for The Cartographer at Dusk.
+
