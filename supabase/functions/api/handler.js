@@ -11,6 +11,7 @@
 //   POST /api/reset                                         new life
 //   POST /api/storylets/:storyId/branches/:choiceId/choose  resolve a choice
 import { availableChoices, availableStories, currentLocation, resolveChoice } from "./game/engine.js";
+import { locations } from "./game/content.js";
 import { initialState, normaliseState } from "./game/state.js";
 
 export async function handle({ method, path, userId }, { repo, random = Math.random }) {
@@ -46,6 +47,22 @@ export async function handle({ method, path, userId }, { repo, random = Math.ran
     const state = initialState();
     await repo.savePlayer(userId, state);
     return ok(state);
+  }
+
+  const travel = route.match(/^\/api\/travel\/([^/]+)$/);
+  if (method === "POST" && travel) {
+    const state = await loadOrCreate();
+    const locationId = decodeURIComponent(travel[1]);
+    if (!state.unlockedLocations.includes(locationId) || !locations[locationId]) {
+      return { status: 409, body: { error: "That location is not unlocked.", state } };
+    }
+    const next = {
+      ...state,
+      locationId,
+      journal: [`Travelled to ${locationId.replaceAll("-", " ")}.`, ...state.journal].slice(0, 30)
+    };
+    await repo.savePlayer(userId, next);
+    return ok(next);
   }
 
   const choose = route.match(/^\/api\/storylets\/([^/]+)\/branches\/([^/]+)\/choose$/);

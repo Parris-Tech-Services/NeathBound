@@ -59,6 +59,18 @@ test("location, storylets, journal, world and reset routes answer", async () => 
   assert.equal((await call(repo, "GET", "/api/nope")).status, 404);
 });
 
+test("travel changes location only when the destination is unlocked", async () => {
+  const repo = fakeRepo();
+  const moved = await call(repo, "POST", "/api/travel/velvet-market");
+  assert.equal(moved.status, 200);
+  assert.equal(moved.body.locationId, "velvet-market");
+  assert.match(moved.body.journal[0], /velvet market/);
+
+  const locked = await call(repo, "POST", "/api/travel/clockwork-gardens");
+  assert.equal(locked.status, 409);
+  assert.equal(locked.body.state.locationId, "velvet-market");
+});
+
 test("route normalisation accepts Supabase and local prefixes", () => {
   assert.equal(normalise("/api/player/"), "/api/player");
   assert.equal(normalise("/functions/v1/api/player"), "/api/player");

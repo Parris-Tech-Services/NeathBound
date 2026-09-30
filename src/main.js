@@ -1,5 +1,6 @@
 import { createGameService } from "./services/index.js?v=20260930-7";
-import { render } from "./ui/render.js?v=20260930-6";
+import { render } from "./ui/render.js?v=20260930-7";
+import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20260930-1";
 
 const app = document.querySelector("#app");
 const service = createGameService();
@@ -17,6 +18,36 @@ async function draw(state) {
       } catch (error) {
         showError(error);
       }
+    },
+    async travel(locationId) {
+      try {
+        const nextState = await service.travel(locationId);
+        await draw(nextState.state ?? nextState);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (error) {
+        showError(error);
+      }
+    },
+    bookmark(storyId) {
+      const preferences = loadPreferences();
+      preferences.bookmarks = preferences.bookmarks.includes(storyId)
+        ? preferences.bookmarks.filter((id) => id !== storyId)
+        : [...preferences.bookmarks, storyId];
+      savePreferences(preferences);
+      draw();
+    },
+    outfit(outfitId) {
+      savePreferences({ ...loadPreferences(), outfit: outfitId });
+      draw();
+    },
+    editNote(noteKey) {
+      const preferences = loadPreferences();
+      const current = preferences.notes[noteKey] ?? "";
+      const next = window.prompt("Edit this note", current);
+      if (next === null) return;
+      preferences.notes[noteKey] = next.trim();
+      savePreferences(preferences);
+      draw();
     },
     async reset() {
       if (!window.confirm("Begin a new life? Your story will be replaced.")) return;

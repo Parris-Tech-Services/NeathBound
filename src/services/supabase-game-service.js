@@ -20,11 +20,15 @@ export class SupabaseGameService {
     return this.#call("POST", `storylets/${encodeURIComponent(storyId)}/branches/${encodeURIComponent(choiceId)}/choose`);
   }
 
+  travel(locationId) {
+    return this.#call("POST", `travel/${encodeURIComponent(locationId)}`);
+  }
+
   reset() {
     return this.#call("POST", "reset");
   }
 
-  async #call(method, route) {
+  async #call(method, route, requestBody = {}) {
     const session = await this.#session();
     const response = await this.fetch(`${this.config.supabaseUrl}/functions/v1/api/${route}`, {
       method,
@@ -33,12 +37,12 @@ export class SupabaseGameService {
         Authorization: `Bearer ${session.access_token}`,
         "Content-Type": "application/json"
       },
-      body: method === "POST" ? "{}" : undefined
+      body: method === "POST" ? JSON.stringify(requestBody) : undefined
     });
-    const body = await response.json().catch(() => ({}));
+    const payload = await response.json().catch(() => ({}));
     // 409 = the rules refused the choice; the body carries { error, state }.
-    if (response.ok || response.status === 409) return body;
-    throw new Error(body.error ?? `Request failed: ${response.status}`);
+    if (response.ok || response.status === 409) return payload;
+    throw new Error(payload.error ?? `Request failed: ${response.status}`);
   }
 
   async #session() {
