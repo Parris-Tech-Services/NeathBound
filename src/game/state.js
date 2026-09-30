@@ -1,5 +1,5 @@
 export const SAVE_KEY = "neathbound.save.v3";
-export const LEGACY_SAVE_KEYS = ["neathbound.save.v2", "neathbound.save.v1"];
+export const LEGACY_SAVE_KEY = "neathbound.save.v1";\nexport const LEGACY_SAVE_KEYS = ["neathbound.save.v2", LEGACY_SAVE_KEY];
 const MENACE_IDS = ["dread", "scandal", "wounds", "suspicion"];
 
 export function initialState() {
