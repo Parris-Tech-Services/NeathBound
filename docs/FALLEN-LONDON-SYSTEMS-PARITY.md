@@ -188,7 +188,7 @@ NeathBound:
 - cards can start story chains, give resources or react to milestones
 - home upgrades can increase hand size
 
-Status: ENGINE FIELDS EXIST (hand/discard), UI/gameplay not implemented.
+Status: DONE (basic hand size 3, draw, discard, play).
 
 ## 7. Possessions / equipment / outfits
 
