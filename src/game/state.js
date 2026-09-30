@@ -7,6 +7,37 @@ export function initialState() {
     version: 4,
     revision: 0,
     name: "The Unmoored",
+    locationId: "lantern-quay",
+    echoes: 12,
+    momentum: 0,
+    qualities: { nerve: 2, insight: 2, poise: 1, shadow: 0 },
+    menaces: { dread: 0, scandal: 0, wounds: 0, suspicion: 0 },
+    items: { "salted-map": 1, "brass-key": 1 },
+    unlockedLocations: ["lantern-quay", "velvet-market", "hollow-archive"],
+    acquaintances: [],
+    flags: {
+      __revision: 0,
+      "tutorial:story": true,
+      "tutorial:escaped": true,
+      "tutorial:myself": true,
+      "tutorial:possessions": true,
+      "tutorial:travel": true,
+      "tutorial:complete": true
+    },
+    globalFlags: {},
+    hand: [],
+    discard: [],
+    journal: ["You woke beneath a sky made of stone, with a brass key in your hand."],
+    events: [],
+    lastDraw: "bell-under-water"
+  };
+}
+
+export function newPlayerState() {
+  return {
+    version: 4,
+    revision: 0,
+    name: "The Unmoored",
     locationId: "the-lair",
     echoes: 0,
     momentum: 0,
@@ -21,7 +52,7 @@ export function initialState() {
     discard: [],
     journal: ["You woke on cold stone beneath a lamp that refuses to go out."],
     events: [],
-    lastDraw: "bell-under-water"
+    lastDraw: "wake-in-the-lair"
   };
 }
 
@@ -85,12 +116,12 @@ export function loadState(storage = globalThis.localStorage) {
   try {
     const raw = storage?.getItem(SAVE_KEY)
       ?? LEGACY_SAVE_KEYS.map((key) => storage?.getItem(key)).find(Boolean);
-    if (!raw) return initialState();
+    if (!raw) return newPlayerState();
     const state = normaliseState(JSON.parse(raw));
     storage?.setItem(SAVE_KEY, JSON.stringify(state));
     return state;
   } catch {
-    return initialState();
+    return newPlayerState();
   }
 }
 
