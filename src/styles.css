@@ -1138,3 +1138,20 @@ button, select { font: inherit; }
   .character-stat-grid,
   .myself-two-column { grid-template-columns: 1fr; }
 }
+
+
+/* Story depth: locked requirements and persistent Plans */
+.choice-row.is-locked { opacity: .72; }
+.locked-requirement { margin: .45rem 0 0; font-size: .82rem; font-weight: 700; letter-spacing: .02em; }
+.choice-row.is-locked .go-button { cursor: not-allowed; }
+.plans-page { padding: 1.5rem; }
+.plans-header { border-bottom: 1px solid rgba(80,65,45,.22); margin-bottom: 1rem; padding-bottom: .75rem; }
+.plans-kicker { margin: 0 0 .25rem; text-transform: uppercase; letter-spacing: .12em; font-size: .72rem; opacity: .72; }
+.plans-list { display: grid; gap: 1rem; }
+.plan-card { display: flex; gap: 1rem; justify-content: space-between; align-items: flex-start; padding: 1rem; border: 1px solid rgba(80,65,45,.22); background: rgba(255,255,255,.22); }
+.plan-card h3 { margin: .1rem 0 .4rem; }
+.plan-card p { margin: .25rem 0; }
+.plan-actions { display: flex; flex-direction: column; gap: .5rem; min-width: 8rem; }
+.plan-actions button, .plan-actions a { font: inherit; }
+.empty-plans { padding: 2rem 1rem; text-align: center; }
+@media (max-width: 720px) { .plan-card { flex-direction: column; } .plan-actions { min-width: 0; width: 100%; } }
