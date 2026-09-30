@@ -107,7 +107,7 @@ export function render(app, state, handlers, outcome = null) {
     return [
       '<article class="storylet', isCard ? ' opportunity-card' : '', '">',
       isCard ? '<div class="card-discard-header"><button class="discard-button" data-action="discard" data-card="' + story.id + '" aria-label="Discard">✗</button></div>' : '',
-      '<div class="story-art story-art-', escapeClass(story.id), '" aria-hidden="true">', storyArtSvg(story.id, state.locationId), '</div>',
+      '<div class="story-art story-art-', escapeClass(story.id), '" aria-hidden="true">', storyArtMarkup(story.id, state.locationId), '</div>',
       '<div class="story-body">',
       '<button class="bookmark', planned ? ' is-bookmarked' : '', '" type="button" data-action="bookmark" data-story="', story.id, '" aria-label="', planned ? 'Remove from Plans' : 'Add to Plans', '" title="', planned ? 'Remove from Plans' : 'Add to Plans', '" aria-pressed="', planned, '">◆</button>',
       '<h3>', escapeHtml(story.title), '</h3>',
@@ -386,7 +386,7 @@ const inventoryHtml = inventory.length
                 '<section class="story-board">',
                   '<div class="board-inner">',
                     '<section class="featured-story">',
-                      '<div class="feature-art feature-art-', escapeClass(state.locationId), '" aria-hidden="true">', locationArtSvg(state.locationId), '</div>',
+                      '<div class="feature-art feature-art-', escapeClass(state.locationId), '" aria-hidden="true">', locationArtMarkup(state.locationId), '</div>',
                       '<div class="feature-copy">',
                         '<button class="edit-dot" type="button" data-action="edit-note" data-note-key="location:', state.locationId, '" aria-label="Edit location note">✎</button>',
                         '<h2>', escapeHtml(location.name), '</h2>',
@@ -612,6 +612,37 @@ possessionCardsHtml,
   setView(viewFromHash());
 }
 
+
+const STORY_IMAGE_ART = {
+  "bell-under-water": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Diving_Bell_(PSF).png",
+  "cartographer-at-dusk": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Portolan_map_by_Battista_Beccario_(1426).jpg",
+  "tea-for-the-tide": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Teacup.png",
+  "index-of-lost-things": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Old_Books_in_the_library.jpg",
+  "the-quiet-librarian": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Old_Books_in_the_library.jpg",
+  "salt-on-the-map": "https://upload.wikimedia.org/wikipedia/commons/4/47/Old_map_1807_plan.jpg"
+};
+
+const LOCATION_IMAGE_ART = {
+  "lantern-quay": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Cromer_pier_at_night.jpg",
+  "hollow-archive": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Old_Books_in_the_library.jpg"
+};
+
+function pictureMarkup(src, label, priority = false) {
+  if (!src) return "";
+  return '<img class="narrative-picture" src="' + escapeHtml(src) + '" alt="" referrerpolicy="no-referrer" decoding="async" ' +
+    (priority ? 'fetchpriority="high"' : 'loading="lazy"') +
+    ' data-art-label="' + escapeHtml(label) + '">';
+}
+
+function storyArtMarkup(storyId, locationId) {
+  const picture = STORY_IMAGE_ART[storyId];
+  return picture ? pictureMarkup(picture, storyId) : storyArtSvg(storyId, locationId);
+}
+
+function locationArtMarkup(locationId) {
+  const picture = LOCATION_IMAGE_ART[locationId];
+  return picture ? pictureMarkup(picture, locationId, true) : locationArtSvg(locationId);
+}
 
 const STORY_ART = {
   "lair-escape": ["⚿", "the sealed iron door", "#171b1d", "#6f6049"],
