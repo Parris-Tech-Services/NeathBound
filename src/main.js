@@ -4,8 +4,10 @@ import { render } from "./ui/render.js?v=20260930-2";
 const app = document.querySelector("#app");
 const service = createGameService();
 
-async function draw(state = await service.getState()) {
-  render(app, state, {
+async function draw(state) {
+  const resolvedState = state ?? await service.getState();
+
+  render(app, resolvedState, {
     async choose(storyId, choiceId) {
       try {
         const outcome = await service.choose(storyId, choiceId);
@@ -19,8 +21,8 @@ async function draw(state = await service.getState()) {
     async reset() {
       if (!window.confirm("Begin a new life? Your story will be replaced.")) return;
       try {
-        const state = await service.reset();
-        await draw(state.state ?? state);
+        const nextState = await service.reset();
+        await draw(nextState.state ?? nextState);
       } catch (error) {
         showError(error);
       }
