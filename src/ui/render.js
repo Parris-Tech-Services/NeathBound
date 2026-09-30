@@ -61,6 +61,10 @@ export function render(app, state, handlers, outcome = null) {
   const unlockedLocations = (state.unlockedLocations ?? []).map((id) => ({ id, location: locations[id] })).filter((entry) => entry.location);
   const locationNote = preferences.notes[`location:${state.locationId}`] ?? location.atmosphere;
   const glossaryNote = preferences.notes.glossary ?? "A quality is anything the city remembers about you: a talent, a rumour, an item, or a consequence.";
+  const showMyself = state.flags?.["tutorial:myself"] === true;
+  const showPossessions = state.flags?.["tutorial:possessions"] === true;
+  const showTravel = state.flags?.["tutorial:travel"] === true;
+  const tutorialComplete = state.flags?.["tutorial:complete"] === true;
 
   const qualitiesHtml = Object.entries(state.qualities).map(([key, value]) => {
     const width = Math.min(100, Math.max(8, value * 10));
@@ -224,7 +228,7 @@ export function render(app, state, handlers, outcome = null) {
         '<nav class="account-nav" aria-label="Account">',
           '<button class="text-link" data-action="reset">New life</button>',
           '<a href="#journal" data-view="story">Journal</a>',
-          '<a href="#possessions" data-view="possessions">Possessions</a>',
+          showPossessions ? '<a href="#possessions" data-view="possessions">Possessions</a>' : '',
           '<a href="#stories" data-view="story">Stories</a>',
         '</nav>',
       '</header>',
@@ -244,12 +248,11 @@ export function render(app, state, handlers, outcome = null) {
 
       '<nav class="main-tabs" aria-label="Game sections">',
         '<a class="active" href="#stories" data-view="story">STORY</a>',
-        '<a href="#journal" data-view="story">MESSAGES</a>',
-        '<a href="#myself" data-view="myself">MYSELF</a>',
-        '<a href="#possessions" data-view="possessions">POSSESSIONS</a>',
-        '<a href="#possessions">BAZAAR</a>',
-        '<a href="#character">FATE</a>',
-        '<a href="#journal">PLANS</a>',
+        state.flags?.["tutorial:escaped"] ? '<a href="#journal" data-view="story">MESSAGES</a>' : '',
+        showMyself ? '<a href="#myself" data-view="myself">MYSELF</a>' : '',
+        showPossessions ? '<a href="#possessions" data-view="possessions">POSSESSIONS</a>' : '',
+        state.flags?.["tutorial:market"] ? '<a href="#exchange" data-view="exchange">EXCHANGE</a>' : '',
+        state.flags?.["tutorial:plans"] ? '<a href="#plans" data-view="plans">PLANS</a>' : '',
       '</nav>',
 
       '<div class="game-grid">',
@@ -380,11 +383,11 @@ export function render(app, state, handlers, outcome = null) {
             '<h2>Welcome to</h2>',
             '<h3>', escapeHtml(location.name), '.</h3>',
             '<p class="welcome-tail">delicious stranger!</p>',
-            '<label class="travel-label" for="travel-location">Travel to</label>',
-            '<select id="travel-location" aria-label="Travel destination">',
-              unlockedLocations.map(({ id, location: destination }) => ['<option value="', id, '"', id === state.locationId ? ' selected' : '', '>', escapeHtml(destination.name), '</option>'].join('')).join(""),
-            '</select>',
-            '<button class="travel-button" data-action="travel"', unlockedLocations.length <= 1 ? ' disabled' : '', '>TRAVEL</button>',
+            showTravel ? '<label class="travel-label" for="travel-location">Travel to</label>' : '<p class="tutorial-lock-note">The wider city is not open to you yet.</p>',
+            showTravel ? '<select id="travel-location" aria-label="Travel destination">' : '',
+              showTravel ? unlockedLocations.filter(({ id }) => id !== "the-lair").map(({ id, location: destination }) => ['<option value="', id, '"', id === state.locationId ? ' selected' : '', '>', escapeHtml(destination.name), '</option>'].join('')).join("") : '',
+            showTravel ? '</select>' : '',
+            showTravel ? '<button class="travel-button" data-action="travel"' + (unlockedLocations.filter(({ id }) => id !== "the-lair").length <= 1 ? ' disabled' : '') + '>TRAVEL</button>' : '',
           '</section>',
 
           '<section class="promo-card">',
@@ -399,16 +402,13 @@ export function render(app, state, handlers, outcome = null) {
             '<p>', escapeHtml(glossaryNote), '</p>',
           '</section>',
 
-          '<section class="satchel" id="possessions-summary">',
-            '<h3>Possessions</h3>',
-            '<div class="satchel-list">', inventoryHtml, '</div>',
-          '</section>',
+          showPossessions ? '<section class="satchel" id="possessions-summary"><h3>Possessions</h3><div class="satchel-list">' + inventoryHtml + '</div></section>' : '',
         '</aside>',
       '</div>',
 
       '<footer class="game-footer">',
         '<span>© NeathBound · Original open-source fiction</span>',
-        '<nav><a href="#stories" data-view="story">Story</a><span>|</span><a href="#myself" data-view="myself">Myself</a><span>|</span><a href="#possessions" data-view="possessions">Possessions</a></nav>',
+        '<nav><a href="#stories" data-view="story">Story</a>', showMyself ? '<span>|</span><a href="#myself" data-view="myself">Myself</a>' : '', showPossessions ? '<span>|</span><a href="#possessions" data-view="possessions">Possessions</a>' : '', '</nav>',
       '</footer>',
     '</div>'
   ].join("");
@@ -420,7 +420,7 @@ export function render(app, state, handlers, outcome = null) {
   app.querySelector("[data-action=onwards]")?.addEventListener("click", handlers.onwards);
   app.querySelectorAll("[data-action=bookmark]").forEach((button) => button.addEventListener("click", () => handlers.bookmark(button.dataset.story)));
   app.querySelectorAll("[data-action=outfit]").forEach((select) => select.addEventListener("change", (event) => handlers.outfit(event.target.value)));
-  app.querySelector("[data-action=travel]").addEventListener("click", () => handlers.travel(app.querySelector("#travel-location").value));
+  app.querySelector("[data-action=travel]")?.addEventListener("click", () => handlers.travel(app.querySelector("#travel-location").value));
   app.querySelectorAll("[data-action=edit-note]").forEach((button) => button.addEventListener("click", () => handlers.editNote(button.dataset.noteKey)));
   app.querySelector("[data-action=reset]").addEventListener("click", handlers.reset);
 
@@ -434,8 +434,8 @@ export function render(app, state, handlers, outcome = null) {
     });
   };
   const viewFromHash = () => {
-    if (globalThis.location?.hash === "#possessions") return "possessions";
-    if (globalThis.location?.hash === "#myself") return "myself";
+    if (showPossessions && globalThis.location?.hash === "#possessions") return "possessions";
+    if (showMyself && globalThis.location?.hash === "#myself") return "myself";
     return "story";
   };
   app.querySelectorAll("[data-view]").forEach((link) => link.addEventListener("click", () => setView(link.dataset.view)));
@@ -445,6 +445,11 @@ export function render(app, state, handlers, outcome = null) {
 
 
 const STORY_ART = {
+  "wake-in-the-lair": ["▦", "sealed lair", "#1e2522", "#5d6e62"],
+  "the-way-out": ["⇧", "door above", "#202a26", "#89967d"],
+  "first-night-name": ["✒", "ledger name", "#253738", "#809899"],
+  "first-night-belongings": ["⚿", "returned packet", "#3f3327", "#a48f69"],
+  "first-night-roads": ["⌖", "first routes", "#25383b", "#7e9da0"],
   "bell-under-water": ["♢", "submerged bell", "#173842", "#8ca49e"],
   "cartographer-at-dusk": ["⌖", "living map", "#473227", "#b68b5a"],
   "borrowed-face": ["◐", "silken mask", "#4b253f", "#c79bb7"],
@@ -478,6 +483,7 @@ const STORY_ART = {
 };
 
 const LOCATION_ART = {
+  "the-lair": ["▦", "◆", "The Lair", "#1a211e", "#56675d"],
   "lantern-quay": ["⚓", "♢", "Lantern Quay", "#143740", "#6d8f91"],
   "velvet-market": ["◐", "✦", "Velvet Market", "#47293f", "#9d6f8f"],
   "hollow-archive": ["▤", "⌑", "Hollow Archive", "#2e342e", "#8d947b"],
