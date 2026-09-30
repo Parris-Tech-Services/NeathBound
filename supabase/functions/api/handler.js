@@ -1,4 +1,14 @@
-import { availableChoices, availableStories, buyItem, currentLocation, effectiveChallenge, equipItem, resolveChoice, sellItem } from "./game/engine.js";
+import {
+  availableChoices,
+  availableStories,
+  buyItem,
+  currentLocation,
+  effectiveChallenge,
+  equipItem,
+  recoverMenace,
+  resolveChoice,
+  sellItem
+} from "./game/engine.js";
 import { locations } from "./game/content.js";
 import { initialState, normaliseState } from "./game/state.js";
 
@@ -47,14 +57,43 @@ export async function handle({ method, path, userId, body = {} }, { repo, random
     if (!state.unlockedLocations.includes(locationId) || !locations[locationId]) {
       return ok({ error: "That location is not unlocked.", state, rejected: true });
     }
+    const revision = Number(state.revision ?? 0) + 1;
     const next = {
       ...state,
-      revision: Number(state.revision ?? 0) + 1,
+      revision,
+      flags: { ...state.flags, "__revision": revision },
       locationId,
       journal: [`Travelled to ${locationId.replaceAll("-", " ")}.`, ...state.journal].slice(0, 100)
     };
     await repo.savePlayer(userId, next);
     return ok({ state: next });
+  }
+
+  const transaction = route.match(/^\/api\/(bazaar\/(buy|sell)|equipment\/toggle)\/([^/]+)$/);
+  if (method === "POST" && transaction) {
+    const state = await loadOrCreate();
+    const stale = revisionMismatch(body, state);
+    if (stale) return ok({ error: stale, state, rejected: true });
+    const itemId = decodeURIComponent(transaction[3]);
+    const result = transaction[1] === "bazaar/buy"
+      ? buyItem(state, itemId)
+      : transaction[1] === "bazaar/sell"
+        ? sellItem(state, itemId)
+        : equipItem(state, itemId);
+    if (result.error) return ok({ ...result, rejected: true });
+    await repo.savePlayer(userId, result.state);
+    return ok(result);
+  }
+
+  const recover = route.match(/^\/api\/menaces\/([^/]+)\/recover$/);
+  if (method === "POST" && recover) {
+    const state = await loadOrCreate();
+    const stale = revisionMismatch(body, state);
+    if (stale) return ok({ error: stale, state, rejected: true });
+    const result = recoverMenace(state, decodeURIComponent(recover[1]));
+    if (result.error) return ok({ ...result, rejected: true });
+    await repo.savePlayer(userId, result.state);
+    return ok(result);
   }
 
   const choose = route.match(/^\/api\/storylets\/([^/]+)\/branches\/([^/]+)\/choose$/);
@@ -63,10 +102,16 @@ export async function handle({ method, path, userId, body = {} }, { repo, random
     const stale = revisionMismatch(body, state);
     if (stale) return ok({ error: stale, state, rejected: true });
 
-    const response = resolveChoice(state, decodeURIComponent(choose[1]), decodeURIComponent(choose[2]), random, ctx);
-    if (response.error) return ok({ ...response, rejected: true });
-    await repo.savePlayer(userId, response.state);
-    return ok(response);
+    const result = resolveChoice(
+      state,
+      decodeURIComponent(choose[1]),
+      decodeURIComponent(choose[2]),
+      random,
+      ctx
+    );
+    if (result.error) return ok({ ...result, rejected: true });
+    await repo.savePlayer(userId, result.state);
+    return ok(result);
   }
 
   return { status: 404, body: { error: "API route not found." } };
