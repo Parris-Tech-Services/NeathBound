@@ -25,7 +25,7 @@ export function render(app, state, handlers, outcome = null) {
     ].join("");
   }).join("");
 
-  const storiesHtml = stories.map((story, storyIndex) => {
+  const storiesHtml = stories.map((story) => {
     const available = new Set(availableChoices(state, story.id).map((choice) => choice.id));
     const choicesHtml = story.choices.map((choice) => {
       const challengeQuality = choice.challenge?.quality ?? choice.challenge?.stat;
@@ -49,7 +49,7 @@ export function render(app, state, handlers, outcome = null) {
 
     return [
       '<article class="storylet">',
-      '<div class="story-art art-', (storyIndex % 5) + 1, '" aria-hidden="true"><span></span></div>',
+      '<div class="story-art story-art-', escapeClass(story.id), '" aria-hidden="true">', storyArtSvg(story.id, state.locationId), '</div>',
       '<div class="story-body">',
       '<button class="bookmark', preferences.bookmarks.includes(story.id) ? ' is-bookmarked' : '', '" type="button" data-action="bookmark" data-story="', story.id, '" aria-label="', preferences.bookmarks.includes(story.id) ? 'Remove bookmark' : 'Bookmark story', '" aria-pressed="', preferences.bookmarks.includes(story.id), '">◆</button>',
       '<h3>', escapeHtml(story.title), '</h3>',
@@ -160,7 +160,7 @@ export function render(app, state, handlers, outcome = null) {
           '<section class="story-board">',
             '<div class="board-inner">',
               '<section class="featured-story">',
-                '<div class="feature-art" aria-hidden="true"><span>⌕</span></div>',
+                '<div class="feature-art feature-art-', escapeClass(state.locationId), '" aria-hidden="true">', locationArtSvg(state.locationId), '</div>',
                 '<div class="feature-copy">',
                   '<button class="edit-dot" type="button" data-action="edit-note" data-note-key="location:', state.locationId, '" aria-label="Edit location note">✎</button>',
                   '<h2>', escapeHtml(location.name), '</h2>',
@@ -223,6 +223,87 @@ export function render(app, state, handlers, outcome = null) {
   app.querySelector("[data-action=travel]").addEventListener("click", () => handlers.travel(app.querySelector("#travel-location").value));
   app.querySelectorAll("[data-action=edit-note]").forEach((button) => button.addEventListener("click", () => handlers.editNote(button.dataset.noteKey)));
   app.querySelector("[data-action=reset]").addEventListener("click", handlers.reset);
+}
+
+
+const STORY_ART = {
+  "bell-under-water": ["♢", "submerged bell", "#173842", "#8ca49e"],
+  "cartographer-at-dusk": ["⌖", "living map", "#473227", "#b68b5a"],
+  "borrowed-face": ["◐", "silken mask", "#4b253f", "#c79bb7"],
+  "red-thread": ["∞", "red thread", "#4d2227", "#c35c62"],
+  "index-of-lost-things": ["▤", "remembering index", "#343128", "#b8aa7d"],
+  "the-quiet-librarian": ["⌑", "silent librarian", "#29352f", "#9aa88f"],
+  "tea-for-the-tide": ["♨", "tide tea", "#1e4148", "#c9b48a"],
+  "market-gossip": ["◌", "whispering stalls", "#432d3e", "#b58b9f"],
+  "catalogue-the-dark": ["▥", "shelf of darkness", "#17191b", "#72777c"],
+  "garden-appointment": ["✿", "clockwork flower", "#35402b", "#c2a85c"],
+  "borrowed-sunlight": ["☼", "bottled sun", "#554018", "#e1c76b"],
+  "salt-on-the-map": ["≋", "salted map", "#3a4038", "#c0b49a"],
+  "the-sand-reader": ["⌛", "black sand", "#332e2a", "#a99574"],
+  "the-locked-stacks": ["⚿", "locked stacks", "#282b2d", "#97866f"],
+  "finish-the-page": ["¶", "unfinished page", "#43392d", "#c8b58c"],
+  "return-the-darkness": ["◒", "returned darkness", "#161b20", "#657685"],
+  "plant-the-sun-seed": ["✦", "sun seed", "#3e4328", "#d0b958"],
+  "the-seedling-dawn": ["♧", "dawn seedling", "#31432e", "#9fbb78"],
+  "the-memory-graft": ["⌁", "memory graft", "#3a332d", "#b49d7e"],
+  "unwritten-ink": ["✒", "unwritten ink", "#20272d", "#8799a4"],
+  "the-cartographer-returns": ["⌘", "returning cartographer", "#3f3028", "#b58561"],
+  "the-debt-collector": ["¤", "debt collector", "#422f2b", "#b79570"],
+  "an-entry-in-the-index": ["☷", "index entry", "#33362f", "#a9a37f"],
+  "the-gardeners-thanks": ["❧", "gardener's thanks", "#30402c", "#a9bb7d"],
+  "the-margin-note": ["※", "margin note", "#43382d", "#b9aa8c"],
+  "survey-the-stone-sky": ["⌕", "stone-sky telescope", "#27343d", "#91a8b8"],
+  "the-lamp-that-fell-upward": ["♢", "ascending lamp", "#3b3426", "#d2b86d"],
+  "the-far-crack": ["ϟ", "far crack", "#242c34", "#9ba7af"],
+  "the-submerged-door": ["▣", "submerged door", "#18343e", "#779a9f"],
+  "the-loose-end": ["⌁", "loose red knot", "#47272c", "#bd6d73"]
+};
+
+const LOCATION_ART = {
+  "lantern-quay": ["⚓", "♢", "Lantern Quay", "#143740", "#6d8f91"],
+  "velvet-market": ["◐", "✦", "Velvet Market", "#47293f", "#9d6f8f"],
+  "hollow-archive": ["▤", "⌑", "Hollow Archive", "#2e342e", "#8d947b"],
+  "clockwork-gardens": ["✿", "⚙", "Clockwork Gardens", "#344128", "#9ca45c"],
+  "glass-observatory": ["⌕", "✧", "Glass Observatory", "#263743", "#758fa3"]
+};
+
+function storyArtSvg(storyId, locationId) {
+  const art = STORY_ART[storyId] ?? ["◆", "unknown story", "#343434", "#888"];
+  const location = LOCATION_ART[locationId] ?? LOCATION_ART["lantern-quay"];
+  const [symbol, label, dark, light] = art;
+  const locationMark = location[0];
+  return [
+    '<svg viewBox="0 0 320 150" role="presentation" focusable="false" xmlns="http://www.w3.org/2000/svg">',
+      '<defs><linearGradient id="g-', escapeClass(storyId), '" x1="0" y1="0" x2="1" y2="1">',
+        '<stop offset="0" stop-color="', dark, '"/><stop offset="1" stop-color="', light, '"/>',
+      '</linearGradient></defs>',
+      '<rect width="320" height="150" fill="url(#g-', escapeClass(storyId), ')"/>',
+      '<circle cx="252" cy="42" r="58" fill="rgba(235,218,175,.09)"/>',
+      '<path d="M0 116 C56 91 92 135 148 111 S248 87 320 114 V150 H0Z" fill="rgba(8,12,13,.34)"/>',
+      '<path d="M0 126 C62 106 118 143 178 120 S266 105 320 128" fill="none" stroke="rgba(230,216,180,.22)" stroke-width="2"/>',
+      '<text x="34" y="90" font-size="58" fill="rgba(246,232,196,.9)" font-family="Georgia,serif">', escapeHtml(symbol), '</text>',
+      '<text x="276" y="126" text-anchor="middle" font-size="23" fill="rgba(246,232,196,.48)" font-family="Georgia,serif">', escapeHtml(locationMark), '</text>',
+      '<text x="34" y="126" font-size="15" letter-spacing="2.2" fill="rgba(247,237,211,.78)" font-family="Georgia,serif">', escapeHtml(label.toUpperCase()), '</text>',
+    '</svg>'
+  ].join("");
+}
+
+function locationArtSvg(locationId) {
+  const [symbol, accent, label, dark, light] = LOCATION_ART[locationId] ?? LOCATION_ART["lantern-quay"];
+  return [
+    '<svg viewBox="0 0 360 190" role="presentation" focusable="false" xmlns="http://www.w3.org/2000/svg">',
+      '<defs><linearGradient id="loc-', escapeClass(locationId), '" x1="0" y1="0" x2="1" y2="1">',
+        '<stop offset="0" stop-color="', dark, '"/><stop offset="1" stop-color="', light, '"/>',
+      '</linearGradient></defs>',
+      '<rect width="360" height="190" fill="url(#loc-', escapeClass(locationId), ')"/>',
+      '<circle cx="287" cy="52" r="74" fill="rgba(241,224,181,.10)"/>',
+      '<path d="M0 137 C52 113 90 145 139 129 C194 111 225 151 278 126 C309 111 332 112 360 123 V190 H0Z" fill="rgba(9,13,14,.38)"/>',
+      '<path d="M0 151 C54 128 105 158 155 143 S250 132 360 151" fill="none" stroke="rgba(239,223,184,.25)" stroke-width="3"/>',
+      '<text x="54" y="111" font-size="72" fill="rgba(249,236,201,.9)" font-family="Georgia,serif">', escapeHtml(symbol), '</text>',
+      '<text x="280" y="84" text-anchor="middle" font-size="42" fill="rgba(249,236,201,.5)" font-family="Georgia,serif">', escapeHtml(accent), '</text>',
+      '<text x="52" y="157" font-size="17" letter-spacing="2.4" fill="rgba(249,238,211,.82)" font-family="Georgia,serif">', escapeHtml(label.toUpperCase()), '</text>',
+    '</svg>'
+  ].join("");
 }
 
 function formatName(value) {
