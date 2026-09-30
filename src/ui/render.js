@@ -366,7 +366,7 @@ function renderMainGoal(state) {
 
 function mainGoal(state) {
   const flags = state.flags ?? {};
-  if (!flags["story-complete:bell-under-water"]) return { title: "Follow the brass key", text: "Investigate the bell beneath Lantern Quay and learn why the key you woke with responds to it." };
+  if (!flags["bell-under-water:descend"]) return { title: "Follow the brass key", text: "Investigate the bell beneath Lantern Quay and learn why the key you woke with responds to it." };
   if (!flags["story-complete:red-thread"]) return { title: "Follow what was lost", text: "The Velvet Market is full of routes that do not appear on maps. Find the child with the red thread." };
   if ((state.items?.["archive-key"] ?? 0) > 0) return { title: "Find the key's door", text: "Take the archive key to the Hollow Archive and discover what it unlocks." };
   if (!(state.unlockedLocations ?? []).includes("clockwork-gardens")) return { title: "Reach the Clockwork Gardens", text: "Find a route upward into the glasshouses above the Lower City." };
