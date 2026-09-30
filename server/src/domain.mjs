@@ -3,7 +3,7 @@ export function defaultPlayer(id) {
     id,
     name: "The Unmoored",
     locationId: "lantern-quay",
-    echoes: 12,
+    obols: 12,
     actions: "unlimited",
     qualities: { nerve: 2, insight: 2, poise: 1, shadow: 0 },
     menaces: { dread: 0, scandal: 0, wounds: 0, suspicion: 0 },
@@ -35,7 +35,7 @@ export function resolveBranch(player, story, branch, random = Math.random) {
     success = roll >= branch.challenge.difficulty;
   }
   const effects = branch.effects ?? {};
-  next.echoes += effects.echoes ?? 0;
+  next.obols += effects.obols ?? 0;
   for (const [key, value] of Object.entries(effects.qualities ?? {})) next.qualities[key] = (next.qualities[key] ?? 0) + value;
   for (const [key, value] of Object.entries(effects.menaces ?? {})) next.menaces[key] = Math.max(0, (next.menaces[key] ?? 0) + value);
   for (const [key, value] of Object.entries(effects.items ?? {})) next.items[key] = Math.max(0, (next.items[key] ?? 0) + value);

@@ -154,13 +154,13 @@ for (const payoff of payoffs) {
   });
 }
 
-test("the debt collector's charity needs echoes to spend", () => {
+test("the debt collector's charity needs obols to spend", () => {
   const broke = stateWith("velvet-market", {}, { "read-the-debt-ledgers": true });
-  broke.echoes = 4;
+  broke.obols = 4;
   assert.equal(choiceAvailable(broke, "the-debt-collector", "settle-stranger"), false);
-  broke.echoes = 5;
+  broke.obols = 5;
   const { state } = resolveChoice(broke, "the-debt-collector", "settle-stranger", SUCCEED);
-  assert.equal(state.echoes, 0);
+  assert.equal(state.obols, 0);
 });
 
 test("the full salted-map arc ends with the cartographer", () => {

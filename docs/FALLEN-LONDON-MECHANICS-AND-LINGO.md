@@ -54,7 +54,7 @@ copying its writing, so every storylet stays original.
 
 | Fallen London | Role | NeathBound |
 |---|---|---|
-| Echoes | currency | **Echoes** (existing; see note below) |
+| Obols | currency | **Obols** (existing; see note below) |
 | Bazaar | shop to buy and sell | **The Exchange** |
 | Opportunity cards / the deck | random, portable encounters | **Whispers Deck** (cards are **Whispers**) |
 | Card borders: bronze / silver / gold | rarity | **tin / silver / gilt** |
@@ -69,7 +69,7 @@ copying its writing, so every storylet stays original.
 These current NeathBound names are identical to Fallen London's, not just similar:
 
 - **Tab labels:** STORY, MESSAGES, MYSELF, POSSESSIONS, BAZAAR, FATE and PLANS are Fallen London's exact tab set. Suggested: **Tales, Letters, Self, Satchel, Exchange** (already the roadmap's name), **Plans**, and drop **Fate**, since there are no payments.
-- **Echoes** is Fallen London's currency name. It's a common word, but in this setting it reads as borrowed. Consider **Chimes** or **Tallies**.
+- **Obols** is Fallen London's currency name. It's a common word, but in this setting it reads as borrowed. Consider **Chimes** or **Tallies**.
 - The four early-track titles are original, but *A Name Written in Margins* follows Fallen London's "A Name …" title pattern. The other three don't; keep new titles off that pattern.
 
 ## 2. Mechanics and numbers
@@ -150,7 +150,7 @@ Failure still grants progress, so failing is never wasted.
 
 ### Circles (factions)
 
-- **Regard** (favours) is capped at **7** per Circle. It's gained by pleasing the Circle and spent to call in rewards; a Favour is worth roughly 4 Echoes of value.
+- **Regard** (favours) is capped at **7** per Circle. It's gained by pleasing the Circle and spent to call in rewards; a Favour is worth roughly 4 Obols of value.
 - **Standing** (renown) rises slowly, almost never falls, and unlocks options.
 - A few special relationships use a separate **Connected**-style quality.
 

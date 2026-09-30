@@ -17,7 +17,7 @@ test("API creates a player with unlimited actions and persists branches", async 
   assert.equal(list.body.actions, "unlimited");
   const result = await api("POST", `/api/players/${created.body.id}/resolve`, { storyletId: "bell-under-water", branchId: "descend" });
   assert.equal(result.status, 200);
-  assert.equal(result.body.player.echoes, 20);
+  assert.equal(result.body.player.obols, 20);
   const loaded = await api("GET", `/api/players/${created.body.id}`);
   assert.equal(loaded.body.journal.length, 2);
 });

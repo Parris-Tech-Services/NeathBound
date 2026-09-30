@@ -162,24 +162,24 @@ export const stories = {
       },
       {
         id: "sell-blinding-gem",
-        label: "Sell a Blinding Gem for Echoes",
+        label: "Sell a Blinding Gem for Obols",
         requirements: [{ type: "item", id: "blinding-gem", op: ">=", value: 1 }],
-        success: "The merchant weighs the gem carefully, then hands you a heavy purse of Echoes.",
-        successEffects: [{ type: "item", id: "blinding-gem", amount: -1 }, { type: "echoes", amount: 12 }]
+        success: "The merchant weighs the gem carefully, then hands you a heavy purse of Obols.",
+        successEffects: [{ type: "item", id: "blinding-gem", amount: -1 }, { type: "obols", amount: 12 }]
       },
       {
         id: "buy-velvet-cloak",
         label: "Purchase a Velvet Cloak",
-        requirements: [{ type: "echoes", op: ">=", value: 20 }],
+        requirements: [{ type: "obols", op: ">=", value: 20 }],
         success: "It is heavy, soft, and smells faintly of smoke. It will serve you well in the dark.",
-        successEffects: [{ type: "echoes", amount: -20 }, { type: "item", id: "velvet-cloak", amount: 1 }]
+        successEffects: [{ type: "obols", amount: -20 }, { type: "item", id: "velvet-cloak", amount: 1 }]
       },
       {
         id: "buy-spectacles",
         label: "Purchase Smoked Spectacles",
-        requirements: [{ type: "echoes", op: ">=", value: 15 }],
+        requirements: [{ type: "obols", op: ">=", value: 15 }],
         success: "They adjust your vision to the gloom.",
-        successEffects: [{ type: "echoes", amount: -15 }, { type: "item", id: "spectacles", amount: 1 }]
+        successEffects: [{ type: "obols", amount: -15 }, { type: "item", id: "spectacles", amount: 1 }]
       }
     ]
   },
@@ -279,7 +279,7 @@ export const stories = {
         success: "You find a submerged door and unlock it. Something on the other side learns your name.",
         failure: "The water closes over your head. You return with a pocketful of black sand.",
         successEffects: [
-          { type: "echoes", amount: 8 },
+          { type: "obols", amount: 8 },
           { type: "item", id: "black-sand", amount: 1 },
           { type: "location", id: "hollow-archive" }
         ],
@@ -316,7 +316,7 @@ export const stories = {
         requirements: [],
         success: "The map accepts the name and opens a red road to the market.",
         successEffects: [
-          { type: "echoes", amount: 4 },
+          { type: "obols", amount: 4 },
           { type: "location", id: "velvet-market" }
         ],
         failureEffects: []
@@ -350,7 +350,7 @@ export const stories = {
         failure: "The face slips. The tailor charges you for the embarrassment.",
         successEffects: [
           { type: "item", id: "silver-thimble", amount: 1 },
-          { type: "echoes", amount: 6 },
+          { type: "obols", amount: 6 },
           { type: "location", id: "velvet-market" }
         ],
         failureEffects: [{ type: "location", id: "velvet-market" }]
@@ -393,7 +393,7 @@ export const stories = {
         success: "The market exhales. You keep the loose end; it may be useful.",
         successEffects: [
           { type: "item", id: "red-thread-end", amount: 1 },
-          { type: "echoes", amount: 4 },
+          { type: "obols", amount: 4 },
           { type: "location", id: "velvet-market" }
         ],
         failureEffects: []
@@ -447,7 +447,7 @@ export const stories = {
         requirements: [],
         success: "You find a route back to the quay and a page with your handwriting.",
         successEffects: [
-          { type: "echoes", amount: 12 },
+          { type: "obols", amount: 12 },
           { type: "item", id: "unfinished-page", amount: 1 },
           { type: "location", id: "lantern-quay" }
         ],
@@ -460,7 +460,7 @@ export const stories = {
         success: "The city applauds politely. You gain a title you did not request.",
         successEffects: [
           { type: "quality", id: "poise", amount: 1 },
-          { type: "echoes", amount: 3 },
+          { type: "obols", amount: 3 },
           { type: "location", id: "velvet-market" }
         ],
         failureEffects: []
@@ -488,7 +488,7 @@ export const stories = {
         label: "Trade a rumour of your own",
         success: "The merchants accept the exchange and point you toward the Gardens.",
         successEffects: [
-          { type: "echoes", amount: 4 },
+          { type: "obols", amount: 4 },
           { type: "unlock-location", id: "clockwork-gardens" },
           { type: "menace", id: "suspicion", amount: 1 },
           { type: "location", id: "clockwork-gardens" }
@@ -510,7 +510,7 @@ export const stories = {
   "catalogue-the-dark": {
     title: "Catalogue the Dark",
     kicker: "An unpaid scholarly errand",
-    text: "A shelf has been filled with darkness instead of books. The archive will pay you in echoes if you assign each patch a proper title.",
+    text: "A shelf has been filled with darkness instead of books. The archive will pay you in obols if you assign each patch a proper title.",
     challenge: { quality: "insight", difficulty: 7 },
     choices: [
       {
@@ -519,7 +519,7 @@ export const stories = {
         success: "The shelf becomes legible. The archive records your name with a respectful error.",
         failure: "The darkness gives you a title instead.",
         successEffects: [
-          { type: "echoes", amount: 15 },
+          { type: "obols", amount: 15 },
           { type: "item", id: "ink-of-absence", amount: 1 },
           { type: "location", id: "hollow-archive" }
         ],
@@ -590,7 +590,7 @@ export const stories = {
         success: "The city looks almost kind in its light.",
         successEffects: [
           { type: "item", id: "small-sun", amount: 1 },
-          { type: "echoes", amount: 9 },
+          { type: "obols", amount: 9 },
           { type: "menace", id: "dread", amount: 1 },
           { type: "location", id: "lantern-quay" }
         ],
@@ -638,7 +638,7 @@ export const stories = {
         failure: "You read a great deal of salt. It says, consistently, salt.",
         successEffects: [
           { type: "quality", id: "insight", amount: 1 },
-          { type: "echoes", amount: 3 },
+          { type: "obols", amount: 3 },
           { type: "location", id: "lantern-quay" }
         ],
         failureEffects: [{ type: "location", id: "lantern-quay" }]
@@ -661,7 +661,7 @@ export const stories = {
         successEffects: [
           { type: "item", id: "black-sand", amount: -1 },
           { type: "quality", id: "insight", amount: 1 },
-          { type: "echoes", amount: 2 },
+          { type: "obols", amount: 2 },
           { type: "location", id: "velvet-market" }
         ],
         failureEffects: [
@@ -676,7 +676,7 @@ export const stories = {
         success: "She weighs it on a scale with no pans and pays in warm coins. \"Come back when the bell has more to say.\"",
         successEffects: [
           { type: "item", id: "black-sand", amount: -1 },
-          { type: "echoes", amount: 6 },
+          { type: "obols", amount: 6 },
           { type: "location", id: "velvet-market" }
         ],
         failureEffects: []
@@ -698,7 +698,7 @@ export const stories = {
         failure: "The gate opens onto a corridor that is slightly longer each time you look down it. You retreat with the key still in your hand and the distinct feeling of having been measured.",
         successEffects: [
           { type: "item", id: "archive-key", amount: -1 },
-          { type: "echoes", amount: 14 },
+          { type: "obols", amount: 14 },
           { type: "quality", id: "shadow", amount: 1 },
           { type: "flag", id: "read-the-debt-ledgers", value: true },
           { type: "location", id: "hollow-archive" }
@@ -713,7 +713,7 @@ export const stories = {
         successEffects: [
           { type: "item", id: "archive-key", amount: -1 },
           { type: "quality", id: "poise", amount: 1 },
-          { type: "echoes", amount: 4 },
+          { type: "obols", amount: 4 },
           { type: "location", id: "velvet-market" }
         ],
         failureEffects: []
@@ -736,7 +736,7 @@ export const stories = {
         successEffects: [
           { type: "item", id: "unfinished-page", amount: -1 },
           { type: "quality", id: "insight", amount: 1 },
-          { type: "echoes", amount: 10 },
+          { type: "obols", amount: 10 },
           { type: "location", id: "hollow-archive" }
         ],
         failureEffects: [{ type: "location", id: "hollow-archive" }]
@@ -750,7 +750,7 @@ export const stories = {
           { type: "item", id: "unfinished-page", amount: -1 },
           { type: "item", id: "silver-thimble", amount: -1 },
           { type: "quality", id: "poise", amount: 1 },
-          { type: "echoes", amount: 18 },
+          { type: "obols", amount: 18 },
           { type: "flag", id: "bound-into-the-index", value: true },
           { type: "location", id: "hollow-archive" }
         ],
@@ -774,7 +774,7 @@ export const stories = {
         successEffects: [
           { type: "item", id: "small-sun", amount: -1 },
           { type: "quality", id: "shadow", amount: 1 },
-          { type: "echoes", amount: 12 },
+          { type: "obols", amount: 12 },
           { type: "flag", id: "kept-the-sun-promise", value: true },
           { type: "location", id: "clockwork-gardens" }
         ],
@@ -789,7 +789,7 @@ export const stories = {
         requirements: [],
         success: "You buy candles to keep the patient dark at a polite distance. It sits outside your door each night and does not complain.",
         successEffects: [
-          { type: "echoes", amount: -3 },
+          { type: "obols", amount: -3 },
           { type: "location", id: "lantern-quay" }
         ],
         failureEffects: []
@@ -846,7 +846,7 @@ export const stories = {
         success: "You catch the morning in your cupped hands. It fits in your pocket, just about, and casts a shadow that will want returning.",
         successEffects: [
           { type: "item", id: "small-sun", amount: 1 },
-          { type: "echoes", amount: 4 },
+          { type: "obols", amount: 4 },
           { type: "location", id: "clockwork-gardens" }
         ],
         failureEffects: []
@@ -880,7 +880,7 @@ export const stories = {
         successEffects: [
           { type: "item", id: "bright-memory", amount: -1 },
           { type: "quality", id: "insight", amount: 1 },
-          { type: "echoes", amount: 15 },
+          { type: "obols", amount: 15 },
           { type: "location", id: "clockwork-gardens" }
         ],
         failureEffects: [{ type: "location", id: "clockwork-gardens" }]
@@ -913,7 +913,7 @@ export const stories = {
         successEffects: [
           { type: "item", id: "ink-of-absence", amount: -1 },
           { type: "quality", id: "shadow", amount: 1 },
-          { type: "echoes", amount: 3 },
+          { type: "obols", amount: 3 },
           { type: "location", id: "velvet-market" }
         ],
         failureEffects: []
@@ -925,7 +925,7 @@ export const stories = {
         success: "The tailor pays generously and does not say what it is for. Later you notice one of the borrowed faces on display has no name tag.",
         successEffects: [
           { type: "item", id: "ink-of-absence", amount: -1 },
-          { type: "echoes", amount: 11 },
+          { type: "obols", amount: 11 },
           { type: "location", id: "velvet-market" }
         ],
         failureEffects: []
@@ -948,7 +948,7 @@ export const stories = {
         success: "She holds it up to a lamp for a long time. Then she pays you more than it is worth and less than it means, and folds it away somewhere near her heart.",
         successEffects: [
           { type: "item", id: "salted-map", amount: -1 },
-          { type: "echoes", amount: 10 },
+          { type: "obols", amount: 10 },
           { type: "flag", id: "cartographer-reckoned", value: true },
           { type: "location", id: "lantern-quay" }
         ],
@@ -985,10 +985,10 @@ export const stories = {
       {
         id: "settle-stranger",
         label: "Quietly settle a stranger's small debt",
-        requirements: [{ type: "echoes", op: ">=", value: 5 }],
+        requirements: [{ type: "obols", op: ">=", value: 5 }],
         success: "You pick a name you will never meet and pay what it owes. The collector crosses it out with visible reluctance and leaves you alone for good.",
         successEffects: [
-          { type: "echoes", amount: -5 },
+          { type: "obols", amount: -5 },
           { type: "quality", id: "poise", amount: 1 },
           { type: "flag", id: "collector-answered", value: true },
           { type: "location", id: "velvet-market" }
@@ -1003,7 +1003,7 @@ export const stories = {
         success: "You name three debts he did not know about. He pays you from a pocket full of other people's money and pretends you never met.",
         failure: "He already knew all three, and now he knows you tried to sell them. He smiles, writes something down and moves on.",
         successEffects: [
-          { type: "echoes", amount: 16 },
+          { type: "obols", amount: 16 },
           { type: "quality", id: "shadow", amount: 1 },
           { type: "flag", id: "collector-answered", value: true },
           { type: "location", id: "velvet-market" }
@@ -1027,7 +1027,7 @@ export const stories = {
         requirements: [],
         success: "An old man asks you what it was like to forget everything. You tell him honestly. He weeps a little, thanks you, and leaves a donation for the archive in your name.",
         successEffects: [
-          { type: "echoes", amount: 8 },
+          { type: "obols", amount: 8 },
           { type: "quality", id: "insight", amount: 1 },
           { type: "location", id: "hollow-archive" }
         ],
@@ -1042,7 +1042,7 @@ export const stories = {
         failure: "Your entry is currently on loan. The librarian cannot say to whom.",
         successEffects: [
           { type: "flag", id: "read-own-entry", value: true },
-          { type: "echoes", amount: 6 },
+          { type: "obols", amount: 6 },
           { type: "location", id: "hollow-archive" }
         ],
         failureEffects: [{ type: "location", id: "hollow-archive" }]
@@ -1065,7 +1065,7 @@ export const stories = {
         success: "\"For sleeping,\" she says. \"Somebody has to. The city lends its dark to whoever needs it most, and forgets to ask for it back.\" You leave understanding the lamps a little better.",
         successEffects: [
           { type: "quality", id: "insight", amount: 1 },
-          { type: "echoes", amount: 6 },
+          { type: "obols", amount: 6 },
           { type: "flag", id: "gardener-thanked", value: true },
           { type: "location", id: "clockwork-gardens" }
         ],
@@ -1078,7 +1078,7 @@ export const stories = {
         success: "She hands you a pair of brass shears and shows you which leaves are telling the time wrongly. It is careful, quiet work, and she pays you for it fairly.",
         successEffects: [
           { type: "quality", id: "poise", amount: 1 },
-          { type: "echoes", amount: 10 },
+          { type: "obols", amount: 10 },
           { type: "flag", id: "gardener-thanked", value: true },
           { type: "location", id: "clockwork-gardens" }
         ],
@@ -1133,7 +1133,7 @@ export const stories = {
         failure: "You spend an hour mapping what turns out to be a smear on the lens. The astronomers are very kind about it.",
         successEffects: [
           { type: "quality", id: "insight", amount: 1 },
-          { type: "echoes", amount: 9 },
+          { type: "obols", amount: 9 },
           { type: "flag", id: "found-the-far-crack", value: true },
           { type: "location", id: "glass-observatory" }
         ],
@@ -1143,9 +1143,9 @@ export const stories = {
         id: "carry-plates",
         label: "Carry photographic plates for the astronomers",
         requirements: [],
-        success: "The plates are heavy, cold and irreplaceable. You drop none of them. The chief astronomer pays you in echoes and in the rare compliment of being asked back.",
+        success: "The plates are heavy, cold and irreplaceable. You drop none of them. The chief astronomer pays you in obols and in the rare compliment of being asked back.",
         successEffects: [
-          { type: "echoes", amount: 6 },
+          { type: "obols", amount: 6 },
           { type: "location", id: "glass-observatory" }
         ],
         failureEffects: []
@@ -1167,7 +1167,7 @@ export const stories = {
         failure: "The rafters are further apart than they looked from the floor. You come down the slow way, without the lamp and with a new respect for gravity.",
         successEffects: [
           { type: "quality", id: "nerve", amount: 1 },
-          { type: "echoes", amount: 12 },
+          { type: "obols", amount: 12 },
           { type: "location", id: "glass-observatory" }
         ],
         failureEffects: [{ type: "location", id: "glass-observatory" }]
@@ -1201,7 +1201,7 @@ export const stories = {
         success: "For a moment the small sun and the thin light are the same colour. Then the thread of light flickers: once, twice, three times. Someone, very far above, has seen you. The small sun goes out in your hands, entirely spent.",
         successEffects: [
           { type: "item", id: "small-sun", amount: -1 },
-          { type: "echoes", amount: 20 },
+          { type: "obols", amount: 20 },
           { type: "flag", id: "signalled-the-surface", value: true },
           { type: "flag", id: "far-crack-answered", value: true },
           { type: "location", id: "glass-observatory" }
@@ -1215,7 +1215,7 @@ export const stories = {
         success: "It takes all night. When the chart is finished the crack has a name, a number, and a column of careful measurements. Your name is in the margin as its discoverer.",
         successEffects: [
           { type: "quality", id: "insight", amount: 1 },
-          { type: "echoes", amount: 8 },
+          { type: "obols", amount: 8 },
           { type: "flag", id: "far-crack-answered", value: true },
           { type: "location", id: "glass-observatory" }
         ],
@@ -1243,7 +1243,7 @@ export const stories = {
         successEffects: [
           { type: "item", id: "brass-key", amount: -1 },
           { type: "quality", id: "nerve", amount: 1 },
-          { type: "echoes", amount: 10 },
+          { type: "obols", amount: 10 },
           { type: "flag", id: "returned-the-brass-key", value: true },
           { type: "location", id: "lantern-quay" }
         ],
@@ -1277,7 +1277,7 @@ export const stories = {
         failure: "It leads you in a slow circle back to where you started. The thread seems pleased with itself.",
         successEffects: [
           { type: "item", id: "red-thread-end", amount: -1 },
-          { type: "echoes", amount: 9 },
+          { type: "obols", amount: 9 },
           { type: "quality", id: "insight", amount: 1 },
           { type: "location", id: "velvet-market" }
         ],
@@ -1330,10 +1330,10 @@ export const stories = {
       {
         id: "pay",
         label: "Settle the matter of your 'fees'",
-        requirements: [{ type: "echoes", op: ">=", value: 15 }],
+        requirements: [{ type: "obols", op: ">=", value: 15 }],
         success: "Coins change hands. The ledger closes. Nobody says the word bribe, which is how you know it was one.",
         successEffects: [
-          { type: "echoes", amount: -15 },
+          { type: "obols", amount: -15 },
           { type: "menace", id: "suspicion", amount: -6 },
           { type: "location", id: "lantern-quay" }
         ],
@@ -1374,10 +1374,10 @@ export const stories = {
       {
         id: "pay",
         label: "Pay for the private room with the window",
-        requirements: [{ type: "echoes", op: ">=", value: 15 }],
+        requirements: [{ type: "obols", op: ">=", value: 15 }],
         success: "Light from the quay, a real bed, and the nurse's full attention. You are discharged within the week.",
         successEffects: [
-          { type: "echoes", amount: -15 },
+          { type: "obols", amount: -15 },
           { type: "menace", id: "dread", amount: -6 },
           { type: "location", id: "lantern-quay" }
         ],
@@ -1418,10 +1418,10 @@ export const stories = {
       {
         id: "pay",
         label: "Pay for the good thread",
-        requirements: [{ type: "echoes", op: ">=", value: 15 }],
+        requirements: [{ type: "obols", op: ">=", value: 15 }],
         success: "Silk instead of twine, and a surgeon in a better mood. You heal quickly and cleanly.",
         successEffects: [
-          { type: "echoes", amount: -15 },
+          { type: "obols", amount: -15 },
           { type: "menace", id: "wounds", amount: -6 },
           { type: "location", id: "lantern-quay" }
         ],
@@ -1462,10 +1462,10 @@ export const stories = {
       {
         id: "pay",
         label: "Buy a better story to replace the old one",
-        requirements: [{ type: "echoes", op: ">=", value: 15 }],
+        requirements: [{ type: "obols", op: ">=", value: 15 }],
         success: "A generous dinner, a rumour placed in the right ear, and the court has a new scandal to try.",
         successEffects: [
-          { type: "echoes", amount: -15 },
+          { type: "obols", amount: -15 },
           { type: "menace", id: "scandal", amount: -6 },
           { type: "location", id: "lantern-quay" }
         ],
@@ -1499,8 +1499,8 @@ export const cards = {
       }
     ]
   },
-  "card-lost-echoes": {
-    id: "card-lost-echoes",
+  "card-lost-obols": {
+    id: "card-lost-obols",
     title: "Glint in the Muck",
     text: "Something catches the scant light near your boots.",
     weight: 8,
@@ -1510,8 +1510,8 @@ export const cards = {
         id: "take",
         label: "Take it",
         challenge: false,
-        success: "A handful of stray Echoes.",
-        successEffects: [{ type: "echoes", delta: 2 }]
+        success: "A handful of stray Obols.",
+        successEffects: [{ type: "obols", delta: 2 }]
       }
     ]
   }
@@ -1520,7 +1520,7 @@ export const cards = {
 export const decks = {
   "whispers": {
     id: "whispers",
-    cardIds: ["card-a-stranger-approaches", "card-lost-echoes"]
+    cardIds: ["card-a-stranger-approaches", "card-lost-obols"]
   }
 };
 

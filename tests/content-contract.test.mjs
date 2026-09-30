@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import { locations, stories } from "../src/game/content.js";
 
 const operators = new Set(["==", "!=", ">", ">=", "<", "<="]);
-const requirementTypes = new Set(["quality", "item", "flag", "echoes", "location", "world-quality"]);
-const effectTypes = new Set(["quality", "set-quality", "echoes", "item", "flag", "location", "unlock-location", "menace"]);
+const requirementTypes = new Set(["quality", "item", "flag", "obols", "location", "world-quality"]);
+const effectTypes = new Set(["quality", "set-quality", "obols", "item", "flag", "location", "unlock-location", "menace"]);
 
 function asRequirements(value) {
   if (!value) return [];
@@ -72,7 +72,7 @@ test("requirements and effects use supported declarative contracts", () => {
       for (const requirement of requirements) {
         assert.ok(requirementTypes.has(requirement.type), `${owner} has unsupported requirement ${requirement.type}`);
         assert.ok(operators.has(requirement.op ?? "=="), `${owner} has unsupported operator ${requirement.op}`);
-        if (!["echoes", "location"].includes(requirement.type)) {
+        if (!["obols", "location"].includes(requirement.type)) {
           assert.ok(requirement.id, `${owner} requirement is missing id`);
         }
         if (requirement.type === "location") {

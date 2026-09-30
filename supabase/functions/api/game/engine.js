@@ -207,8 +207,8 @@ export function describeChanges(before, after) {
     changes.push({ type: "momentum", id: "momentum", label: "Momentum", before: Number(before.momentum ?? 0), after: Number(after.momentum ?? 0), delta: Number(after.momentum ?? 0) - Number(before.momentum ?? 0) });
   }
 
-  if (Number(before.echoes ?? 0) !== Number(after.echoes ?? 0)) {
-    changes.push({ type: "echoes", id: "echoes", label: "Echoes", before: Number(before.echoes ?? 0), after: Number(after.echoes ?? 0), delta: Number(after.echoes ?? 0) - Number(before.echoes ?? 0) });
+  if (Number(before.obols ?? 0) !== Number(after.obols ?? 0)) {
+    changes.push({ type: "obols", id: "obols", label: "Obols", before: Number(before.obols ?? 0), after: Number(after.obols ?? 0), delta: Number(after.obols ?? 0) - Number(before.obols ?? 0) });
   }
 
   for (const key of new Set([...Object.keys(before.qualities ?? {}), ...Object.keys(after.qualities ?? {})])) numeric("qualities", key, title(key));

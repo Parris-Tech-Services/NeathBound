@@ -6,7 +6,7 @@
     "kind": "storylet",
     "description": "At low tide, a stairway descends into black water. A bell tolls below the last step.",
     "branches": [
-      { "id": "descend", "label": "Descend toward the bell", "challenge": { "quality": "nerve", "difficulty": 5 }, "onSuccess": "You find a submerged door and unlock it.", "onFailure": "The water closes over your head. You return with black sand.", "effects": { "echoes": 8, "items": { "black-sand": 1 }, "locationId": "hollow-archive" } },
+      { "id": "descend", "label": "Descend toward the bell", "challenge": { "quality": "nerve", "difficulty": 5 }, "onSuccess": "You find a submerged door and unlock it.", "onFailure": "The water closes over your head. You return with black sand.", "effects": { "obols": 8, "items": { "black-sand": 1 }, "locationId": "hollow-archive" } },
       { "id": "listen", "label": "Listen for the pattern", "onSuccess": "The bell's rhythm maps a route through the city.", "effects": { "qualities": { "insight": 1 } } }
     ]
   },
@@ -17,7 +17,7 @@
     "kind": "opportunity",
     "description": "Three merchants whisper about a door that opens only for people seen in the wrong place.",
     "branches": [
-      { "id": "trade-rumour", "label": "Trade a rumour of your own", "onSuccess": "The merchants point you toward the clockwork gardens.", "effects": { "echoes": 7, "menaces": { "suspicion": 1 }, "unlockLocations": ["clockwork-gardens"], "locationId": "clockwork-gardens" } },
+      { "id": "trade-rumour", "label": "Trade a rumour of your own", "onSuccess": "The merchants point you toward the clockwork gardens.", "effects": { "obols": 7, "menaces": { "suspicion": 1 }, "unlockLocations": ["clockwork-gardens"], "locationId": "clockwork-gardens" } },
       { "id": "leave", "label": "Leave before they learn your name", "onSuccess": "You leave with your name intact.", "effects": { "qualities": { "shadow": 1 } } }
     ]
   },

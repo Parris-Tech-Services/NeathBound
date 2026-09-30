@@ -60,7 +60,7 @@ test("failing Catalogue the Dark never grants its success rewards", () => {
   const state = at("hollow-archive");
   const result = resolveChoice(state, "catalogue-the-dark", "catalogue", FAIL);
   assert.equal(result.success, false);
-  assert.equal(result.state.echoes, state.echoes);
+  assert.equal(result.state.obols, state.obols);
   assert.equal(result.state.items["ink-of-absence"], undefined);
   assert.equal(result.state.menaces.dread, 1);
 });
@@ -121,11 +121,11 @@ test("the same mutation revision cannot be submitted twice sequentially", async 
   assert.equal(second.body.state.revision, 1);
 });
 
-test("one-shot Echo rewards cannot be farmed repeatedly", () => {
+test("one-shot Obol rewards cannot be farmed repeatedly", () => {
   const state = at("velvet-market");
   const first = resolveChoice(state, "red-thread", "cut", SUCCEED);
-  assert.equal(first.state.echoes, state.echoes + 4);
+  assert.equal(first.state.obols, state.obols + 4);
   const second = resolveChoice(first.state, "red-thread", "cut", SUCCEED);
   assert.match(second.error, /no longer available/i);
-  assert.equal(second.state.echoes, first.state.echoes);
+  assert.equal(second.state.obols, first.state.obols);
 });

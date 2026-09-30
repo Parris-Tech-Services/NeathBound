@@ -10,14 +10,14 @@ import { initialState as baseInitialState, normaliseState } from "../src/game/st
     return s;
   }
 
-test("quality, item, flag, echo and location requirements are evaluated", () => {
+test("quality, item, flag, obol and location requirements are evaluated", () => {
   const state = initialState();
   state.flags.invited = true;
 
   assert.equal(requirementMet(state, { type: "quality", id: "insight", op: ">=", value: 2 }), true);
   assert.equal(requirementMet(state, { type: "item", id: "salted-map", op: ">=", value: 1 }), true);
   assert.equal(requirementMet(state, { type: "flag", id: "invited", op: "==", value: true }), true);
-  assert.equal(requirementMet(state, { type: "echoes", op: ">", value: 10 }), true);
+  assert.equal(requirementMet(state, { type: "obols", op: ">", value: 10 }), true);
   assert.equal(requirementMet(state, { type: "location", op: "==", value: "lantern-quay" }), true);
 });
 
@@ -33,14 +33,14 @@ test("typed effects mutate only declared state", () => {
   const state = initialState();
   applyEffects(state, [
     { type: "quality", id: "insight", amount: 2 },
-    { type: "echoes", amount: 5 },
+    { type: "obols", amount: 5 },
     { type: "item", id: "brass-token", amount: 2 },
     { type: "flag", id: "knows-bell", value: true },
     { type: "location", id: "hollow-archive" }
   ]);
 
   assert.equal(state.qualities.insight, 4);
-  assert.equal(state.echoes, 17);
+  assert.equal(state.obols, 17);
   assert.equal(state.items["brass-token"], 2);
   assert.equal(state.flags["knows-bell"], true);
   assert.equal(state.locationId, "hollow-archive");

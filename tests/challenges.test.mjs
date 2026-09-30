@@ -74,7 +74,7 @@ test("menace 5 warns; menace 8 sends you to its area, which you cannot travel ou
 
 test("each consequence area has an escape that lowers the menace and returns you to the quay", () => {
   for (const [menace, areaId] of Object.entries(menaceAreas)) {
-    const state = { ...initialState(), locationId: areaId, echoes: 20, menaces: { ...initialState().menaces, [menace]: 8 } };
+    const state = { ...initialState(), locationId: areaId, obols: 20, menaces: { ...initialState().menaces, [menace]: 8 } };
     const storyId = locations[areaId].stories[0];
     const result = resolveChoice(state, storyId, "pay", () => 0.5);
     assert.equal(result.error, undefined, `${areaId}: ${result.error}`);

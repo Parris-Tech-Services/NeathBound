@@ -19,8 +19,8 @@ export function valueForRequirement(state, requirement, context = {}) {
       return state.items?.[requirement.id] ?? 0;
     case "flag":
       return state.flags?.[requirement.id];
-    case "echoes":
-      return state.echoes ?? 0;
+    case "obols":
+      return state.obols ?? 0;
     case "location":
       return state.locationId;
     case "world-quality":
@@ -52,8 +52,8 @@ export function applyEffect(state, effect) {
       state.menaces ??= {};
       state.menaces[effect.id] = Math.max(0, (state.menaces[effect.id] ?? 0) + Number(effect.amount ?? 0));
       break;
-    case "echoes":
-      state.echoes = Math.max(0, (state.echoes ?? 0) + Number(effect.amount ?? 0));
+    case "obols":
+      state.obols = Math.max(0, (state.obols ?? 0) + Number(effect.amount ?? 0));
       break;
     case "item": {
       const next = Math.max(0, (state.items[effect.id] ?? 0) + Number(effect.amount ?? 0));

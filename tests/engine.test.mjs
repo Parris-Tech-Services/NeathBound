@@ -12,7 +12,7 @@ function initialState() {
 
 test("actions never consume a finite action resource", () => {
   const result = resolveChoice(initialState(), "bell-under-water", "listen", () => 0.9);
-  assert.equal(result.state.echoes, 12);
+  assert.equal(result.state.obols, 12);
   assert.equal(result.state.qualities.insight, 3);
   assert.equal("actions" in result.state, false);
 });
@@ -22,7 +22,7 @@ test("challenge success applies configured effects", () => {
   assert.equal(result.success, true);
   assert.equal(result.state.items["black-sand"], 1);
   assert.equal(result.state.locationId, "hollow-archive");
-  assert.equal(result.state.echoes, 20);
+  assert.equal(result.state.obols, 20);
 });
 
 test("challenge failure applies failure effects and still advances the story", () => {
@@ -30,7 +30,7 @@ test("challenge failure applies failure effects and still advances the story", (
   assert.equal(result.success, false);
   assert.equal(result.state.locationId, "hollow-archive");
   assert.equal(result.state.items["black-sand"], 1);
-  assert.equal(result.state.echoes, 12);
+  assert.equal(result.state.obols, 12);
   assert.match(result.state.journal[0], /failure/);
 });
 

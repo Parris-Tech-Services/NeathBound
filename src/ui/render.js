@@ -165,9 +165,9 @@ const inventoryHtml = inventory.length
     const changesList = (outcome.changes ?? []).map((change) => {
       const name = formatName(change.label ?? change.id);
       if (change.message) return '<li class="outcome-change occurrence">' + escapeHtml(change.message) + '</li>';
-      if (change.type === "echoes") {
+      if (change.type === "obols") {
         const verb = change.delta > 0 ? "gained" : "lost";
-        return '<li class="outcome-change ' + (change.delta > 0 ? "gain" : "loss") + '">You&apos;ve ' + verb + ' ' + Math.abs(change.delta) + ' x Echoes (new total ' + change.after + ').</li>';
+        return '<li class="outcome-change ' + (change.delta > 0 ? "gain" : "loss") + '">You&apos;ve ' + verb + ' ' + Math.abs(change.delta) + ' x Obols (new total ' + change.after + ').</li>';
       }
       if (change.type === "items") {
         const verb = change.delta > 0 ? "gained" : "lost";
@@ -243,9 +243,9 @@ const inventoryHtml = inventory.length
               '<div><strong>Fate</strong><div>0</div><small>No waiting or payment gates.</small></div>',
             '</section>',
 
-            '<section class="side-section echoes-section">',
-              '<div class="side-icon echo-icon">₠</div>',
-              '<div><strong>Echoes</strong><div>', state.echoes, '</div></div>',
+            '<section class="side-section obols-section">',
+              '<div class="side-icon obol-icon">₠</div>',
+              '<div><strong>Obols</strong><div>', state.obols, '</div></div>',
             '</section>',
 
             '<section class="outfit">',
@@ -297,7 +297,7 @@ const inventoryHtml = inventory.length
               '<div class="possessions-totals">',
                 '<span><strong>', inventoryCount, '</strong> item', inventoryCount === 1 ? '' : 's', '</span>',
                 '<span><strong>', inventory.length, '</strong> kind', inventory.length === 1 ? '' : 's', '</span>',
-                '<span><strong>₠', state.echoes, '</strong> Echoes</span>',
+                '<span><strong>₠', state.obols, '</strong> Obols</span>',
               '</div>',
             '</div>',
             '<div class="refuges-section">',
@@ -335,7 +335,7 @@ possessionCardsHtml,
                 '<h2>', escapeHtml(state.name), '</h2>',
                 '<p>Currently in <strong>', escapeHtml(location.name), '</strong>, ', escapeHtml(location.region), '.</p>',
                 '<div class="myself-summary">',
-                  '<span><strong>₠', state.echoes, '</strong> Echoes</span>',
+                  '<span><strong>₠', state.obols, '</strong> Obols</span>',
                   '<span><strong>', state.momentum ?? 0, '</strong> Momentum</span>',
                   '<span><strong>', exploredCount, '</strong> places known</span>',
                   '<span><strong>', state.journal?.length ?? 0, '</strong> memories recorded</span>',

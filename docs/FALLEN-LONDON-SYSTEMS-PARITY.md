@@ -230,7 +230,7 @@ NeathBound:
 - price/value metadata in item definitions
 - search and category filters
 
-Status: NOT IMPLEMENTED
+Status: DONE (Currencies renamed to Obols; shops, buy/sell, resource classes, and exchange conversions implemented in Velvet Market).
 
 ## 9. Menaces and consequence locations
 
@@ -330,7 +330,7 @@ Pattern:
 - lets the world feel persistent
 
 NeathBound:
-- scheduled **Echoes** / delayed replies
+- scheduled **Obols** / delayed replies
 - story can set availableAt timestamps
 - Messages tab announces arrival
 - no monetised waiting required

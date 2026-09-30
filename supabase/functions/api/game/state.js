@@ -8,7 +8,7 @@ export function initialState() {
     revision: 0,
     name: "The Unmoored",
     locationId: "the-lair",
-    echoes: 12,
+    obols: 12,
     momentum: 0,
     progress: {},
     qualities: { nerve: 2, insight: 2, poise: 1, shadow: 0 },
