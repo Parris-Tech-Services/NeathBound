@@ -70,9 +70,14 @@ export function render(app, state, handlers) {
       '</header>',
 
       '<section class="city-banner" aria-label="NeathBound city skyline">',
+        '<div class="cavern-ceiling"></div>',
         '<div class="skyline-far"></div>',
         '<div class="skyline-near"></div>',
+        '<div class="distant-towers"></div>',
+        '<div class="mist-layer"></div>',
+        '<div class="waterline"></div>',
         '<div class="city-arch"></div>',
+        '<div class="scene-focus" aria-hidden="true">✦</div>',
         '<div class="city-lamp left"></div>',
         '<div class="city-lamp right"></div>',
       '</section>',
@@ -113,6 +118,7 @@ export function render(app, state, handlers) {
         '</aside>',
 
         '<main class="story-column" id="stories">',
+          '<div class="parchment-board">',
           '<section class="featured-story parchment">',
             '<div class="feature-art" aria-hidden="true"><span>⌕</span></div>',
             '<div>',
@@ -128,6 +134,7 @@ export function render(app, state, handlers) {
             '<h3>What the city remembers</h3>',
             '<ol>', journalHtml, '</ol>',
           '</section>',
+          '</div>',
         '</main>',
 
         '<aside class="right-rail">',
@@ -157,6 +164,7 @@ export function render(app, state, handlers) {
           '</section>',
         '</aside>',
       '</div>',
+      '<footer class="site-footer"><span>NeathBound is original open-source fiction.</span><span>Play at your own pace · No waiting</span><nav aria-label="Footer"><a href="#stories">Help</a><a href="#journal">Journal</a><a href="#stories">Terms</a></nav></footer>',
     '</div>'
   ].join("");
 

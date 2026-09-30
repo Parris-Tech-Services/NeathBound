@@ -142,3 +142,93 @@ button, select { font: inherit; }
   .choice-row { grid-template-columns:1fr; }
   .go-button { width:100%; }
 }
+
+/* Art-direction pass: original cavern panorama, aged board, denser web-game scale. */
+.city-banner {
+  height: 252px;
+  background:
+    radial-gradient(ellipse at 50% 48%, rgba(207, 231, 174, .32), transparent 31%),
+    linear-gradient(180deg, #121a16 0 12%, #435d3c 40%, #93ad72 66%, #53664c 100%);
+  isolation: isolate;
+}
+.city-banner::before {
+  background:
+    radial-gradient(ellipse at 18% 56%, rgba(233, 242, 186, .35), transparent 27%),
+    radial-gradient(ellipse at 70% 48%, rgba(226, 239, 181, .28), transparent 34%),
+    linear-gradient(180deg, transparent 44%, rgba(239, 235, 178, .2) 67%, transparent 82%);
+  filter: blur(8px);
+}
+.cavern-ceiling {
+  position: absolute;
+  z-index: 5;
+  inset: 0 0 auto;
+  height: 108px;
+  background: #111813;
+  clip-path: polygon(0 0,100% 0,100% 42%,96% 38%,94% 68%,91% 45%,88% 58%,85% 31%,82% 56%,79% 40%,76% 76%,73% 46%,70% 61%,67% 34%,64% 52%,61% 29%,58% 74%,55% 43%,52% 51%,49% 27%,46% 48%,43% 39%,40% 64%,37% 36%,34% 58%,31% 31%,28% 47%,25% 33%,22% 67%,19% 43%,16% 58%,13% 28%,10% 50%,7% 35%,4% 72%,2% 44%,0 58%);
+  box-shadow: 0 14px 24px rgba(14, 22, 16, .55);
+}
+.distant-towers {
+  position: absolute;
+  z-index: 2;
+  left: 12%; right: 12%; bottom: 42px; height: 76px;
+  opacity: .42;
+  background: #506944;
+  clip-path: polygon(0 100%,0 62%,5% 62%,5% 41%,8% 41%,8% 68%,14% 68%,14% 55%,19% 55%,19% 30%,22% 30%,22% 66%,27% 66%,27% 49%,32% 49%,32% 72%,38% 72%,38% 22%,41% 22%,41% 61%,47% 61%,47% 45%,51% 45%,51% 69%,58% 69%,58% 35%,62% 35%,62% 62%,68% 62%,68% 46%,73% 46%,73% 67%,79% 67%,79% 28%,82% 28%,82% 58%,89% 58%,89% 40%,94% 40%,94% 65%,100% 65%,100% 100%);
+  filter: blur(.4px);
+}
+.mist-layer {
+  position: absolute;
+  z-index: 4;
+  left: -5%; right: -5%; bottom: 32px; height: 88px;
+  background: linear-gradient(180deg, transparent, rgba(221, 235, 176, .35) 48%, rgba(192, 215, 156, .12));
+  filter: blur(9px);
+  opacity: .9;
+}
+.waterline {
+  position: absolute;
+  z-index: 3;
+  left: 0; right: 0; bottom: 24px; height: 25px;
+  opacity: .55;
+  background: repeating-linear-gradient(171deg, transparent 0 7px, rgba(210, 231, 178, .38) 8px 9px, transparent 10px 16px);
+  transform: skewY(-1deg);
+}
+.skyline-far { z-index: 1; height: 154px; bottom: 34px; opacity: .26; background: #273925; clip-path: polygon(0 100%,0 68%,6% 68%,8% 47%,12% 60%,16% 31%,20% 61%,24% 51%,29% 66%,34% 37%,39% 62%,44% 44%,49% 65%,54% 34%,59% 59%,64% 41%,69% 66%,75% 49%,80% 60%,85% 33%,90% 61%,96% 44%,100% 60%,100% 100%); }
+.skyline-near { z-index: 6; height: 68px; bottom: 0; background: #172019; clip-path: polygon(0 100%,0 50%,7% 50%,11% 36%,16% 57%,22% 42%,29% 58%,36% 34%,42% 54%,49% 40%,55% 56%,62% 33%,68% 51%,75% 38%,82% 56%,88% 32%,94% 52%,100% 42%,100% 100%); }
+.city-arch { z-index: 7; left: 44%; bottom: 25px; width: 150px; height: 124px; background: #1b251b; opacity: .92; clip-path: polygon(0 100%,0 28%,14% 28%,20% 12%,29% 8%,37% 16%,47% 2%,56% 13%,67% 5%,78% 18%,87% 8%,100% 28%,100% 100%); }
+.city-arch::before { left: 48%; width: 58px; height: 76px; bottom: 0; background: #9caf78; box-shadow: 0 0 0 8px #1b251b; }
+.city-arch::after { left: 30px; right: 30px; top: 49px; height: 3px; background: rgba(214,231,174,.45); box-shadow: 0 19px rgba(214,231,174,.32); }
+.scene-focus { position: absolute; z-index: 8; left: 50%; top: 46%; color: #e7f1b5; font-size: 1.5rem; text-shadow: 0 0 14px #f0f4bd; transform: translate(-50%,-50%); opacity: .8; }
+.city-lamp { z-index: 9; background: #182018; }
+.city-lamp::before { background: #e8efbb; border-color: #182018; box-shadow: 0 0 19px rgba(233,241,181,.8); }
+
+.parchment-board {
+  padding: 9px;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,.16) 0 1px, transparent 2px),
+    radial-gradient(circle at 70% 74%, rgba(75,57,34,.1) 0 1px, transparent 2px),
+    linear-gradient(135deg, #9d9279, #c2b69b 48%, #8f846e);
+  background-size: 17px 19px, 23px 21px, auto;
+  border: 2px solid #6d6250;
+  box-shadow: inset 0 0 0 2px rgba(240,224,183,.35), 0 3px 0 #111, 0 9px 20px rgba(0,0,0,.28);
+}
+.parchment-board > .featured-story { margin-bottom: 9px; }
+.story-stack { gap: 8px; }
+.storylet { padding: 8px; background: rgba(224,217,193,.93); border-color: #807660; box-shadow: inset 0 0 15px rgba(81,66,42,.12); }
+.story-body > p { font-size: .76rem; }
+.choice-row { padding: 7px 0 1px; }
+.choice-copy > strong { font-size: .82rem; }
+.journal { margin-top: 9px; }
+
+.candle { width: 50px; height: 82px; border-radius: 12px 12px 16px 16px; background: linear-gradient(90deg,#9c6715 0 15%,#ffd953 26%,#c98818 74%,#82510d); border-width: 3px; box-shadow: 0 0 16px rgba(255,225,85,.5), inset -6px 0 rgba(92,49,0,.18); }
+.candle::after { content:""; position:absolute; inset:16px 7px 8px; background: repeating-linear-gradient(180deg, transparent 0 10px, rgba(83,45,6,.52) 11px 13px); opacity:.7; }
+.candle-block { align-items:flex-start; }
+.side-icon { width:42px; height:42px; background: radial-gradient(circle at 35% 30%, #ffe98a, #8e6823 50%, #2a251c 53%); border: 2px solid #ddb94d; box-shadow: inset 0 0 0 2px #332717, 0 1px 4px #000; }
+.quality-icon { background: linear-gradient(135deg,#6d3d2f,#301f1c); box-shadow: inset 0 0 0 2px rgba(242,214,163,.22), 0 1px 3px #111; }
+
+.promo-card { height: 170px; margin: 0 3px 12px; opacity: .86; }
+.welcome-panel { padding-bottom: 10px; }
+.site-footer { display:flex; justify-content:center; align-items:center; gap:18px; width:min(1160px,100%); margin: 4px auto 0; padding: 12px 10px 26px; color:#75c3ca; font: .66rem Arial,sans-serif; }
+.site-footer nav { display:flex; gap:10px; }
+.site-footer a { color:#75c3ca; text-decoration:none; }
+.site-footer a:hover { color:#e0cf7b; text-decoration:underline; }
+@media (max-width:700px) { .site-footer { flex-direction:column; gap:6px; }.parchment-board { padding:5px; }.city-banner { height:190px; }.cavern-ceiling { height:80px; }.city-arch { left:38%; transform:scale(.78); transform-origin:bottom center; } }
