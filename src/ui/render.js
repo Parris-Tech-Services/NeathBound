@@ -32,13 +32,18 @@ export function render(app, state, handlers) {
           <section class="map-panel" data-panel="map" hidden><div class="section-heading"><div><p class="eyebrow">Travel</p><h2>The city</h2></div></div><div class="location-list">${unlocked.map(([id, place]) => `<button class="location-button ${id === state.locationId ? "current" : ""}" data-location="${id}"><span><b>${place.name}</b><small>${place.region}</small></span><span>→</span></button>`).join("")}</div></section>
           <section class="journal" data-panel="journal"><div class="section-heading"><div><p class="eyebrow">Your history</p><h2>Journal</h2></div></div><ol>${state.journal.map((entry) => `<li>${escapeHtml(entry)}</li>`).join("")}</ol></section>
         </main>
+        <aside class="right-rail" aria-label="City navigation">
+          <section class="rail-section"><p class="eyebrow">Your lodgings</p><h3>The Unmoored Room</h3><p class="rail-copy">A borrowed key, a narrow bed, and a view of the underground weather.</p><button class="rail-link" data-action="journal">Open journal <span>→</span></button></section>
+          <section class="rail-section"><p class="eyebrow">Known places</p>${unlocked.map(([id, place]) => `<button class="rail-location ${id === state.locationId ? "current" : ""}" data-location="${id}"><span>${place.name}</span><small>${place.region}</small></button>`).join("")}</section>
+          <section class="rail-section"><p class="eyebrow">A small reminder</p><p class="rail-copy">Every choice leaves a mark. There is always another choice.</p></section>
+        </aside>
       </div>
       <footer><span>Neathbound is original open-source fiction.</span><span>Play at your own pace. No waiting.</span></footer>
     </div>`;
   app.querySelectorAll("[data-choice]").forEach((button) => button.addEventListener("click", () => handlers.choose(button.dataset.story, button.dataset.choice)));
   app.querySelector("[data-action=reset]").addEventListener("click", handlers.reset);
-  app.querySelector("[data-action=map]").addEventListener("click", () => togglePanel(app, "map"));
-  app.querySelector("[data-action=journal]").addEventListener("click", () => togglePanel(app, "journal"));
+  app.querySelectorAll("[data-action=map]").forEach((button) => button.addEventListener("click", () => togglePanel(app, "map")));
+  app.querySelectorAll("[data-action=journal]").forEach((button) => button.addEventListener("click", () => togglePanel(app, "journal")));
   app.querySelectorAll("[data-location]").forEach((button) => button.addEventListener("click", () => handlers.travel(button.dataset.location)));
 }
 
