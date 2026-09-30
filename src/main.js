@@ -5,28 +5,68 @@ import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20260930
 const app = document.querySelector("#app");
 const service = createGameService();
 
-async function draw(state) {
-  const resolvedState = state ?? await service.getState();
+let currentState = null;
+let pending = false;
+let outcome = null;
+let notice = null;
 
-  render(app, resolvedState, {
+function currentView() {
+  const value = (globalThis.location?.hash ?? "#story").replace(/^#/, "");
+  return ["story", "messages", "myself", "possessions", "bazaar", "plans"].includes(value) ? value : "story";
+}
+
+async function draw(state = currentState) {
+  currentState = state ?? await service.getState();
+  render(app, currentState, {
     async choose(storyId, choiceId) {
+      if (pending) return;
+      pending = true;
+      notice = null;
+      outcome = null;
+      await draw(currentState);
       try {
-        const outcome = await service.choose(storyId, choiceId);
-        if (outcome.error) return;
-        await draw(outcome.state ?? outcome);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        const response = await service.choose(storyId, choiceId, currentState.revision ?? 0);
+        currentState = response.state ?? currentState;
+        if (response.error) {
+          notice = response.error;
+          outcome = {
+            title: "That choice could not be played",
+            result: response.error,
+            success: false,
+            rejected: true,
+            changes: []
+          };
+        } else {
+          outcome = response;
+        }
       } catch (error) {
-        showError(error);
+        notice = error.message;
+      } finally {
+        pending = false;
+        await draw(currentState);
+        queueMicrotask(() => app.querySelector("#action-result")?.focus());
       }
     },
     async travel(locationId) {
+      if (pending) return;
+      pending = true;
+      notice = null;
+      await draw(currentState);
       try {
-        const nextState = await service.travel(locationId);
-        await draw(nextState.state ?? nextState);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        const response = await service.travel(locationId, currentState.revision ?? 0);
+        currentState = response.state ?? response;
+        if (response.error) notice = response.error;
       } catch (error) {
-        showError(error);
+        notice = error.message;
+      } finally {
+        pending = false;
+        await draw(currentState);
       }
+    },
+    continue() {
+      outcome = null;
+      notice = null;
+      draw(currentState);
     },
     bookmark(storyId) {
       const preferences = loadPreferences();
@@ -34,11 +74,11 @@ async function draw(state) {
         ? preferences.bookmarks.filter((id) => id !== storyId)
         : [...preferences.bookmarks, storyId];
       savePreferences(preferences);
-      draw();
+      draw(currentState);
     },
     outfit(outfitId) {
       savePreferences({ ...loadPreferences(), outfit: outfitId });
-      draw();
+      draw(currentState);
     },
     editNote(noteKey) {
       const preferences = loadPreferences();
@@ -47,27 +87,47 @@ async function draw(state) {
       if (next === null) return;
       preferences.notes[noteKey] = next.trim();
       savePreferences(preferences);
-      draw();
+      draw(currentState);
+    },
+    navigate(view) {
+      globalThis.location.hash = view;
     },
     async reset() {
-      if (!window.confirm("Begin a new life? Your story will be replaced.")) return;
+      if (pending || !window.confirm("Begin a new life? Your story will be replaced.")) return;
+      pending = true;
+      await draw(currentState);
       try {
-        const nextState = await service.reset();
-        await draw(nextState.state ?? nextState);
+        currentState = await service.reset();
+        outcome = null;
+        notice = "A new life has begun.";
       } catch (error) {
-        showError(error);
+        notice = error.message;
+      } finally {
+        pending = false;
+        await draw(currentState);
       }
     }
+  }, {
+    view: currentView(),
+    pending,
+    outcome,
+    notice,
+    mode: service.mode ?? "local"
   });
 }
 
 function showError(error) {
   console.error(error);
-  const message = document.createElement("p");
-  message.className = "runtime-error";
-  message.setAttribute("role", "alert");
-  message.textContent = `The city is temporarily unreachable: ${error.message}`;
-  app.prepend(message);
+  notice = error.message;
+  if (currentState) draw(currentState);
+  else {
+    const message = document.createElement("p");
+    message.className = "runtime-error";
+    message.setAttribute("role", "alert");
+    message.textContent = `The city is temporarily unreachable: ${error.message}`;
+    app.prepend(message);
+  }
 }
 
+globalThis.addEventListener?.("hashchange", () => draw(currentState));
 draw().catch(showError);
