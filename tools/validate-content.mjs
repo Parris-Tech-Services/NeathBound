@@ -1,7 +1,7 @@
 import { locations, stories } from "../src/game/content.js";
 
 const effectTypes = new Set(["quality", "set-quality", "obols", "item", "flag", "location", "menace", "unlock-location", "momentum", "global-flag", "acquaintance"]);
-const requirementTypes = new Set(["quality", "item", "flag", "obols", "location", "world-quality"]);
+const requirementTypes = new Set(["quality", "item", "flag", "obols", "location", "world-quality", "menace"]);
 const errors = [];
 function requirements(value) {
   if (Array.isArray(value)) return value;

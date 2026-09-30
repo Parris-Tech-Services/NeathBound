@@ -298,6 +298,10 @@ window.addEventListener("neathbound:enter", () => {
   startGame();
 });
 
+if (window.__neathboundEntered || new URLSearchParams(window.location.search).get("autoplay") === "1") {
+  startGame();
+}
+
 document.addEventListener("visibilitychange", () => {
   if (started && document.visibilityState === "visible" && !pending && !lastOutcome) {
     draw().catch(showError);
