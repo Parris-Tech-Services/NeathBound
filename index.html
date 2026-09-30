@@ -303,6 +303,7 @@
     <noscript>
       <p style="margin:2rem;color:#eee8dc;font-family:Georgia,serif;text-align:center">NeathBound needs JavaScript enabled to enter the city.</p>
     </noscript>
+    <script type="module" src="./src/main.js?v=20260930-18"></script>
     <script type="module">
       const landing = document.querySelector("#landing-screen");
       const boot = document.querySelector("#boot-screen");
@@ -320,22 +321,13 @@
         document.querySelector(".landing-note").textContent = "Your previous progress was found on this device.";
       }
 
-      let loading = false;
-      async function enterGame() {
-        if (loading) return;
-        loading = true;
+      let entering = false;
+      function enterGame() {
+        if (entering) return;
+        entering = true;
         landing.hidden = true;
         boot.hidden = false;
-        try {
-          await import("./src/main.js?v=20260930-18");
-        } catch (error) {
-          console.error(error);
-          boot.hidden = true;
-          landing.hidden = false;
-          loading = false;
-          const note = document.querySelector(".landing-note");
-          note.textContent = "The city could not be opened. Please reload and try again.";
-        }
+        window.dispatchEvent(new CustomEvent("neathbound:enter"));
       }
 
       enter.addEventListener("click", enterGame);
