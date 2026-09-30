@@ -7,7 +7,7 @@ const operators = {
   "<=": (actual, expected) => Number(actual) <= Number(expected)
 };
 
-export function valueForRequirement(state, requirement) {
+export function valueForRequirement(state, requirement, context = {}) {
   switch (requirement.type) {
     case "quality":
       return state.qualities?.[requirement.id] ?? 0;
@@ -19,19 +19,21 @@ export function valueForRequirement(state, requirement) {
       return state.echoes ?? 0;
     case "location":
       return state.locationId;
+    case "world-quality":
+      return context.worldQualities?.[requirement.id] ?? state.worldQualities?.[requirement.id] ?? 0;
     default:
       return undefined;
   }
 }
 
-export function requirementMet(state, requirement) {
+export function requirementMet(state, requirement, context = {}) {
   const op = operators[requirement.op ?? "=="];
   if (!op) return false;
-  return op(valueForRequirement(state, requirement), requirement.value);
+  return op(valueForRequirement(state, requirement, context), requirement.value);
 }
 
-export function requirementsMet(state, requirements = []) {
-  return requirements.every((requirement) => requirementMet(state, requirement));
+export function requirementsMet(state, requirements = [], context = {}) {
+  return requirements.every((requirement) => requirementMet(state, requirement, context));
 }
 
 export function applyEffect(state, effect) {
