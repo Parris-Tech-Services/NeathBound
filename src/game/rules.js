@@ -1,3 +1,5 @@
+import { effectiveQualityValue } from "./systems.js?v=20260930-15";
+
 const operators = {
   "==": (actual, expected) => actual === expected,
   "!=": (actual, expected) => actual !== expected,
@@ -94,7 +96,7 @@ export function applyEffects(state, effects = []) {
 export function resolveChallenge(state, challenge, random = Math.random) {
   if (!challenge) return { success: true, roll: null, total: null, quality: null };
   const die = Math.floor(random() * 10) + 1;
-  const quality = state.qualities?.[challenge.quality] ?? 0;
+  const quality = effectiveQualityValue(state, challenge.quality);
   const total = die + quality;
   return { success: total >= challenge.difficulty, roll: die, total, quality };
 }
