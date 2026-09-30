@@ -92,6 +92,28 @@ async function draw(state = currentState) {
     navigate(view) {
       globalThis.location.hash = view;
     },
+    async transact(kind, itemId) {
+      if (pending) return;
+      pending = true;
+      outcome = null;
+      notice = null;
+      await draw(currentState);
+      try {
+        const response = await service[kind](itemId, currentState.revision ?? 0);
+        currentState = response.state ?? currentState;
+        if (response.error) {
+          outcome = { title: "Transaction refused", result: response.error, rejected: true, success: false, changes: [] };
+        } else {
+          outcome = response;
+        }
+      } catch (error) {
+        notice = error.message;
+      } finally {
+        pending = false;
+        await draw(currentState);
+        queueMicrotask(() => app.querySelector("#action-result")?.focus());
+      }
+    },
     async reset() {
       if (pending || !window.confirm("Begin a new life? Your story will be replaced.")) return;
       pending = true;
