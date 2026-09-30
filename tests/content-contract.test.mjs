@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import { locations, stories } from "../src/game/content.js";
 
 const operators = new Set(["==", "!=", ">", ">=", "<", "<="]);
-const requirementTypes = new Set(["quality", "item", "flag", "echoes", "location", "world-quality"]);
-const effectTypes = new Set(["quality", "set-quality", "echoes", "item", "flag", "location", "unlock-location", "menace"]);
+const requirementTypes = new Set(["quality", "menace", "item", "flag", "echoes", "location", "world-quality"]);
+const effectTypes = new Set(["quality", "set-quality", "menace", "echoes", "item", "flag", "location", "unlock-location", "momentum", "global-flag", "acquaintance"]);
 
 function asRequirements(value) {
   if (!value) return [];
