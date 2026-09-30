@@ -113,6 +113,47 @@ test("New life resets the character", async () => {
   await context.close();
 });
 
+
+test("real tabs expose Bazaar and Possessions actions", async () => {
+  const { context, page, problems } = await openGame();
+
+  await page.locator('[data-tab="bazaar"]').click();
+  await page.waitForSelector('[data-system-action="buy"]');
+  assert.match(await page.locator(".secondary-screen").innerText(), /Bazaar/);
+
+  const bandage = page.locator('[data-system-action="buy"][data-item-id="bandage-roll"]');
+  await bandage.click();
+  await page.waitForSelector("[data-action=onwards]");
+  assert.match(await page.locator(".outcome-panel").innerText(), /Bandage Roll/i);
+  await page.locator("[data-action=onwards]").click();
+
+  await page.locator('[data-tab="possessions"]').click();
+  await page.waitForSelector(".inventory-grid");
+  assert.match(await page.locator(".secondary-screen").innerText(), /Bandage Roll/i);
+  assert.deepEqual(problems, []);
+  await context.close();
+});
+
+test("opportunity cards draw into the hand and can be discarded", async () => {
+  const { context, page, problems } = await openGame();
+
+  await page.locator('[data-system-action="draw-card"]').click();
+  await page.waitForSelector("[data-action=onwards]");
+  await page.locator("[data-action=onwards]").click();
+  await page.waitForSelector(".opportunity-card");
+
+  const saveAfterDraw = await readSave(page);
+  assert.equal(saveAfterDraw.hand.length, 1);
+
+  await page.locator('[data-system-action="discard-card"]').first().click();
+  await page.waitForSelector("[data-action=onwards]");
+  const saveAfterDiscard = await readSave(page);
+  assert.equal(saveAfterDiscard.hand.length, 0);
+  assert.equal(saveAfterDiscard.discard.length, 1);
+  assert.deepEqual(problems, []);
+  await context.close();
+});
+
 test("accessibility audit (axe-core)", async (t) => {
   const { context, page } = await openGame();
   const axeSource = await readFile(createRequire(import.meta.url).resolve("axe-core/axe.min.js"), "utf8");
