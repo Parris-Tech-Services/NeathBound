@@ -2,17 +2,12 @@ import { config } from "../config.js?v=20260930-12";
 import { LocalGameService } from "./local-game-service.js?v=20260930-12";
 import { SupabaseGameService } from "./supabase-game-service.js?v=20260930-12";
 
-// Online (Supabase) by default; ?api=local forces offline play.
 export function createGameService({ settings = config, search = globalThis.location?.search ?? "", storage = globalThis.localStorage } = {}) {
   const forceLocal = new URLSearchParams(search).get("api") === "local" || !settings.supabaseUrl;
   if (forceLocal) return new LocalGameService(storage);
   return new FallbackGameService(new SupabaseGameService(settings, storage), () => new LocalGameService(storage));
 }
 
-// Tries the online service on first contact; if the backend is unreachable
-// (or paused), the whole session switches to offline play with a local save.
-// Once online, later errors are shown to the player rather than silently
-// switching saves mid-story.
 export class FallbackGameService {
   constructor(online, makeOffline) {
     this.active = online;
@@ -35,15 +30,13 @@ export class FallbackGameService {
     return this.active.getState();
   }
 
-  choose(storyId, choiceId) {
-    return this.active.choose(storyId, choiceId);
-  }
-
-  travel(locationId) {
-    return this.active.travel(locationId);
-  }
-
-  reset() {
-    return this.active.reset();
-  }
+  choose(storyId, choiceId, revision) { return this.active.choose(storyId, choiceId, revision); }
+  travel(locationId, revision) { return this.active.travel(locationId, revision); }
+  buy(itemId, revision) { return this.active.buy(itemId, revision); }
+  sell(itemId, revision) { return this.active.sell(itemId, revision); }
+  equip(itemId, revision) { return this.active.equip(itemId, revision); }
+  recover(menaceId, revision) { return this.active.recover(menaceId, revision); }
+  drawOpportunity(revision) { return this.active.drawOpportunity(revision); }
+  discardOpportunity(storyId, revision) { return this.active.discardOpportunity(storyId, revision); }
+  reset() { return this.active.reset(); }
 }
