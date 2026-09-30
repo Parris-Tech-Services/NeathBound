@@ -1,8 +1,10 @@
 export const SAVE_KEY = "neathbound.save.v3";
-export const LEGACY_SAVE_KEYS = ["neathbound.save.v2", "neathbound.save.v1"];
+export const LEGACY_SAVE_KEY = "neathbound.save.v1";
+export const LEGACY_SAVE_KEYS = ["neathbound.save.v2", LEGACY_SAVE_KEY];
 const MENACE_IDS = ["dread", "scandal", "wounds", "suspicion"];
 
 export function initialState() {
+  const equipment = { coat: null, tool: null, charm: null };
   return {
     version: 3,
     revision: 0,
@@ -15,13 +17,22 @@ export function initialState() {
     items: { "salted-map": 1, "brass-key": 1 },
     unlockedLocations: ["lantern-quay", "velvet-market", "hollow-archive"],
     acquaintances: [],
-    flags: {},
+    equipment,
+    flags: {
+      "__revision": 0,
+      "__momentum": 0,
+      "__globalFlags": {},
+      "__equipment": equipment,
+      "__events": [],
+      "__hand": [],
+      "__discard": []
+    },
     globalFlags: {},
     hand: [],
     discard: [],
     journal: ["You woke beneath a sky made of stone, with a brass key in your hand."],
     events: [],
-    lastDraw: "bell-under-water"
+    lastDraw: null
   };
 }
 
@@ -33,12 +44,10 @@ export function normaliseState(input = {}) {
   const base = initialState();
   const legacyItems = Array.isArray(input.items)
     ? Object.fromEntries(input.items.map((item) => [item, 1]))
-    : (input.items ?? {});
+    : { ...(input.items ?? {}) };
   const qualities = { ...base.qualities, ...(input.qualities ?? {}) };
   const menaces = { ...base.menaces, ...(input.menaces ?? {}) };
 
-  // Older saves accidentally stored menaces as qualities. Reconcile by taking
-  // the larger value so a duplicated historical value is never double-counted.
   for (const id of MENACE_IDS) {
     if (qualities[id] !== undefined) {
       menaces[id] = Math.max(Number(menaces[id] ?? 0), Number(qualities[id] ?? 0));
@@ -46,24 +55,56 @@ export function normaliseState(input = {}) {
     }
   }
 
+  const flags = { ...(input.flags ?? {}) };
+  const revision = Number.isInteger(input.revision) ? input.revision : Number(flags.__revision ?? 0);
+  const momentum = Number.isFinite(input.momentum) ? input.momentum : Number(flags.__momentum ?? base.momentum);
+  const globalFlags = { ...(flags.__globalFlags ?? {}), ...(input.globalFlags ?? {}) };
+  const equipment = { ...base.equipment, ...(flags.__equipment ?? {}), ...(input.equipment ?? {}) };
+  const events = Array.isArray(input.events) ? input.events.slice(0, 250) : (Array.isArray(flags.__events) ? flags.__events.slice(0, 250) : []);
+  const hand = Array.isArray(input.hand) ? [...new Set(input.hand)] : (Array.isArray(flags.__hand) ? [...new Set(flags.__hand)] : []);
+  const discard = Array.isArray(input.discard) ? [...new Set(input.discard)] : (Array.isArray(flags.__discard) ? [...new Set(flags.__discard)] : []);
+
   return {
     ...base,
     ...input,
     version: 3,
-    revision: Number.isInteger(input.revision) ? input.revision : 0,
+    revision,
     qualities,
     menaces,
-    momentum: Number.isFinite(input.momentum) ? input.momentum : base.momentum,
-    globalFlags: { ...(input.globalFlags ?? {}) },
-    items: { ...legacyItems },
+    momentum,
+    globalFlags,
+    items: legacyItems,
     unlockedLocations: [...new Set(input.unlockedLocations ?? base.unlockedLocations)],
     acquaintances: [...new Set(input.acquaintances ?? base.acquaintances)],
-    flags: { ...(input.flags ?? {}) },
+    equipment,
+    flags: {
+      ...flags,
+      "__revision": revision,
+      "__momentum": momentum,
+      "__globalFlags": globalFlags,
+      "__equipment": equipment,
+      "__events": events,
+      "__hand": hand,
+      "__discard": discard
+    },
     journal: Array.isArray(input.journal) ? input.journal.slice(0, 100) : base.journal,
-    events: Array.isArray(input.events) ? input.events.slice(0, 250) : [],
-    hand: Array.isArray(input.hand) ? [...new Set(input.hand)] : [],
-    discard: Array.isArray(input.discard) ? [...new Set(input.discard)] : []
+    events,
+    hand,
+    discard,
+    lastDraw: input.lastDraw ?? null
   };
+}
+
+export function syncDerivedState(state) {
+  state.flags ??= {};
+  state.flags.__revision = Number(state.revision ?? 0);
+  state.flags.__momentum = Number(state.momentum ?? 0);
+  state.flags.__globalFlags = { ...(state.globalFlags ?? {}) };
+  state.flags.__equipment = { ...(state.equipment ?? {}) };
+  state.flags.__events = [...(state.events ?? [])];
+  state.flags.__hand = [...(state.hand ?? [])];
+  state.flags.__discard = [...(state.discard ?? [])];
+  return state;
 }
 
 export function loadState(storage = globalThis.localStorage) {
@@ -72,7 +113,7 @@ export function loadState(storage = globalThis.localStorage) {
       ?? LEGACY_SAVE_KEYS.map((key) => storage?.getItem(key)).find(Boolean);
     if (!raw) return initialState();
     const state = normaliseState(JSON.parse(raw));
-    storage?.setItem(SAVE_KEY, JSON.stringify(state));
+    storage?.setItem(SAVE_KEY, JSON.stringify(syncDerivedState(state)));
     return state;
   } catch {
     return initialState();
@@ -80,5 +121,5 @@ export function loadState(storage = globalThis.localStorage) {
 }
 
 export function saveState(state, storage = globalThis.localStorage) {
-  storage?.setItem(SAVE_KEY, JSON.stringify(normaliseState(state)));
+  storage?.setItem(SAVE_KEY, JSON.stringify(normaliseState(syncDerivedState(state))));
 }
