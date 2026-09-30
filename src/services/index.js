@@ -47,6 +47,10 @@ export class FallbackGameService {
     return this.active.drawCard(deckId, options);
   }
 
+  setRefuge(refugeId, options) {
+    return this.active.setRefuge(refugeId, options);
+  }
+
   discard(cardId, options) {
     return this.active.discard(cardId, options);
   }

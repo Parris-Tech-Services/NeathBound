@@ -291,7 +291,7 @@ NeathBound:
 - refuge actions: rest, letters, plans, identity changes, contacts, trophies
 - upgrade path
 
-Status: NOT IMPLEMENTED
+Status: DONE (ownership, active refuge, hand size constraints).
 
 ## 12. Plans
 

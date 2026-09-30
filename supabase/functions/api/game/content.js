@@ -1424,3 +1424,26 @@ export const decks = {
     cardIds: ["card-a-stranger-approaches", "card-lost-echoes"]
   }
 };
+
+export const refuges = {
+  "camp-on-the-docks": {
+    name: "A Camp on the Docks",
+    description: "A drafty spot near the water where no one asks questions.",
+    handSize: 2
+  },
+  "rented-attic": {
+    name: "A Rented Attic",
+    description: "Small, but dry, and with a lock on the door.",
+    handSize: 3
+  },
+  "spacious-townhouse": {
+    name: "A Spacious Townhouse",
+    description: "A respectable address for a person of consequence.",
+    handSize: 4
+  },
+  "brass-embassy-guest-room": {
+    name: "A Brass-Bound Guest Room",
+    description: "Opulent, uncomfortably warm, and strictly guarded.",
+    handSize: 5
+  }
+};

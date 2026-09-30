@@ -1,4 +1,4 @@
-import { locations, menaceAreas, stories, decks, cards } from "./content.js";
+import { locations, menaceAreas, stories, decks, cards, refuges } from "./content.js";
 import { drawCardToHand, discardCard as removeCardFromHand } from "./decks.js";
 import { cloneState, initialState } from "./state.js";
 import { applyEffects, awardProgress, describeChallenge, requirementsMet, resolveChallenge } from "./rules.js";
@@ -211,11 +211,21 @@ export function drawCard(state, deckId = "whispers", random = Math.random) {
   const next = cloneState(state);
   const deck = decks[deckId];
   if (!deck) return { state: next, error: "Deck not found." };
+  const maxHand = refuges[next.refuge ?? "camp-on-the-docks"]?.handSize ?? 3;
+  if ((next.hand?.length ?? 0) >= maxHand) return { state: next, error: "Your hand is full." };
   
   const card = drawCardToHand(next, deck, cards, random);
   next.flags = next.flags || {};
   next.flags.__revision = (next.flags.__revision ?? 0) + 1;
   return { state: next, drawn: card ? card.id : null };
+}
+
+export function setRefuge(state, refugeId) {
+  const next = cloneState(state);
+  next.refuge = refugeId;
+  next.flags = next.flags || {};
+  next.flags.__revision = (next.flags.__revision ?? 0) + 1;
+  return { state: next };
 }
 
 export function discard(state, cardId) {

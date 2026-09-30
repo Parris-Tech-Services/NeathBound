@@ -28,6 +28,10 @@ export class SupabaseGameService {
     return this.#call("POST", `deck/${encodeURIComponent(deckId)}/draw`, { expectedRevision });
   }
 
+  setRefuge(refugeId, { expectedRevision } = {}) {
+    return this.#call("POST", `refuge/${encodeURIComponent(refugeId)}`, { expectedRevision });
+  }
+
   discard(cardId, { expectedRevision } = {}) {
     return this.#call("POST", `deck/${encodeURIComponent(cardId)}/discard`, { expectedRevision });
   }

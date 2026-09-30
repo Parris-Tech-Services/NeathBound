@@ -1,5 +1,5 @@
 import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge } from "../game/engine.js?v=20260930-20";
-import { locations, cards, decks } from "../game/content.js?v=20260930-20";
+import { locations, cards, decks, refuges } from "../game/content.js?v=20260930-20";
 import { loadPreferences } from "./preferences.js?v=20260930-20";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
@@ -93,7 +93,7 @@ export function render(app, state, handlers, outcome = null) {
   let deckHtml = "";
   if (state.flags["tutorial.cards"]) {
     const hand = state.hand || [];
-    const MAX_HAND = 3;
+    const MAX_HAND = refuges[state.refuge ?? "camp-on-the-docks"]?.handSize ?? 3;
     const drawButton = hand.length < MAX_HAND
       ? `<button class="draw-card-button" data-action="draw-card" data-deck="whispers">Draw a Card (${hand.length}/${MAX_HAND})</button>`
       : `<button class="draw-card-button disabled" disabled>Hand Full (${MAX_HAND}/${MAX_HAND})</button>`;
@@ -351,7 +351,28 @@ export function render(app, state, handlers, outcome = null) {
                 '<span><strong>₠', state.echoes, '</strong> Echoes</span>',
               '</div>',
             '</div>',
-            '<div class="possessions-grid">', possessionCardsHtml, '</div>',
+            '<div class="refuges-section">',
+  '<h3>Your Refuge</h3>',
+  (function() {
+    const activeId = state.refuge ?? "camp-on-the-docks";
+    const activeRefuge = refuges[activeId];
+    
+    // Find all owned refuges based on inventory items with 'refuge-' prefix, plus the default camp
+    const owned = ["camp-on-the-docks", ...Object.keys(state.items ?? {}).filter(id => id.startsWith("refuge-") && state.items[id] > 0)];
+    
+    return owned.map(id => {
+      const ref = refuges[id] || { name: formatName(id), description: "A place to rest.", handSize: 3 };
+      const isActive = id === activeId;
+      return `<div class="refuge-card ${isActive ? 'is-active' : ''}">
+        <h4>${escapeHtml(ref.name)} ${isActive ? '(Active)' : ''}</h4>
+        <p>${escapeHtml(ref.description)}</p>
+        <p><strong>Whispers Deck size: ${ref.handSize}</strong></p>
+        ${!isActive ? `<button data-action="set-refuge" data-refuge="${id}">Move Here</button>` : ''}
+      </div>`;
+    }).join('');
+  })(),
+'</div>',
+'<div class="possessions-grid">', possessionCardsHtml, '</div>',
           '</section>',
           '<section class="myself-page parchment" id="myself" data-view-panel="myself" hidden>',
             '<header class="myself-hero">',
@@ -456,6 +477,10 @@ export function render(app, state, handlers, outcome = null) {
   app.querySelectorAll("[data-action=draw-card]").forEach((button) => {
     button.dataset.originallyDisabled = String(button.disabled);
     button.addEventListener("click", () => handlers.drawCard(button.dataset.deck));
+  });
+  app.querySelectorAll("[data-action=set-refuge]").forEach((button) => {
+    button.dataset.originallyDisabled = String(button.disabled);
+    button.addEventListener("click", () => handlers.setRefuge(button.dataset.refuge));
   });
   app.querySelectorAll("[data-action=discard]").forEach((button) => {
     button.dataset.originallyDisabled = String(button.disabled);
