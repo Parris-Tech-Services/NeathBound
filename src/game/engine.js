@@ -1,6 +1,6 @@
-import { locations, stories } from "./content.js?v=20260930-16";
-import { cloneState, initialState } from "./state.js?v=20260930-16";
-import { applyEffects, requirementsMet, resolveChallenge } from "./rules.js?v=20260930-16";
+import { locations, stories } from "./content.js?v=20260930-17";
+import { cloneState, initialState } from "./state.js?v=20260930-17";
+import { applyEffects, requirementsMet, resolveChallenge } from "./rules.js?v=20260930-17";
 
 export function currentLocation(state) {
   return locations[state.locationId] ?? locations["lantern-quay"];

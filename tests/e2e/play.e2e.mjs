@@ -146,6 +146,39 @@ test("Possessions opens a dedicated inventory view and Story returns to play", a
   await context.close();
 });
 
+test("Myself opens a full character screen and outfit changes stay in sync", async () => {
+  const { context, page, problems } = await openGame();
+  await page.locator(".main-tabs [data-view=myself]").click();
+
+  await assert.doesNotReject(() => page.locator("#myself").waitFor({ state: "visible" }));
+  assert.equal(await page.locator("[data-view-panel=story]").isHidden(), true, "story view is hidden while Myself is open");
+  assert.equal(await page.locator("#possessions").isHidden(), true, "possessions view remains hidden");
+  const text = await page.locator("#myself").innerText();
+  assert.match(text, /The Unmoored/);
+  assert.match(text, /Qualities/);
+  assert.match(text, /Nerve/);
+  assert.match(text, /Insight/);
+  assert.match(text, /Poise/);
+  assert.match(text, /Shadow/);
+  assert.match(text, /Menaces/);
+  assert.match(text, /Dread/);
+  assert.match(text, /Scandal/);
+  assert.match(text, /Wounds/);
+  assert.match(text, /Suspicion/);
+  assert.match(text, /Momentum/);
+
+  await page.locator("#myself-outfit").selectOption("dock-coat");
+  await page.waitForSelector("#myself:not([hidden])");
+  assert.equal(await page.locator("#myself-outfit").inputValue(), "dock-coat");
+  assert.equal(await page.locator("#outfit").inputValue(), "dock-coat", "sidebar and Myself outfit selectors stay in sync");
+
+  await page.locator(".main-tabs a[href=\"#stories\"]").click();
+  assert.equal(await page.locator("[data-view-panel=story]").isVisible(), true, "Story returns to the playable view");
+  assert.equal(await page.locator("#myself").isHidden(), true, "Myself closes when returning to Story");
+  assert.deepEqual(problems, []);
+  await context.close();
+});
+
 test("accessibility audit (axe-core)", async (t) => {
   const { context, page } = await openGame();
   const axeSource = await readFile(createRequire(import.meta.url).resolve("axe-core/axe.min.js"), "utf8");

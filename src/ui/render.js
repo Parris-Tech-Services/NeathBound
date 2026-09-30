@@ -1,8 +1,42 @@
-import { availableChoices, availableStories, currentLocation, effectiveChallenge } from "../game/engine.js?v=20260930-16";
-import { locations } from "../game/content.js?v=20260930-16";
-import { loadPreferences } from "./preferences.js?v=20260930-16";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge } from "../game/engine.js?v=20260930-17";
+import { locations } from "../game/content.js?v=20260930-17";
+import { loadPreferences } from "./preferences.js?v=20260930-17";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
+
+const QUALITY_DETAILS = {
+  nerve: { glyph: "◉", description: "Courage, steadiness and the willingness to go where sensible people stop." },
+  insight: { glyph: "◆", description: "Attention, deduction and a talent for noticing what the city hoped you would miss." },
+  poise: { glyph: "✦", description: "Grace under scrutiny: charm, composure and knowing when not to flinch." },
+  shadow: { glyph: "◒", description: "Subtlety, secrecy and the useful art of being elsewhere when questions are asked." }
+};
+
+const MENACE_DETAILS = {
+  dread: { glyph: "▲", description: "How heavily the city's darker truths are pressing on you." },
+  scandal: { glyph: "♢", description: "How loudly respectable people are whispering your name." },
+  wounds: { glyph: "✚", description: "The price your body has paid for your curiosity." },
+  suspicion: { glyph: "⌁", description: "How much attention you have attracted from people best left uninterested." }
+};
+
+const MILESTONE_DETAILS = {
+  "acquaintance-dockworker": "Won the trust of a Lantern Quay dockworker.",
+  "bell-under-water:descend": "Descended the drowned stair beneath Lantern Quay.",
+  "bound-into-the-index": "Allowed the Hollow Archive to bind you into its index.",
+  "cartographer-reckoned": "Settled matters with the one-eyed cartographer.",
+  "collector-answered": "Answered the Velvet Market's debt collector.",
+  "far-crack-answered": "Resolved the mystery of the far crack in the stone sky.",
+  "found-the-far-crack": "Discovered an uncharted crack in the cavern ceiling.",
+  "garden-appointment:attend": "Kept the Clockwork Garden's impossible appointment.",
+  "gardener-thanked": "Earned the gardener's gratitude.",
+  "kept-the-sun-promise": "Kept your promise concerning borrowed sunlight.",
+  "map-route-known": "Revealed a hidden route in the salted map.",
+  "plant-the-sun-seed:plant": "Planted a seed that remembered the sun.",
+  "read-own-entry": "Read your own entry in the Hollow Archive.",
+  "read-the-debt-ledgers": "Read what the market's ledgers say you owe.",
+  "returned-the-brass-key": "Returned the brass key to the submerged door.",
+  "salt-on-the-map:soak": "Washed the salt from the map and exposed its secret.",
+  "signalled-the-surface": "Sent a signal through the stone sky toward the surface."
+};
 
 const ITEM_DETAILS = {
   "salted-map": { glyph: "≋", category: "Documents", description: "A salt-stiffened map whose hidden routes emerge when the city decides you are ready to see them." },
@@ -80,6 +114,50 @@ export function render(app, state, handlers, outcome = null) {
     ? inventory.map(([item, quantity]) => '<span>' + formatName(item) + (quantity > 1 ? ' ×' + quantity : '') + '</span>').join("")
     : "<small>Nothing of note.</small>";
   const inventoryCount = inventory.reduce((total, [, quantity]) => total + quantity, 0);
+  const qualityCardsHtml = Object.entries(state.qualities ?? {}).map(([id, value]) => {
+    const details = QUALITY_DETAILS[id] ?? { glyph: "◆", description: "A quality the city has learned to associate with you." };
+    const width = Math.min(100, Math.max(4, Number(value) * 10));
+    return [
+      '<article class="character-stat quality-stat">',
+        '<div class="character-stat-glyph" aria-hidden="true">', escapeHtml(details.glyph), '</div>',
+        '<div class="character-stat-copy">',
+          '<div class="character-stat-heading"><h3>', escapeHtml(formatName(id)), '</h3><strong>', value, '</strong></div>',
+          '<div class="character-stat-track"><span style="width:', width, '%"></span></div>',
+          '<p>', escapeHtml(details.description), '</p>',
+        '</div>',
+      '</article>'
+    ].join("");
+  }).join("");
+
+  const menaceCardsHtml = Object.entries(state.menaces ?? {}).map(([id, value]) => {
+    const details = MENACE_DETAILS[id] ?? { glyph: "▲", description: "A danger gathering around you." };
+    const width = Math.min(100, Math.max(0, Number(value) * 12.5));
+    return [
+      '<article class="character-stat menace-stat', Number(value) > 0 ? ' is-active' : '', '">',
+        '<div class="character-stat-glyph" aria-hidden="true">', escapeHtml(details.glyph), '</div>',
+        '<div class="character-stat-copy">',
+          '<div class="character-stat-heading"><h3>', escapeHtml(formatName(id)), '</h3><strong>', value, '</strong></div>',
+          '<div class="character-stat-track"><span style="width:', width, '%"></span></div>',
+          '<p>', escapeHtml(details.description), '</p>',
+        '</div>',
+      '</article>'
+    ].join("");
+  }).join("");
+
+  const acquaintances = (state.acquaintances ?? []).filter(Boolean);
+  const acquaintancesHtml = acquaintances.length
+    ? acquaintances.map((name) => '<span class="character-chip">' + escapeHtml(formatName(name)) + '</span>').join("")
+    : '<p class="character-empty">No one has admitted to knowing you yet.</p>';
+
+  const milestones = Object.entries(state.flags ?? {})
+    .filter(([id, value]) => id !== "__revision" && value === true && MILESTONE_DETAILS[id])
+    .map(([id]) => MILESTONE_DETAILS[id]);
+  const milestoneHtml = milestones.length
+    ? milestones.map((text) => '<li>' + escapeHtml(text) + '</li>').join("")
+    : '<li class="character-empty">Your more consequential choices are still ahead of you.</li>';
+
+  const exploredCount = (state.unlockedLocations ?? []).length;
+
   const possessionCardsHtml = inventory.length
     ? inventory.map(([item, quantity]) => {
         const details = ITEM_DETAILS[item] ?? { glyph: "◆", category: "Curiosity", description: "Something the city has placed in your keeping. Its significance is not yet clear." };
@@ -167,7 +245,7 @@ export function render(app, state, handlers, outcome = null) {
       '<nav class="main-tabs" aria-label="Game sections">',
         '<a class="active" href="#stories" data-view="story">STORY</a>',
         '<a href="#journal" data-view="story">MESSAGES</a>',
-        '<a href="#character" data-view="story">MYSELF</a>',
+        '<a href="#myself" data-view="myself">MYSELF</a>',
         '<a href="#possessions" data-view="possessions">POSSESSIONS</a>',
         '<a href="#possessions">BAZAAR</a>',
         '<a href="#character">FATE</a>',
@@ -244,6 +322,56 @@ export function render(app, state, handlers, outcome = null) {
             '</div>',
             '<div class="possessions-grid">', possessionCardsHtml, '</div>',
           '</section>',
+          '<section class="myself-page parchment" id="myself" data-view-panel="myself" hidden>',
+            '<header class="myself-hero">',
+              '<div class="myself-portrait" aria-hidden="true"><span>◈</span></div>',
+              '<div class="myself-identity">',
+                '<p class="myself-kicker">The city knows you as</p>',
+                '<h2>', escapeHtml(state.name), '</h2>',
+                '<p>Currently in <strong>', escapeHtml(location.name), '</strong>, ', escapeHtml(location.region), '.</p>',
+                '<div class="myself-summary">',
+                  '<span><strong>₠', state.echoes, '</strong> Echoes</span>',
+                  '<span><strong>', state.momentum ?? 0, '</strong> Momentum</span>',
+                  '<span><strong>', exploredCount, '</strong> places known</span>',
+                  '<span><strong>', state.journal?.length ?? 0, '</strong> memories recorded</span>',
+                '</div>',
+              '</div>',
+            '</header>',
+
+            '<section class="myself-section">',
+              '<div class="myself-section-heading"><div><p class="myself-kicker">Capabilities</p><h3>Qualities</h3></div><p>What the city has learned you can do.</p></div>',
+              '<div class="character-stat-grid">', qualityCardsHtml, '</div>',
+            '</section>',
+
+            '<section class="myself-section">',
+              '<div class="myself-section-heading"><div><p class="myself-kicker">Consequences</p><h3>Menaces</h3></div><p>Trouble has a way of keeping its own accounts.</p></div>',
+              '<div class="character-stat-grid menace-grid">', menaceCardsHtml, '</div>',
+            '</section>',
+
+            '<section class="myself-two-column">',
+              '<div class="myself-section character-panel">',
+                '<p class="myself-kicker">Presentation</p>',
+                '<h3>Outfit</h3>',
+                '<p>Change how you present yourself. The same outfit is reflected in the sidebar.</p>',
+                '<label for="myself-outfit">Current outfit</label>',
+                '<select id="myself-outfit" aria-label="Character outfit" data-action="outfit">',
+                  '<option value="morning-outfit"', preferences.outfit === "morning-outfit" ? ' selected' : '', '>Morning Outfit</option>',
+                  '<option value="dock-coat"', preferences.outfit === "dock-coat" ? ' selected' : '', '>Dockworker&apos;s Coat</option>',
+                  '<option value="archive-linen"', preferences.outfit === "archive-linen" ? ' selected' : '', '>Archive Linen</option>',
+                '</select>',
+              '</div>',
+              '<div class="myself-section character-panel">',
+                '<p class="myself-kicker">People</p>',
+                '<h3>Acquaintances</h3>',
+                '<div class="character-chips">', acquaintancesHtml, '</div>',
+              '</div>',
+            '</section>',
+
+            '<section class="myself-section">',
+              '<div class="myself-section-heading"><div><p class="myself-kicker">History</p><h3>Marks left on the city</h3></div><p>Choices important enough that the Neath still remembers them.</p></div>',
+              '<ol class="character-milestones">', milestoneHtml, '</ol>',
+            '</section>',
+          '</section>',
         '</main>',
 
         '<aside class="right-rail">',
@@ -280,7 +408,7 @@ export function render(app, state, handlers, outcome = null) {
 
       '<footer class="game-footer">',
         '<span>© NeathBound · Original open-source fiction</span>',
-        '<nav><a href="#stories" data-view="story">Story</a><span>|</span><a href="#journal" data-view="story">Journal</a><span>|</span><a href="#possessions" data-view="possessions">Possessions</a></nav>',
+        '<nav><a href="#stories" data-view="story">Story</a><span>|</span><a href="#myself" data-view="myself">Myself</a><span>|</span><a href="#possessions" data-view="possessions">Possessions</a></nav>',
       '</footer>',
     '</div>'
   ].join("");
@@ -291,13 +419,13 @@ export function render(app, state, handlers, outcome = null) {
   });
   app.querySelector("[data-action=onwards]")?.addEventListener("click", handlers.onwards);
   app.querySelectorAll("[data-action=bookmark]").forEach((button) => button.addEventListener("click", () => handlers.bookmark(button.dataset.story)));
-  app.querySelector("[data-action=outfit]").addEventListener("change", (event) => handlers.outfit(event.target.value));
+  app.querySelectorAll("[data-action=outfit]").forEach((select) => select.addEventListener("change", (event) => handlers.outfit(event.target.value)));
   app.querySelector("[data-action=travel]").addEventListener("click", () => handlers.travel(app.querySelector("#travel-location").value));
   app.querySelectorAll("[data-action=edit-note]").forEach((button) => button.addEventListener("click", () => handlers.editNote(button.dataset.noteKey)));
   app.querySelector("[data-action=reset]").addEventListener("click", handlers.reset);
 
   const setView = (view) => {
-    const activeView = view === "possessions" ? "possessions" : "story";
+    const activeView = ["possessions", "myself"].includes(view) ? view : "story";
     app.querySelectorAll("[data-view-panel]").forEach((panel) => {
       panel.hidden = panel.dataset.viewPanel !== activeView;
     });
@@ -305,7 +433,11 @@ export function render(app, state, handlers, outcome = null) {
       link.classList.toggle("active", link.dataset.view === activeView);
     });
   };
-  const viewFromHash = () => globalThis.location?.hash === "#possessions" ? "possessions" : "story";
+  const viewFromHash = () => {
+    if (globalThis.location?.hash === "#possessions") return "possessions";
+    if (globalThis.location?.hash === "#myself") return "myself";
+    return "story";
+  };
   app.querySelectorAll("[data-view]").forEach((link) => link.addEventListener("click", () => setView(link.dataset.view)));
   globalThis.onhashchange = () => setView(viewFromHash());
   setView(viewFromHash());
