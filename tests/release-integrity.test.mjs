@@ -14,8 +14,8 @@ function stripQuery(value) {
 test("all local entry-point assets resolve to real files", async () => {
   const html = await read("index.html");
   const refs = [
-    ...html.matchAll(/(?:src|href)="(./[^"]+)"/g)
-  ].map((match) => stripQuery(match[1].replace(/^.//, "")));
+    ...html.matchAll(/(?:src|href)="(\.\/[^"]+)"/g)
+  ].map((match) => stripQuery(match[1].replace(/^\.\//, "")));
 
   assert.ok(refs.length >= 2, "expected stylesheet and module references");
   for (const ref of refs) {
