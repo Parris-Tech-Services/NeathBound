@@ -1,5 +1,5 @@
 import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20260930-21";
-import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles } from "../game/content.js?v=20260930-21";
+import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions } from "../game/content.js?v=20260930-21";
 import { loadPreferences } from "./preferences.js?v=20260930-21";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
@@ -57,6 +57,79 @@ export function render(app, state, handlers, outcome = null) {
   const location = currentLocation(state);
   const stories = availableStories(state);
   const inventory = Object.entries(state.items ?? {}).filter(([, quantity]) => quantity > 0);
+  const preferences = loadPreferences();
+  const unlockedLocations = (state.unlockedLocations ?? []).map((id) => ({ id, location: locations[id] })).filter((entry) => entry.location);
+  const locationNote = preferences.notes[`location:${state.locationId}`] ?? location.atmosphere;
+  const glossaryNote = preferences.notes.glossary ?? "A quality is anything the city remembers about you: a talent, a rumour, an item, or a consequence.";
+
+  const qualitiesHtml = Object.entries(state.qualities ?? {}).map(([key, value]) => {
+    const effective = effectiveStat(state, key);
+    const width = Math.min(100, Math.max(8, effective * 10));
+    return [
+      '<div class="quality-row quality-', escapeClass(key), '">',
+      '<div class="quality-icon"><span>', icon[key] ?? "•", '</span></div>',
+      '<div class="quality-main">',
+      '<div class="quality-title"><strong>', formatName(key), '</strong><span>', effective !== Number(value) ? effective + ' (' + value + ')' : value, '</span></div>',
+      '<div class="quality-track"><span style="width:', width, '%"></span></div>',
+      '</div></div>'
+    ].join("");
+  }).join("");
+
+  const renderStory = (story, isCard = false) => {
+    const available = new Set(availableChoices(state, story.id).map((choice) => choice.id));
+    const choicesHtml = story.choices.map((choice) => {
+      const isAvailable = available.has(choice.id);
+      const requirements = requirementList(choice);
+      const lockedReason = !isAvailable && requirements.length
+        ? '<p class="locked-requirement">Locked: ' + escapeHtml(requirementSummary(state, requirements)) + '</p>'
+        : '';
+      const resolvedChallenge = effectiveChallenge(story, choice);
+      const challengeQuality = resolvedChallenge?.quality ?? resolvedChallenge?.stat;
+      const challenge = resolvedChallenge
+        ? [
+            '<div class="challenge-line">',
+            '<span class="challenge-icon">', icon[challengeQuality] ?? "•", '</span>',
+            '<span><strong>', formatName(challengeQuality), ' challenge</strong>',
+            '<small>', escapeHtml(challengeSummary(state, resolvedChallenge)), '</small></span></div>'
+          ].join("")
+        : '<div class="challenge-line simple"><span class="challenge-icon">◆</span><span><strong>A straightforward choice</strong><small>No challenge roll</small></span></div>';
+
+      return [
+        '<div class="choice-row', isAvailable ? '' : ' is-locked', '">',
+        '<div class="choice-copy"><strong>', escapeHtml(choice.label), '</strong>', challenge, lockedReason, '</div>',
+        '<button class="go-button" data-story="', story.id, '" data-choice="', choice.id, '" ',
+        isAvailable ? "" : "disabled",
+        '>', isAvailable ? 'GO' : 'LOCKED', '</button></div>'
+      ].join("");
+    }).join("");
+
+    const planned = preferences.bookmarks.includes(story.id);
+    return [
+      '<article class="storylet', isCard ? ' opportunity-card' : '', '">',
+      isCard ? '<div class="card-discard-header"><button class="discard-button" data-action="discard" data-card="' + story.id + '" aria-label="Discard">✗</button></div>' : '',
+      '<div class="story-art story-art-', escapeClass(story.id), '" aria-hidden="true">', storyArtSvg(story.id, state.locationId), '</div>',
+      '<div class="story-body">',
+      '<button class="bookmark', planned ? ' is-bookmarked' : '', '" type="button" data-action="bookmark" data-story="', story.id, '" aria-label="', planned ? 'Remove from Plans' : 'Add to Plans', '" title="', planned ? 'Remove from Plans' : 'Add to Plans', '" aria-pressed="', planned, '">◆</button>',
+      '<h3>', escapeHtml(story.title), '</h3>',
+      '<p>', escapeHtml(story.text), '</p>',
+      '<div class="story-choices">', choicesHtml, '</div>',
+      '</div></article>'
+    ].join("");
+  };
+
+  const storiesHtml = stories.map((story) => renderStory(story, false)).join("");
+  let deckHtml = "";
+  if (state.flags["tutorial.cards"]) {
+    const hand = state.hand || [];
+    const maxHand = refuges[state.refuge ?? "camp-on-the-docks"]?.handSize ?? 3;
+    const drawButton = hand.length < maxHand
+      ? `<button class="draw-card-button" data-action="draw-card" data-deck="whispers">Draw a Card (${hand.length}/${maxHand})</button>`
+      : `<button class="draw-card-button disabled" disabled>Hand Full (${maxHand}/${maxHand})</button>`;
+    const handHtml = hand.map((id) => cards[id] ? renderStory({ id, ...cards[id] }, true) : "").join("");
+    deckHtml = `<section class="whispers-deck"><div class="deck-controls">${drawButton}</div><div class="deck-hand">${handHtml}</div></section>`;
+  }
+
+  const journalHtml = (state.journal ?? []).map((entry) => '<li>' + escapeHtml(entry) + '</li>').join("");
   
   // Categorize inventory
   const categorizedInventory = {};
@@ -171,6 +244,19 @@ const inventoryHtml = inventory.length
       </div>`;
     }).join('');
 
+  const plannedStories = preferences.bookmarks
+    .map((id) => ({ id, story: storyDefinitions[id] ?? cards[id] }))
+    .filter((entry) => entry.story);
+  const plansHtml = plannedStories.length
+    ? plannedStories.map(({ id, story }) => [
+        '<article class="plan-card">',
+          '<div><p class="plans-kicker">Saved story</p><h3>', escapeHtml(story.title), '</h3><p>', escapeHtml(story.text), '</p></div>',
+          '<div class="plan-actions"><a href="#stories" data-view="story">Return to stories</a>',
+          '<button type="button" data-action="bookmark" data-story="', id, '">Remove</button></div>',
+        '</article>'
+      ].join("")).join("")
+    : '<div class="empty-plans"><strong>No plans yet.</strong><p>Use the ◆ button on a story to keep it here for later.</p></div>';
+
   let outcomeHtml = "";
   if (outcome) {
     const challengeQuality = outcome.challenge?.quality ?? outcome.challenge?.stat;
@@ -222,6 +308,7 @@ const inventoryHtml = inventory.length
           '<button class="text-link" data-action="reset">New life</button>',
           '<a href="#journal" data-view="story">Journal</a>',
           '<a href="#possessions" data-view="possessions">Possessions</a>',
+          '<a href="#plans" data-view="plans">Plans</a>',
           '<a href="#stories" data-view="story">Stories</a>',
         '</nav>',
       '</header>',
@@ -245,7 +332,7 @@ const inventoryHtml = inventory.length
         state.flags['tutorial.myself'] ? '<a href="#myself" data-view="myself">SELF</a>' : '',
         state.flags['tutorial.possessions'] ? '<a href="#possessions" data-view="possessions">SATCHEL</a>' : '',
         state.flags['tutorial.possessions'] ? '<a href="#possessions">EXCHANGE</a>' : '',
-        state.flags['tutorial.story'] ? '<a href="#journal">PLANS</a>' : '',
+        state.flags['tutorial.story'] ? '<a href="#plans" data-view="plans">PLANS</a>' : '',
       '</nav>',
 
       '<div class="game-grid">',
@@ -305,6 +392,10 @@ const inventoryHtml = inventory.length
             '<ol>', journalHtml, '</ol>',
           '</section>',
           '</div>',
+          '<section class="plans-page parchment" id="plans" data-view-panel="plans" hidden>',
+            '<header class="plans-header"><p class="plans-kicker">Things worth returning to</p><h2>Plans</h2><p>Stories you have marked to pursue later. Plans are saved on this device.</p></header>',
+            '<div class="plans-list">', plansHtml, '</div>',
+          '</section>',
           '<section class="possessions-page parchment" id="possessions" data-view-panel="possessions" hidden>',
             '<div class="possessions-header">',
               '<div>',
@@ -485,7 +576,7 @@ possessionCardsHtml,
   app.querySelector("[data-action=reset]").addEventListener("click", handlers.reset);
 
   const setView = (view) => {
-    const activeView = ["possessions", "myself"].includes(view) ? view : "story";
+    const activeView = ["possessions", "myself", "plans"].includes(view) ? view : "story";
     app.querySelectorAll("[data-view-panel]").forEach((panel) => {
       panel.hidden = panel.dataset.viewPanel !== activeView;
     });
@@ -496,6 +587,7 @@ possessionCardsHtml,
   const viewFromHash = () => {
     if (globalThis.location?.hash === "#possessions") return "possessions";
     if (globalThis.location?.hash === "#myself") return "myself";
+    if (globalThis.location?.hash === "#plans") return "plans";
     return "story";
   };
   app.querySelectorAll("[data-view]").forEach((link) => link.addEventListener("click", () => setView(link.dataset.view)));
@@ -538,6 +630,7 @@ const STORY_ART = {
 };
 
 const LOCATION_ART = {
+  "the-lair": ["▣", "⚿", "The Lair", "#1f2528", "#66635b"],
   "lantern-quay": ["⚓", "♢", "Lantern Quay", "#143740", "#6d8f91"],
   "velvet-market": ["◐", "✦", "Velvet Market", "#47293f", "#9d6f8f"],
   "hollow-archive": ["▤", "⌑", "Hollow Archive", "#2e342e", "#8d947b"],
@@ -582,6 +675,34 @@ function locationArtSvg(locationId) {
       '<text x="52" y="157" font-size="17" letter-spacing="2.4" fill="rgba(249,238,211,.82)" font-family="Georgia,serif">', escapeHtml(label.toUpperCase()), '</text>',
     '</svg>'
   ].join("");
+}
+
+function requirementList(entry) {
+  const requirements = entry?.requirements;
+  if (Array.isArray(requirements)) return requirements;
+  if (!requirements) return [];
+  const normalized = [];
+  if (requirements.item) normalized.push({ type: "item", id: requirements.item, op: ">=", value: 1 });
+  if (requirements.quality) normalized.push({ type: "quality", id: requirements.quality[0], op: ">=", value: requirements.quality[1] });
+  return normalized;
+}
+
+function requirementSummary(state, requirements) {
+  return requirements.map((requirement) => {
+    const expected = requirement.value;
+    const op = requirement.op ?? "==";
+    let actual;
+    let label = formatName(requirement.id ?? requirement.type);
+    if (requirement.type === "quality") actual = effectiveStat(state, requirement.id);
+    else if (requirement.type === "menace") actual = state.menaces?.[requirement.id] ?? 0;
+    else if (requirement.type === "item") actual = state.items?.[requirement.id] ?? 0;
+    else if (requirement.type === "obols" || requirement.type === "echoes") { actual = state.obols ?? state.echoes ?? 0; label = "Obols"; }
+    else if (requirement.type === "flag") actual = state.flags?.[requirement.id] ?? false;
+    else if (requirement.type === "location") { actual = state.locationId; label = "Location"; }
+    if (requirement.type === "flag") return `${label} must be ${expected ? "true" : "false"}`;
+    if (requirement.type === "location") return `${label} must be ${formatName(expected)}`;
+    return `${label} ${op} ${expected} (you have ${actual})`;
+  }).join(" · ");
 }
 
 // "Very modest · 80% chance (difficulty 5)"
