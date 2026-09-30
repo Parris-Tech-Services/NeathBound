@@ -1,6 +1,6 @@
-import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge } from "../game/engine.js?v=20260930-20";
-import { locations, cards, decks, refuges } from "../game/content.js?v=20260930-20";
-import { loadPreferences } from "./preferences.js?v=20260930-20";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge } from "../game/engine.js?v=20260930-21";
+import { locations } from "../game/content.js?v=20260930-21";
+import { loadPreferences } from "./preferences.js?v=20260930-21";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
 
@@ -74,37 +74,7 @@ export function render(app, state, handlers, outcome = null) {
     ].join("");
   }).join("");
 
-  const renderStory = (story, isCard = false) => {
-        return [
-      '<article class="storylet', isCard ? ' opportunity-card' : '', '">',
-      isCard ? ['<div class="card-discard-header"><button class="discard-button" data-action="discard" data-card="', story.id, '" aria-label="Discard">✗</button></div>'].join("") : '',
-      '<div class="story-art story-art-', escapeClass(story.id), '" aria-hidden="true">', storyArtSvg(story.id, state.locationId), '</div>',
-      '<div class="story-body">',
-      '<button class="bookmark', preferences.bookmarks.includes(story.id) ? ' is-bookmarked' : '', '" type="button" data-action="bookmark" data-story="', story.id, '" aria-label="', preferences.bookmarks.includes(story.id) ? 'Remove bookmark' : 'Bookmark story', '" aria-pressed="', preferences.bookmarks.includes(story.id), '">◆</button>',
-      '<h3>', escapeHtml(story.title), '</h3>',
-      '<p>', escapeHtml(story.text), '</p>',
-      '<div class="story-choices">', choicesHtml, '</div>',
-      '</div></article>'
-    ].join("");
-  };
-
-  const storiesHtml = stories.map(s => renderStory(s, false)).join("");
-  
-  let deckHtml = "";
-  if (state.flags["tutorial.cards"]) {
-    const hand = state.hand || [];
-    const MAX_HAND = refuges[state.refuge ?? "camp-on-the-docks"]?.handSize ?? 3;
-    const drawButton = hand.length < MAX_HAND
-      ? `<button class="draw-card-button" data-action="draw-card" data-deck="whispers">Draw a Card (${hand.length}/${MAX_HAND})</button>`
-      : `<button class="draw-card-button disabled" disabled>Hand Full (${MAX_HAND}/${MAX_HAND})</button>`;
-      
-    const handHtml = hand.map(id => cards[id] ? renderStory({ id, ...cards[id] }, true) : "").join("");
-    deckHtml = `<section class="whispers-deck">
-      <div class="deck-controls">${drawButton}</div>
-      <div class="deck-hand">${handHtml}</div>
-    </section>`;
-  }
-
+  const storiesHtml = stories.map((story) => {
     const available = new Set(availableChoices(state, story.id).map((choice) => choice.id));
     const choicesHtml = story.choices.map((choice) => {
       const resolvedChallenge = effectiveChallenge(story, choice);
@@ -121,8 +91,6 @@ export function render(app, state, handlers, outcome = null) {
       return [
         '<div class="choice-row">',
         '<div class="choice-copy"><strong>', escapeHtml(choice.label), '</strong>', challenge, '</div>',
-        (resolvedChallenge && (state.items[`lesson-${challengeQuality}`] > 0)) ?
-          '<label class="second-chance-label"><input type="checkbox" data-lesson-for="' + choice.id + '"> Use Recalled Lesson: ' + formatName(challengeQuality) + '</label>' : '',
         '<button class="go-button" data-story="', story.id, '" data-choice="', choice.id, '" ',
         available.has(choice.id) ? "" : "disabled",
         '>GO</button></div>'
@@ -330,7 +298,7 @@ export function render(app, state, handlers, outcome = null) {
                         '<p class="feature-note"><strong>', escapeHtml(locationNote), '</strong></p>',
                       '</div>',
                     '</section>',
-                    deckHtml, '<section class="story-stack">', storiesHtml, '</section>',
+                    '<section class="story-stack">', storiesHtml, '</section>',
                   '</div>',
                 '</section>'
               ].join(""),
@@ -353,28 +321,7 @@ export function render(app, state, handlers, outcome = null) {
                 '<span><strong>₠', state.echoes, '</strong> Echoes</span>',
               '</div>',
             '</div>',
-            '<div class="refuges-section">',
-  '<h3>Your Refuge</h3>',
-  (function() {
-    const activeId = state.refuge ?? "camp-on-the-docks";
-    const activeRefuge = refuges[activeId];
-    
-    // Find all owned refuges based on inventory items with 'refuge-' prefix, plus the default camp
-    const owned = ["camp-on-the-docks", ...Object.keys(state.items ?? {}).filter(id => id.startsWith("refuge-") && state.items[id] > 0)];
-    
-    return owned.map(id => {
-      const ref = refuges[id] || { name: formatName(id), description: "A place to rest.", handSize: 3 };
-      const isActive = id === activeId;
-      return `<div class="refuge-card ${isActive ? 'is-active' : ''}">
-        <h4>${escapeHtml(ref.name)} ${isActive ? '(Active)' : ''}</h4>
-        <p>${escapeHtml(ref.description)}</p>
-        <p><strong>Whispers Deck size: ${ref.handSize}</strong></p>
-        ${!isActive ? `<button data-action="set-refuge" data-refuge="${id}">Move Here</button>` : ''}
-      </div>`;
-    }).join('');
-  })(),
-'</div>',
-'<div class="possessions-grid">', possessionCardsHtml, '</div>',
+            '<div class="possessions-grid">', possessionCardsHtml, '</div>',
           '</section>',
           '<section class="myself-page parchment" id="myself" data-view-panel="myself" hidden>',
             '<header class="myself-hero">',
@@ -473,24 +420,9 @@ export function render(app, state, handlers, outcome = null) {
 
   app.querySelectorAll("[data-choice]").forEach((button) => {
     button.dataset.originallyDisabled = String(button.disabled);
-    button.addEventListener("click", () => {
-      const useLesson = app.querySelector(`input[data-lesson-for="${button.dataset.choice}"]`)?.checked ?? false;
-      handlers.choose(button.dataset.story, button.dataset.choice, { useLesson });
-    });
+    button.addEventListener("click", () => handlers.choose(button.dataset.story, button.dataset.choice));
   });
   app.querySelector("[data-action=onwards]")?.addEventListener("click", handlers.onwards);
-  app.querySelectorAll("[data-action=draw-card]").forEach((button) => {
-    button.dataset.originallyDisabled = String(button.disabled);
-    button.addEventListener("click", () => handlers.drawCard(button.dataset.deck));
-  });
-  app.querySelectorAll("[data-action=set-refuge]").forEach((button) => {
-    button.dataset.originallyDisabled = String(button.disabled);
-    button.addEventListener("click", () => handlers.setRefuge(button.dataset.refuge));
-  });
-  app.querySelectorAll("[data-action=discard]").forEach((button) => {
-    button.dataset.originallyDisabled = String(button.disabled);
-    button.addEventListener("click", () => handlers.discardCard(button.dataset.card));
-  });
   app.querySelectorAll("[data-action=bookmark]").forEach((button) => button.addEventListener("click", () => handlers.bookmark(button.dataset.story)));
   app.querySelectorAll("[data-action=outfit]").forEach((select) => select.addEventListener("change", (event) => handlers.outfit(event.target.value)));
   app.querySelector("[data-action=travel]")?.addEventListener("click", () => handlers.travel(app.querySelector("#travel-location")?.value));
