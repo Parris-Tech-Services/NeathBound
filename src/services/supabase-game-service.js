@@ -17,15 +17,28 @@ export class SupabaseGameService {
     return this.#call(
       "POST",
       `storylets/${encodeURIComponent(storyId)}/branches/${encodeURIComponent(choiceId)}/choose`,
-      { requestId: crypto.randomUUID(), expectedRevision }
+      actionBody(expectedRevision)
     );
   }
 
   travel(locationId, expectedRevision = 0) {
-    return this.#call("POST", `travel/${encodeURIComponent(locationId)}`, {
-      requestId: crypto.randomUUID(),
-      expectedRevision
-    });
+    return this.#call("POST", `travel/${encodeURIComponent(locationId)}`, actionBody(expectedRevision));
+  }
+
+  buy(itemId, expectedRevision = 0) {
+    return this.#call("POST", `bazaar/buy/${encodeURIComponent(itemId)}`, actionBody(expectedRevision));
+  }
+
+  sell(itemId, expectedRevision = 0) {
+    return this.#call("POST", `bazaar/sell/${encodeURIComponent(itemId)}`, actionBody(expectedRevision));
+  }
+
+  equip(itemId, expectedRevision = 0) {
+    return this.#call("POST", `equipment/toggle/${encodeURIComponent(itemId)}`, actionBody(expectedRevision));
+  }
+
+  recover(menaceId, expectedRevision = 0) {
+    return this.#call("POST", `menaces/${encodeURIComponent(menaceId)}/recover`, actionBody(expectedRevision));
   }
 
   reset() {
@@ -66,9 +79,15 @@ export class SupabaseGameService {
       body: JSON.stringify(body)
     });
     const data = await response.json().catch(() => ({}));
-    if (!response.ok || !data.access_token) throw new Error(data.msg ?? data.error_description ?? `Auth failed: ${response.status}`);
+    if (!response.ok || !data.access_token) {
+      throw new Error(data.msg ?? data.error_description ?? `Auth failed: ${response.status}`);
+    }
     return data;
   }
+}
+
+function actionBody(expectedRevision) {
+  return { requestId: crypto.randomUUID(), expectedRevision: Number(expectedRevision ?? 0) };
 }
 
 function readJson(storage, key) {
