@@ -1,4 +1,4 @@
-import { items, equipmentSlots } from "./content.js?v=20260930-21";
+import { items, equipmentSlots } from "./content.js?v=20260930-22";
 
 const operators = {
   "==": (actual, expected) => actual === expected,

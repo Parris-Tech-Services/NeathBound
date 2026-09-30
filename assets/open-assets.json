@@ -5,7 +5,11 @@
     "sourcePage": "https://commons.wikimedia.org/wiki/File:Ishigaki_Stalactite_Cave_01.jpg",
     "license": "CC0-1.0",
     "author": "AsPJT",
-    "uses": ["cavern panorama", "promo art", "story-card crop"]
+    "uses": [
+      "cavern panorama",
+      "promo art",
+      "story-card crop"
+    ]
   },
   {
     "id": "paper-texture",
@@ -13,7 +17,10 @@
     "sourcePage": "https://commons.wikimedia.org/wiki/File:%D0%A2%D0%B5%D0%BA%D1%81%D1%82%D1%83%D1%80%D0%B0_%D0%B1%D1%83%D0%BC%D0%B0%D0%B3%D0%B8.jpg",
     "license": "CC0-1.0",
     "author": "Iroi su",
-    "uses": ["parchment board", "story cards"]
+    "uses": [
+      "parchment board",
+      "story cards"
+    ]
   },
   {
     "id": "magnifying-glass",
@@ -21,7 +28,9 @@
     "sourcePage": "https://commons.wikimedia.org/wiki/File:Magnifying-glass.jpg",
     "license": "Public-Domain",
     "author": "Endofskull",
-    "uses": ["story-card art"]
+    "uses": [
+      "story-card art"
+    ]
   },
   {
     "id": "old-map-1807",
@@ -29,7 +38,10 @@
     "sourcePage": "https://commons.wikimedia.org/wiki/File:Old_map_1807_plan.jpg",
     "license": "Public-Domain",
     "author": "Unknown / historical work",
-    "uses": ["featured art", "story-card art"]
+    "uses": [
+      "featured art",
+      "story-card art"
+    ]
   },
   {
     "id": "teacup",
@@ -37,7 +49,9 @@
     "sourcePage": "https://commons.wikimedia.org/wiki/File:Teacup.png",
     "license": "CC0-1.0",
     "author": "Rijksmuseum source / Commons derivative",
-    "uses": ["story-card art"]
+    "uses": [
+      "story-card art"
+    ]
   },
   {
     "id": "old-library-books",
@@ -45,6 +59,38 @@
     "sourcePage": "https://commons.wikimedia.org/wiki/File:Old_Books_in_the_library.jpg",
     "license": "Public-Domain",
     "author": "InfoSources",
-    "uses": ["story-card art"]
+    "uses": [
+      "story-card art"
+    ]
+  },
+  {
+    "id": "cromer-pier-night",
+    "assetUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Cromer_pier_at_night.jpg",
+    "sourcePage": "https://commons.wikimedia.org/wiki/File:Cromer_pier_at_night.jpg",
+    "license": "CC0-1.0",
+    "author": "diego_torres",
+    "uses": [
+      "Lantern Quay location art"
+    ]
+  },
+  {
+    "id": "diving-bell-psf",
+    "assetUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Diving_Bell_(PSF).png",
+    "sourcePage": "https://commons.wikimedia.org/wiki/File:Diving_Bell_(PSF).png",
+    "license": "Public-Domain",
+    "author": "Pearson Scott Foresman",
+    "uses": [
+      "The Bell Under Water story art"
+    ]
+  },
+  {
+    "id": "beccario-portolan-1426",
+    "assetUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Portolan_map_by_Battista_Beccario_(1426).jpg",
+    "sourcePage": "https://commons.wikimedia.org/wiki/File:Portolan_map_by_Battista_Beccario_(1426).jpg",
+    "license": "Public-Domain",
+    "author": "Battista Beccario",
+    "uses": [
+      "The Cartographer at Dusk story art"
+    ]
   }
 ]

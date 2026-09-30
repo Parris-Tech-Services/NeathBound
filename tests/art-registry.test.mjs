@@ -25,6 +25,15 @@ test("every storylet and opportunity card has dedicated artwork", () => {
 });
 
 test("renderer keeps the artwork hooks wired into location and story panels", () => {
-  assert.match(renderSource, /storyArtSvg\(story\.id, state\.locationId\)/);
-  assert.match(renderSource, /locationArtSvg\(state\.locationId\)/);
+  assert.match(renderSource, /storyArtMarkup\(story\.id, state\.locationId\)/);
+  assert.match(renderSource, /locationArtMarkup\(state\.locationId\)/);
+});
+
+test("real photographs are wired for the visible Lantern Quay introduction", () => {
+  assert.match(renderSource, /const STORY_IMAGE_ART = \{/);
+  assert.match(renderSource, /"bell-under-water": "https:\/\//);
+  assert.match(renderSource, /"cartographer-at-dusk": "https:\/\//);
+  assert.match(renderSource, /const LOCATION_IMAGE_ART = \{/);
+  assert.match(renderSource, /"lantern-quay": "https:\/\//);
+  assert.match(renderSource, /class="narrative-picture"/);
 });
