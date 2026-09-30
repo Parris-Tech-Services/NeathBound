@@ -1,5 +1,5 @@
 import { locations, menaceAreas, stories } from "./content.js?v=20260930-19";
-import { cloneState, initialState } from "./state.js?v=20260930-19";
+import { cloneState, newPlayerState } from "./state.js?v=20260930-19";
 import { applyEffects, awardProgress, describeChallenge, requirementsMet, resolveChallenge } from "./rules.js?v=20260930-19";
 
 export { describeChallenge };
@@ -49,8 +49,10 @@ export function canPlay(state, story, context = {}) {
 }
 
 export function availableStories(state, context = {}) {
+  const tutorialComplete = state.flags?.["tutorial:complete"] === true;
   return currentLocation(state).stories
     .filter((id) => storyAvailable(state, id, context))
+    .filter((id) => tutorialComplete || stories[id]?.tags?.includes("tutorial"))
     .map((id) => ({ id, ...stories[id] }));
 }
 
@@ -173,7 +175,7 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
 }
 
 export function resetState() {
-  return initialState();
+  return newPlayerState();
 }
 
 export function describeChanges(before, after) {
