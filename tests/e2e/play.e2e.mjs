@@ -50,7 +50,7 @@ after(async () => {
   if (unique.length) console.warn(report);
 });
 
-async function openGame() {
+async function openGame({ established = true } = {}) {
   const context = await browser.newContext();
   const page = await context.newPage();
   page.setDefaultTimeout(10_000);
@@ -70,6 +70,39 @@ async function openGame() {
   page.on("requestfailed", (req) => record(req.url(), `request failed: ${req.url()} ${req.failure()?.errorText}`));
   page.on("response", (res) => { if (res.status() >= 400) record(res.url(), `HTTP ${res.status()}: ${res.url()}`); });
   page.on("dialog", (dialog) => dialog.accept());
+
+  if (established) {
+    await page.goto(new URL("?api=local", baseUrl).href, { waitUntil: "domcontentloaded" });
+    await page.evaluate(([key, save]) => localStorage.setItem(key, JSON.stringify(save)), [SAVE_KEY, {
+      version: 4,
+      revision: 0,
+      name: "The Unmoored",
+      locationId: "lantern-quay",
+      echoes: 12,
+      momentum: 0,
+      qualities: { nerve: 2, insight: 2, poise: 1, shadow: 0 },
+      menaces: { dread: 0, scandal: 0, wounds: 0, suspicion: 0 },
+      items: { "salted-map": 1, "brass-key": 1 },
+      unlockedLocations: ["lantern-quay", "velvet-market", "hollow-archive"],
+      acquaintances: [],
+      flags: {
+        __revision: 0,
+        "tutorial:story": true,
+        "tutorial:escaped": true,
+        "tutorial:myself": true,
+        "tutorial:possessions": true,
+        "tutorial:travel": true,
+        "tutorial:complete": true
+      },
+      globalFlags: {},
+      hand: [],
+      discard: [],
+      journal: ["You woke beneath a sky made of stone, with a brass key in your hand."],
+      events: [],
+      lastDraw: "bell-under-water"
+    }]);
+  }
+
   await page.goto(new URL("?api=local&autoplay=1", baseUrl).href, { waitUntil: "networkidle" });
   await page.waitForSelector("[data-choice]");
   return { context, page, problems };
@@ -106,6 +139,51 @@ test("entering the city shows the loader until the game has rendered", async () 
   await page.waitForSelector("[data-choice]");
   await page.waitForFunction(() => !document.querySelector("#boot-screen"));
   assert.equal(await page.locator("#app").getAttribute("aria-busy"), "false");
+  await context.close();
+});
+
+test("a new character escapes The Lair and progressively unlocks the interface", async () => {
+  const { context, page, problems } = await openGame({ established: false });
+
+  assert.match(await page.locator("body").innerText(), /The Lair/);
+  assert.equal(await page.locator(".main-tabs [data-view=myself]").count(), 0);
+  assert.equal(await page.locator(".main-tabs [data-view=possessions]").count(), 0);
+  assert.equal(await page.locator("#travel-location").count(), 0);
+
+  for (let attempts = 0; attempts < 5; attempts += 1) {
+    const save = await readSave(page);
+    if (save.flags?.["tutorial:escape-ready"]) break;
+    await page.locator('[data-story="wake-in-the-lair"][data-choice="force"]').click();
+    await page.locator('[data-action="onwards"]').click();
+  }
+
+  assert.equal((await readSave(page)).flags["tutorial:escape-ready"], true);
+  await page.locator('[data-story="the-way-out"][data-choice="leave"]').click();
+  await page.locator('[data-action="onwards"]').click();
+  assert.match(await page.locator("body").innerText(), /Lantern Quay/);
+  assert.equal(await page.locator(".main-tabs [data-view=myself]").count(), 0);
+
+  await page.locator('[data-story="first-night-name"][data-choice="sign"]').click();
+  await page.locator('[data-action="onwards"]').click();
+  assert.equal(await page.locator(".main-tabs [data-view=myself]").count(), 1);
+  assert.equal(await page.locator(".main-tabs [data-view=possessions]").count(), 0);
+
+  await page.locator('[data-story="first-night-belongings"][data-choice="take"]').click();
+  await page.locator('[data-action="onwards"]').click();
+  assert.equal(await page.locator(".main-tabs [data-view=possessions]").count(), 1);
+  assert.equal((await readSave(page)).items["salted-map"], 1);
+  assert.equal((await readSave(page)).items["brass-key"], 1);
+  assert.equal(await page.locator("#travel-location").count(), 0);
+
+  await page.locator('[data-story="first-night-roads"][data-choice="learn"]').click();
+  await page.locator('[data-action="onwards"]').click();
+
+  const completed = await readSave(page);
+  assert.equal(completed.flags["tutorial:complete"], true);
+  assert.equal(completed.flags["tutorial:travel"], true);
+  assert.equal(await page.locator("#travel-location").count(), 1);
+  assert.match(await page.locator("body").innerText(), /The Bell Under Water/);
+  assert.deepEqual(problems, []);
   await context.close();
 });
 
