@@ -1,6 +1,3 @@
-// Supabase Edge Function entry point: auth, CORS and the Postgres repository.
-// Game rules live in handler.js and ./game/ (a copy of src/game, kept in sync
-// by `npm run sync:engine`; tests fail if the copies drift).
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { handle } from "./handler.js";
@@ -52,8 +49,9 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
     const result = await handle(
-      { method: req.method, path: new URL(req.url).pathname, userId: auth.user.id },
+      { method: req.method, path: new URL(req.url).pathname, userId: auth.user.id, body },
       { repo }
     );
     return new Response(JSON.stringify(result.body), { status: result.status, headers });
