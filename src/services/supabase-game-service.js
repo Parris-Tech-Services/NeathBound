@@ -28,6 +28,10 @@ export class SupabaseGameService {
     return this.#call("POST", `travel/${encodeURIComponent(locationId)}`, { expectedRevision });
   }
 
+  act(action, payload = {}, { expectedRevision } = {}) {
+    return this.#call("POST", `action/${encodeURIComponent(action)}`, { ...payload, expectedRevision });
+  }
+
   reset() {
     return this.#call("POST", "reset");
   }
