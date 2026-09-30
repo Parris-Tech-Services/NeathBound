@@ -1,3 +1,5 @@
+import { equipmentBonuses } from "./items.js";
+
 const operators = {
   "==": (actual, expected) => actual === expected,
   "!=": (actual, expected) => actual !== expected,
@@ -30,8 +32,7 @@ export function valueForRequirement(state, requirement, context = {}) {
 
 export function requirementMet(state, requirement, context = {}) {
   const op = operators[requirement.op ?? "=="];
-  if (!op) return false;
-  return op(valueForRequirement(state, requirement, context), requirement.value);
+  return Boolean(op && op(valueForRequirement(state, requirement, context), requirement.value));
 }
 
 export function requirementsMet(state, requirements = [], context = {}) {
@@ -41,19 +42,19 @@ export function requirementsMet(state, requirements = [], context = {}) {
 export function applyEffect(state, effect) {
   switch (effect.type) {
     case "quality":
-      state.qualities[effect.id] = Math.max(0, (state.qualities[effect.id] ?? 0) + Number(effect.amount ?? 0));
+      state.qualities[effect.id] = Math.max(0, Number(state.qualities[effect.id] ?? 0) + Number(effect.amount ?? 0));
       break;
     case "set-quality":
       state.qualities[effect.id] = Math.max(0, Number(effect.value ?? 0));
       break;
     case "menace":
-      state.menaces[effect.id] = Math.max(0, (state.menaces[effect.id] ?? 0) + Number(effect.amount ?? 0));
+      state.menaces[effect.id] = Math.max(0, Number(state.menaces[effect.id] ?? 0) + Number(effect.amount ?? 0));
       break;
     case "echoes":
-      state.echoes = Math.max(0, (state.echoes ?? 0) + Number(effect.amount ?? 0));
+      state.echoes = Math.max(0, Number(state.echoes ?? 0) + Number(effect.amount ?? 0));
       break;
     case "item": {
-      const next = Math.max(0, (state.items[effect.id] ?? 0) + Number(effect.amount ?? 0));
+      const next = Math.max(0, Number(state.items[effect.id] ?? 0) + Number(effect.amount ?? 0));
       if (next === 0) delete state.items[effect.id];
       else state.items[effect.id] = next;
       break;
@@ -81,10 +82,25 @@ export function applyEffects(state, effects = []) {
   return state;
 }
 
+export function effectiveQuality(state, qualityId) {
+  const base = Number(state.qualities?.[qualityId] ?? 0);
+  const bonus = Number(equipmentBonuses(state)[qualityId] ?? 0);
+  return { base, bonus, total: base + bonus };
+}
+
 export function resolveChallenge(state, challenge, random = Math.random) {
-  if (!challenge) return { success: true, roll: null, total: null, quality: null };
+  if (!challenge) {
+    return { success: true, roll: null, total: null, quality: null, baseQuality: null, bonus: 0 };
+  }
   const die = Math.floor(random() * 10) + 1;
-  const quality = state.qualities?.[challenge.quality] ?? 0;
-  const total = die + quality;
-  return { success: total >= challenge.difficulty, roll: die, total, quality };
+  const effective = effectiveQuality(state, challenge.quality);
+  const total = die + effective.total;
+  return {
+    success: total >= challenge.difficulty,
+    roll: die,
+    total,
+    quality: effective.total,
+    baseQuality: effective.base,
+    bonus: effective.bonus
+  };
 }
