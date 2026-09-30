@@ -1,5 +1,5 @@
-import { resolveChoice, resetState } from "../game/engine.js?v=20260930-14";
-import { loadState, saveState } from "../game/state.js?v=20260930-14";
+import { resolveChoice, resolveGameAction, resetState } from "../game/engine.js?v=20260930-15";
+import { loadState, saveState } from "../game/state.js?v=20260930-15";
 
 export class LocalGameService {
   constructor(storage = globalThis.localStorage) {
@@ -16,6 +16,17 @@ export class LocalGameService {
       return { error: "This save changed in another tab.", state: this.state };
     }
     const outcome = resolveChoice(this.state, storyId, choiceId);
+    if (outcome.error) return outcome;
+    this.state = outcome.state;
+    saveState(this.state, this.storage);
+    return outcome;
+  }
+
+  async act(action, payload = {}, { expectedRevision } = {}) {
+    if (Number.isInteger(expectedRevision) && expectedRevision !== Number(this.state.revision ?? 0)) {
+      return { error: "This save changed in another tab.", state: this.state };
+    }
+    const outcome = resolveGameAction(this.state, action, payload);
     if (outcome.error) return outcome;
     this.state = outcome.state;
     saveState(this.state, this.storage);
