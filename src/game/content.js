@@ -1,3 +1,5 @@
+import { ambitions, destinies, festivals, qbnStories, qbnCards } from "./qbn-expansion.js?v=20261015-04";
+export { ambitions, destinies, festivals };
 import { expansionLocations, expansionStories } from "./expansion.js?v=20261015-03";
 
 
@@ -31,7 +33,7 @@ export const itemCategories = {
   lesson: "Recalled Lessons"
 };
 
-export const equipmentSlots = ["hat", "clothing", "gloves", "boots", "weapon", "companion"];
+export const equipmentSlots = ["boon","hat","clothing","adornment","gloves","weapon","boots","luggage","companion","treasure","destiny","tools-of-the-trade","affiliation","transport","home-comfort","ship","crew","airship","spouse","club"];
 
 export const items = {
   "brass-key": { name: "Brass Key", description: "Heavy and cold.", category: "tool" },
@@ -2099,3 +2101,19 @@ export const refuges = {
 Object.assign(locations, expansionLocations);
 Object.assign(stories, expansionStories);
 locations["lantern-quay"].stories.unshift("quay-roads");
+
+// Original QBN extension: existing storylets, maps and items remain unchanged.
+Object.assign(items, {
+ "treasure-ledger": {name:"Keeper's Ledger",description:"A permanent account of the missing.",category:"curiosity",slot:"treasure",stats:{insight:5,poise:2}},
+ "treasure-lamp": {name:"The Unfailing Lamp",description:"It burns when official lamps fail.",category:"curiosity",slot:"treasure",stats:{nerve:5}},
+ "treasure-oath": {name:"River Oath",description:"A promise that cannot be submerged.",category:"curiosity",slot:"treasure",stats:{poise:5}},
+ "treasure-clock": {name:"Unspent Hour",description:"A clock that records nobody's time.",category:"curiosity",slot:"treasure",stats:{shadow:5}}
+});
+Object.assign(stories,qbnStories);
+Object.assign(cards,qbnCards);
+decks.whispers.cardIds.push(...Object.keys(qbnCards));
+locations["lantern-quay"].stories.push("qbn-choose-ambition",
+ ...Object.keys(qbnStories).filter(id=>id.startsWith("qbn-missing-name-")||id.startsWith("qbn-last-light-")||id.startsWith("qbn-river-debt-")||id.startsWith("qbn-stolen-hour-")||id.startsWith("qbn-festival-")||id.startsWith("qbn-investigate-")));
+for(const [menace,areaId] of Object.entries(menaceAreas)){
+ if(locations[areaId])locations[areaId].stories.push("qbn-arrival-"+menace);
+}
