@@ -88,6 +88,18 @@ export function repairDraft(input,ctx,{ensureProgress=true}={}){
    }
   }
  });
+ // The workflow gate requires a pitch, although it used to be absent from QA.
+ // Construct a grounded first draft from the user's existing scene and choices.
+ // Do not fabricate a premise when the original contains no useful story content.
+ if(!text(s.pitch)&&text(s.description).length>=40){
+  const premise=text(s.description).replace(/\\s+/g," ").slice(0,400);
+  const approaches=s.choices.map(c=>text(c.label)).filter(Boolean).slice(0,3);
+  const setbacks=s.choices.map(c=>text(c.failure?.text)).filter(Boolean).slice(0,2);
+  s.pitch="Premise: "+premise+
+   (approaches.length?" The player must decide whether to "+approaches.join(" or ").replace(/[.!?]+$/,"")+".":"")+
+   (setbacks.length?" Stakes: "+setbacks.join(" Alternatively, ").slice(0,270):"");
+  changes.push("pitch: built a usable outline from the existing scene, branches, and setbacks (ready for editorial revision)");
+ }
  if(s.author==null)s.author="";
  if(s.reviewer==null)s.reviewer="";
  return {story:s,changes,report:audit(s,ctx)};
