@@ -353,6 +353,7 @@
 "festival","cinder-fair","Cinder Fair","","","","","{""start"":[8,10],""end"":[8,25]}"
 "festival","winter-names","Winter Names","","","","","{""start"":[6,1],""end"":[6,20]}"
 "quality","dread","dread","","","","","menace"
+"quality","gloomwing_hunt_progress","gloomwing_hunt_progress","","","","","story"
 "quality","insight","insight","","","","","primary"
 "quality","investigation-progress","investigation-progress","","","","","story"
 "quality","nerve","nerve","","","","","primary"
