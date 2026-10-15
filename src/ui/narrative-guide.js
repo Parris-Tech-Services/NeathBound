@@ -6,7 +6,10 @@ export const CITY_ROUTES = [
   { id: "hollow-archive", hint: "Follow the Bell Under Water at Lantern Quay." },
   { id: "velvet-market", hint: "Meet the Cartographer at Dusk at Lantern Quay, or ask the Quiet Librarian." },
   { id: "clockwork-gardens", hint: "Trade a rumour in the Velvet Market, or wash the salt from the cartographer's map." },
-  { id: "glass-observatory", hint: "Recover your own Archive entry and follow The Margin Note." }
+  { id: "glass-observatory", hint: "Recover your own Archive entry and follow The Margin Note." },
+  { id: "ashrail-station", hint: "From Lantern Quay, choose Three Roads Out of Lantern Quay and ride the north line." },
+  { id: "cinder-ward", hint: "From Lantern Quay, choose Three Roads Out of Lantern Quay and climb the east stair." },
+  { id: "registry-of-hours", hint: "At Ashrail Station, investigate The Cancelled Platform to unlock the Registry." }
 ];
 
 export function getQuestGuide(state) {
@@ -14,7 +17,7 @@ export function getQuestGuide(state) {
   const hasPage = (state.items?.["unfinished-page"] ?? 0) > 0;
   const known = new Set(state.unlockedLocations ?? []);
   const make = (chapter, title, knownFact, objective, nextLocation, storyId, step) =>
-    ({ chapter, title, knownFact, objective, nextLocation, storyId, step, total: 7 });
+    ({ chapter, title, knownFact, objective, nextLocation, storyId, step, total: chapter.startsWith("Chapter Two") ? 4 : 7 });
   if (state.locationId === "the-lair") {
     return make("Prologue", "The Missing Name", "The Lair's registry lists another person in your place. A bell is stamped into the lock.", "Escape through A Way Out and follow the clue to Lantern Quay.", "the-lair", "lair-escape", 1);
   }
@@ -38,5 +41,33 @@ export function getQuestGuide(state) {
   if (!flags["far-crack-answered"]) {
     return make("Chapter One", "Choose what to do with the evidence", "The Observatory's uncharted crack holds light that isn't from any city lamp.", "At the Glass Observatory, explore The Far Crack. You may document the evidence, or signal it if you have a small sun.", "glass-observatory", "the-far-crack", 7);
   }
-  return make("Chapter One: complete", "A name still missing", "You traced the falsified registry to the Archive and its strange skyward reference. You found evidence, but not yet the person who altered your record.", "Explore other storylines and develop your qualities. The next chapter of the identity mystery has not been written yet.", state.locationId, null, 7);
+  if (!flags["chapter-two:ticket"]) {
+    return make("Chapter Two", "The cancelled journey",
+      "The far crack was witnessed when your name vanished. Someone also cancelled a railway platform at the same moment.",
+      "At Lantern Quay, choose Three Roads Out of Lantern Quay and take the north line. At Ashrail Station, investigate The Cancelled Platform.",
+      known.has("ashrail-station") ? "ashrail-station" : "lantern-quay",
+      known.has("ashrail-station") ? "ashrail-cancelled-platform" : "quay-roads", 1);
+  }
+  if (!flags["chapter-two:evidence"]) {
+    return make("Chapter Two", "The Thirteenth Correction",
+      "The cancelled ticket identifies the Registry of Hours. The Observatory charts show why the thirteenth bell matters.",
+      "Travel to the Registry of Hours using the city map and choose The Thirteenth Correction. You can also visit Cinder Ward to meet families whose records were removed.",
+      "registry-of-hours", "registry-thirteenth-correction", 2);
+  }
+  if (!flags["chapter-two:complete"]) {
+    return make("Chapter Two", "What shall the city remember?",
+      "A clerk erased families' names to hide them from the hungry presence beyond the stone sky. Now you have the evidence.",
+      "At the Registry of Hours, choose What Shall the City Remember? Your decision is permanent in this playthrough.",
+      "registry-of-hours", "registry-last-decision", 3);
+  }
+  if (!flags["story-complete:registry-afterword"]) {
+    return make("Chapter Two", "The clerk's last note",
+      "Your choice changed who the city recognises, and who is hidden. The Registry still has a message for you.",
+      "At the Registry of Hours, read The Clerk's Last Note to finish Chapter Two.",
+      "registry-of-hours", "registry-afterword", 4);
+  }
+  return make("Chapter Two: complete", "Your choice remains",
+    flags["chapter-two:truth-published"] ? "The deleted names are public again, but their bearers may now be exposed." : "You hid the names in a private ledger, protecting lives while leaving people unrecognised.",
+    "Explore Ashrail Station, Cinder Ward, the Registry and earlier districts. Chapter Three remains unwritten.",
+    state.locationId, null, 4);
 }
