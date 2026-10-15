@@ -89,7 +89,7 @@ export function mountGroqAssistant({project,getStory,isReference,createStory,upd
  const ui=document.createElement("section");
  ui.id="groq-studio";ui.className="panel";ui.setAttribute("aria-label","Groq AI narrative assistant");
  ui.innerHTML='<h3>✦ Groq AI writing partner</h3>'+
-  '<p class="muted">For pitches, branching, prose, NPCs, economy, timed stories, continuity, QA and cross-game handoffs. Suggestions are previewed before applying. Human sign-off stays mandatory.</p>'+
+  '<p class="muted">For pitches, branching, prose, NPCs, economy, timed stories, continuity, QA and cross-game handoffs. Suggestions are previewed before applying. Human sign-off stays mandatory. Keys remain on the server. <a href="./GROQ_AI.md" target="_blank" rel="noreferrer">Groq configuration and safety guide</a>.</p>'+
   '<div class="grid"><div><label for="groq-mode">AI task</label><select id="groq-mode">'+
   Object.entries(MODES).map(([k,v])=>'<option value="'+esc(k)+'">'+esc(v)+'</option>').join("")+
   '</select></div><div><label for="groq-model">Model</label><select id="groq-model">'+
