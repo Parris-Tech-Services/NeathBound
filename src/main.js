@@ -1,5 +1,5 @@
 import { createGameService } from "./services/index.js?v=20261015-03";
-import { render } from "./ui/render.js?v=20261015-03";
+import { render } from "./ui/render.js?v=20261015-04";
 import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20261015-03";
 
 const app = document.querySelector("#app");
@@ -310,3 +310,6 @@ document.addEventListener("visibilitychange", () => {
     draw().catch(showError);
   }
 });
+
+// Refresh pending Living Stories while the tab is open.
+setInterval(()=>{if(started&&!pending&&!lastOutcome)draw().catch(showError);},60000);
