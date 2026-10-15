@@ -153,6 +153,8 @@ test("New life resets the character", async () => {
   const { context, page, problems } = await openGame();
   await page.locator("[data-choice]:not([disabled])").first().click();
   await page.waitForFunction((key) => (JSON.parse(localStorage.getItem(key) ?? "{}").journal ?? []).length > 1, SAVE_KEY);
+  // Complete the visible outcome dialog before interacting with background navigation.
+  await page.locator('[data-action="onwards"]').click();
   await page.locator("[data-action=reset]").first().click();
   await page.waitForFunction((key) => (JSON.parse(localStorage.getItem(key) ?? "{}").journal ?? []).length === 1, SAVE_KEY);
   const save = await readSave(page);
