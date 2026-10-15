@@ -73,7 +73,7 @@ function aiExport(game,story,docs,ctx){
    "Treat this as a proposal, not automatically approved game content.",
    "Apply to its native game first; map story stats, items, locations, menaces and CP formulas when adapting to the other game.",
    "Do not copy existing copyrighted media or canon from another game.",
-   "Preserve player save migration, branch outcome integrity and independent peer sign-off.",
+   "Preserve player save migration, branch outcomes and the accurate declared review mode; independent peer review is optional for explicitly creator-approved solo drafts.",
    "Validate both games using their repository-native narrative studio and CI validators before PR."
   ],
   game_contract:{game,stats:ctx.stats,menaces:ctx.menaces,items:ctx.items,locations:ctx.locations,
@@ -81,7 +81,7 @@ function aiExport(game,story,docs,ctx){
   story:clone(story),
   reference_documents:{bible:(docs.bible||"").slice(0,15000),
    style:(docs.style||"").slice(0,8000),secrets:(docs.secrets||"").slice(0,6000)},
-  review_required:["content","design","mechanical","continuity","peer"],
+  review_required:story.review_mode==="solo-creator"?["creator-confirmed","schema-validated"]:["content","design","mechanical","continuity","peer"],
   integration_tests:["node scripts/validate-content.mjs (Undercity)","npm test (both repos)"]
  };
 }
@@ -91,7 +91,7 @@ export function mountGroqAssistant({project,getStory,isReference,createStory,upd
  const ui=document.createElement("section");
  ui.id="groq-studio";ui.className="panel";ui.setAttribute("aria-label","Groq AI narrative assistant");
  ui.innerHTML='<h3>✦ Groq AI writing partner</h3>'+
-  '<p class="muted">For pitches, branching, prose, NPCs, economy, timed stories, continuity, QA and cross-game handoffs. Suggestions are previewed before applying. Human sign-off stays mandatory. Keys remain on the server. <a href="./GROQ_AI.md" target="_blank" rel="noreferrer">Groq configuration and safety guide</a>.</p>'+
+  '<p class="muted">For pitches, branching, prose, NPCs, economy, timed stories, continuity, QA and cross-game handoffs. Individual AI suggestions are previewed before applying. For solo creators, the one-tap option can complete a validated draft and request explicit creator approval without claiming independent human review. Keys remain on the server. <a href="./GROQ_AI.md" target="_blank" rel="noreferrer">Groq configuration and safety guide</a>.</p>'+
   '<div class="grid"><div><label for="groq-mode">AI task</label><select id="groq-mode">'+
   Object.entries(MODES).map(([k,v])=>'<option value="'+esc(k)+'">'+esc(v)+'</option>').join("")+
   '</select></div><div><label for="groq-model">Model</label><select id="groq-model">'+
