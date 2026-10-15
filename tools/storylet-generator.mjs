@@ -261,7 +261,20 @@ function publish(){
  if(flag("check")){if(!fs.existsSync(full)||fs.readFileSync(full,"utf8")!==code)die("Approved bundle stale: run publish");console.log("Bundle current ("+entries.length+" approved): "+target)}
  else{fs.writeFileSync(full,code);console.log("Compiled "+entries.length+" HUMAN-APPROVED storylets into "+target+"; run full tests before commit");}
 }
-function help(){console.log("Storylet Foundry for "+GAME+"\nGROQ_API_KEY=... node tools/storylet-generator.mjs generate --id original_id --location PLACE --brief 'story beats' [--kind story|card]\nnode tools/storylet-generator.mjs validate --id original_id\nnode tools/storylet-generator.mjs review --id original_id\nnode tools/storylet-generator.mjs approve --id original_id --reviewer 'Editor' --notes 'I checked every choice and its consequences carefully.' --confirm\nnode tools/storylet-generator.mjs publish [--check]\nnode tools/storylet-generator.mjs locations\nEditorial context: bible + style + proposed secrets ledger are loaded for Groq calls by default. Use --omit-secrets only to withhold the ledger; continuity review then remains incomplete.\nKey never goes in repo or browser; nothing is published without human approval.");}
+function help(){
+ console.log([
+  "Storylet Foundry for "+GAME,
+  "Set GROQ_API_KEY as an environment variable, never in client-side code.",
+  "node tools/storylet-generator.mjs locations",
+  "node tools/storylet-generator.mjs generate --id original_id --location PLACE --brief 'story beats' --kind story",
+  "node tools/storylet-generator.mjs validate --id original_id",
+  "node tools/storylet-generator.mjs review --id original_id",
+  "node tools/storylet-generator.mjs approve --id original_id --reviewer 'Editor' --notes 'I have checked every branch and its consequences.' --confirm",
+  "node tools/storylet-generator.mjs publish",
+  "node tools/storylet-generator.mjs publish --check",
+  "AI output never publishes without a recorded human review."
+ ].join("\n"));
+}
 export async function main(){
  if(command==="generate")await generate();
  else if(command==="validate")validateCmd();
