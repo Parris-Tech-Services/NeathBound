@@ -1,6 +1,6 @@
-import { ambitions, destinies, festivals, qbnStories, qbnCards } from "./qbn-expansion.js?v=20261015-06";
+import { ambitions, destinies, festivals, qbnStories, qbnCards } from "./qbn-expansion.js?v=20261015-07";
 export { ambitions, destinies, festivals };
-import { expansionLocations, expansionStories } from "./expansion.js?v=20261015-06";
+import { expansionLocations, expansionStories } from "./expansion.js?v=20261015-07";
 import { gloomwingLocations, gloomwingItems, gloomwingStories } from "./gloomwing-content.js?v=20261015-07";
 
 
