@@ -59,6 +59,8 @@ for(const [choiceIndex,trophy] of [
       assert.equal(storyAvailable(state,id(n)),true,"locked chapter "+n);
       // Simulate the next ten-minute action tick between chapter visits.
       state.last_action_tick=Date.now()-600001;
+      // Advance the simulated clock by 10 minutes between chapters.
+      state.last_action_tick=Date.now()-600000;
       const result=resolveChoice(state,id(n),choice,()=>0);
       assert.equal(result.error,undefined,"error at "+id(n));
       assert.equal(result.success,true,"failed "+id(n));
