@@ -248,6 +248,53 @@ test("Travel opens on demand and never covers the story after choices", async ()
   await context.close();
 });
 
+test("mobile Gloomwing chapter 3 GO visibly responds, and no-action attempts say WAIT", async () => {
+  const { context, page, problems } = await openGame({ completeTutorial: true });
+  await page.setViewportSize({ width: 390, height: 740 });
+  await page.evaluate((key) => {
+    const state = JSON.parse(localStorage.getItem(key));
+    state.locationId = "duskwater";
+    if(!state.unlockedLocations.includes("duskwater")) state.unlockedLocations.push("duskwater");
+    state.ambition = "gloomwing-hunt";
+    state.ambition_progress = { "gloomwing-hunt": 2 };
+    state.qualities.gloomwing_hunt_progress = 2;
+    state.qualities.insight = 12;
+    state.flags["qbn-ambition-chosen"] = true;
+    state.actions = 0;
+    state.last_action_tick = Date.now();
+    localStorage.setItem(key, JSON.stringify(state));
+  }, SAVE_KEY);
+  await page.reload({ waitUntil: "networkidle" });
+  const branch = page.locator('[data-story="gloomwing_hunt_02"][data-choice="investigate"]');
+  await branch.waitFor({ state: "visible" });
+  assert.equal(await branch.isDisabled(), true, "no-actions choice must be disabled, not silently rejected");
+  assert.equal(await branch.innerText(), "WAIT");
+  assert.match(await page.locator('[data-story="gloomwing_hunt_02"]').first().locator("..").innerText(), /No actions remaining/);
+
+  await page.evaluate((key) => {
+    const state = JSON.parse(localStorage.getItem(key));
+    state.actions = 10;
+    state.last_action_tick = Date.now();
+    localStorage.setItem(key, JSON.stringify(state));
+  }, SAVE_KEY);
+  await page.reload({ waitUntil: "networkidle" });
+  const go = page.locator('[data-story="gloomwing_hunt_02"][data-choice="investigate"]');
+  await go.waitFor({ state: "visible" });
+  await go.click();
+  const result = page.locator(".outcome-screen-overlay .outcome-panel[role=dialog]");
+  await result.waitFor({ state: "visible" });
+  assert.equal(await page.locator('[data-action="onwards"]').isVisible(), true);
+  const bounds = await result.boundingBox(), viewport = page.viewportSize();
+  assert.ok(bounds.y < viewport.height && bounds.y + bounds.height > 0, "outcome must be in the mobile viewport");
+  const saved = await readSave(page);
+  assert.equal(saved.ambition_progress["gloomwing-hunt"], 3);
+  assert.equal(saved.actions, 9);
+  await page.locator('[data-action="onwards"]').click();
+  assert.equal(await page.locator(".outcome-screen-overlay").count(), 0);
+  assert.deepEqual(problems, []);
+  await context.close();
+});
+
 test("accessibility audit (axe-core)", async (t) => {
   const { context, page } = await openGame();
   const axeSource = await readFile(createRequire(import.meta.url).resolve("axe-core/axe.min.js"), "utf8");
