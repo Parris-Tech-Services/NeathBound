@@ -359,12 +359,16 @@ const inventoryHtml = inventory.length
     }):['<p>No letters awaiting delivery.</p>']),
     ...((state.messages??[]).map(message=>'<article class="story"><h3>'+escapeHtml(message.title)+'</h3><p>'+escapeHtml(message.text)+'</p><small>'+escapeHtml(message.at??"")+'</small></article>'))
   ].join("");
+  const actionCount=Math.max(0,Number(state.actions??10));
+  const actionCap=Math.max(10,Number(state.max_actions??10));
+  const nextActionIn=actionCount>=actionCap?null:Math.max(0,Math.ceil((600000-(Date.now()-Number(state.last_action_tick??Date.now())))/60000));
   const ambitionName=ambitions[state.ambition]?.name??"Not yet chosen";
   const ambitionStage=state.ambition_progress?.[state.ambition]??0;
   app.innerHTML = [
         '<div class="game-shell outfit-', escapeClass(preferences.outfit), '">',
       '<header class="topbar">',
         '<div class="brand">NEATH<span>◆</span>BOUND</div>',
+        '<div class="action-counter" role="status" aria-live="polite">Actions: ',actionCount,' / ',actionCap, nextActionIn===null?' · Full':' · next in '+nextActionIn+' min','</div>',
         '<nav class="account-nav" aria-label="Account">',
           '<button class="text-link" data-action="reset">New life</button>',
           '<a href="#journal" data-view="story">Journal</a>',
