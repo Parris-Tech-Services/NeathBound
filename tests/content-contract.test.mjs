@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { locations, stories } from "../src/game/content.js";
 
 const operators = new Set(["==", "!=", ">", ">=", "<", "<="]);
-const requirementTypes = new Set(["quality", "item", "flag", "obols", "location", "world-quality", "menace", "time-since-flag"]);
+const requirementTypes = new Set(["quirk", "quality", "item", "flag", "obols", "location", "world-quality", "menace", "time-since-flag"]);
 const effectTypes = new Set(["quality", "set-quality", "obols", "item", "flag", "location", "unlock-location", "menace", "momentum", "global-flag", "acquaintance", "set-time-flag", "quirk", "living-story", "progress", "ambition", "ambition-progress", "destiny", "equip-treasure"]);
 
 function asRequirements(value) {
@@ -32,7 +32,7 @@ test("every story is reachable from at least one location and all references res
 
 test("story and choice ids are unique and narrative fields are complete", () => {
   for (const [storyId, story] of Object.entries(stories)) {
-    assert.match(storyId, /^[a-z0-9][a-z0-9-]*$/);
+    assert.match(storyId, /^[a-z0-9][a-z0-9_-]*$/g);
     assert.ok(story.title?.trim(), `${storyId} missing title`);
     assert.ok(story.text?.trim(), `${storyId} missing text`);
     assert.ok(Array.isArray(story.choices) && story.choices.length > 0, `${storyId} needs choices`);
@@ -41,7 +41,7 @@ test("story and choice ids are unique and narrative fields are complete", () => 
     assert.equal(new Set(ids).size, ids.length, `${storyId} repeats a choice id`);
 
     for (const choice of story.choices) {
-      assert.match(choice.id, /^[a-z0-9][a-z0-9-]*$/, `${storyId} has invalid choice id`);
+      assert.match(choice.id, /^[a-z0-9][a-z0-9_-]*$/, `${storyId} has invalid choice id`);
       assert.ok(choice.label?.trim(), `${storyId}/${choice.id} missing label`);
       assert.ok(choice.success?.trim(), `${storyId}/${choice.id} missing success text`);
     }
