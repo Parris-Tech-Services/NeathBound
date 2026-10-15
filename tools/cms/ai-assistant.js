@@ -105,9 +105,9 @@ export function mountGroqAssistant({project,getStory,isReference,createStory,upd
   '<section id="groq-review" hidden><h3>AI proposal · review before applying</h3>'+
   '<p id="groq-summary"></p><div id="groq-issues"></div>'+
   '<details><summary>Inspect structured AI JSON</summary><pre id="groq-json"></pre></details>'+
-  '<div class="row"><button id="groq-apply" class="primary">Apply proposal to this draft</button>'+
-  '<button id="groq-new">Start separate draft from proposal</button>'+
-  '<button id="groq-export">Download AI proposal JSON</button></div></section>';
+  '<div class="row"><button id="groq-apply" class="primary" disabled>Apply proposal to this draft</button>'+
+  '<button id="groq-new" disabled>Start separate draft from proposal</button>'+
+  '<button id="groq-export" disabled>Download AI proposal JSON</button></div></section>';
  const toolbar=editor.querySelector(".toolbar");
  if(toolbar)toolbar.insertAdjacentElement("afterend",ui);else editor.append(ui);
  const $=x=>ui.querySelector("#"+x);
