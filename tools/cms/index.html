@@ -1,51 +1,75 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neathbound CMS</title>
-    <style>
-        body { font-family: sans-serif; display: flex; height: 100vh; margin: 0; }
-        #sidebar { width: 300px; border-right: 1px solid #ccc; padding: 1rem; overflow-y: auto; background: #fafafa; }
-        #editor { flex-grow: 1; padding: 2rem; overflow-y: auto; }
-        .storylet-item { padding: 0.75rem; cursor: pointer; border-bottom: 1px solid #eee; border-radius: 4px; }
-        .storylet-item:hover { background-color: #e2e8f0; }
-        .form-group { margin-bottom: 1.5rem; }
-        label { display: block; margin-bottom: 0.5rem; font-weight: bold; color: #333; }
-        input[type="text"], textarea { width: 100%; padding: 0.75rem; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; }
-        textarea { height: 150px; resize: vertical; }
-        button { padding: 0.75rem 1.5rem; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
-        button:hover { background: #0056b3; }
-    </style>
-</head>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>QBN Studio · Narrative CMS</title>
+<style>
+:root{color-scheme:dark;--bg:#11191d;--panel:#19262b;--raised:#223339;--line:#40535a;--ink:#f4ebdd;--soft:#bac6c2;--gold:#d8b98b;--red:#a95c60}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:var(--raised);color:var(--ink);border-radius:7px;padding:.52rem .8rem}
+button:hover,button:focus-visible{border-color:var(--gold);outline-color:var(--gold)}button:disabled{opacity:.45;cursor:not-allowed}
+button.primary{background:#86504d;border-color:#ac7472}button.quiet{border:0;background:transparent;color:var(--gold);padding:.3rem .45rem}
+input,select,textarea{background:#0c161a;color:var(--ink);border:1px solid var(--line);border-radius:6px;width:100%;padding:.55rem}
+input:focus,select:focus,textarea:focus{outline:2px solid #a88563;outline-offset:1px}
+textarea{min-height:92px;resize:vertical}label{display:block;font-size:.84rem;color:var(--soft);margin:.65rem 0 .25rem}
+small,.muted{color:var(--soft)}strong{font-weight:650}h1,h2,h3{font-family:Georgia,serif;font-weight:500;line-height:1.2}h1{font-size:1.55rem;margin:0}h2{font-size:1.35rem;margin:0 0 .5rem}h3{font-size:1.13rem;margin:.8rem 0 .5rem}p{margin:.5rem 0 .9rem}
+header{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.85rem 1.35rem;background:#18252a;border-bottom:1px solid var(--line)}
+header .brand{display:flex;align-items:center;gap:.8rem}header .brand b{letter-spacing:.14em;font-size:.7rem;text-transform:uppercase;color:var(--gold)}
+nav{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center}a{color:var(--gold)}
+.shell{display:grid;grid-template-columns:280px minmax(400px,1fr) 340px;min-height:calc(100vh - 68px)}
+aside{background:#172328;padding:1rem;overflow-y:auto;max-height:calc(100vh - 68px)}
+aside:first-child{border-right:1px solid var(--line)}aside:last-child{border-left:1px solid var(--line)}
+main{padding:1.1rem min(3vw,2rem);min-width:0}
+.toolbar{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;margin-bottom:.8rem}
+.story-entry{width:100%;text-align:left;margin:.22rem 0;padding:.58rem;border-color:transparent;background:transparent}
+.story-entry:hover,.story-entry.active{background:#293a40;border-color:var(--line)}.story-entry b{display:block;font-weight:550}.story-entry small{display:block;font-size:.73rem}
+.story-entry.reference{opacity:.73}
+.pills{display:flex;flex-wrap:wrap;gap:.35rem;margin:.8rem 0 1.15rem}.pill{font-size:.7rem;letter-spacing:.02em;padding:.3rem .52rem;border-radius:4px;border:1px solid var(--line);color:var(--soft)}
+.pill.active{background:#493a35;border-color:#bf9465;color:#fff0d0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem 1rem}
+.full{grid-column:1/-1}.field{min-width:0}
+.panel{border:1px solid var(--line);border-radius:9px;background:var(--panel);padding:1rem;margin:1rem 0}
+.branch{border-left:3px solid #9f765c;margin:1rem 0;padding:.3rem .7rem 1rem;background:#203138;border-radius:5px}
+.outcome{border:1px solid var(--line);padding:.65rem;margin:.6rem 0;border-radius:6px}
+.outcome h4{font-size:.86rem;margin:0;text-transform:uppercase;letter-spacing:.09em;color:var(--gold)}
+.row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.row.between{justify-content:space-between}
+.row>button{flex-shrink:0}
+.actionrow{display:grid;grid-template-columns:100px 1fr 85px 95px 30px;gap:.3rem;align-items:end;margin:.45rem 0}
+.actionrow label{margin:0}.actionrow input,.actionrow select{min-width:0}
+.check{display:flex;gap:.5rem;align-items:center;margin:.6rem 0;color:var(--ink)}
+.check input{width:auto;accent-color:#d3aa78}
+.qa-error,.qa-warning{margin:.5rem 0;border-left:3px solid var(--red);padding:.4rem .65rem;background:#322628;overflow-wrap:anywhere}
+.qa-warning{border-color:var(--gold);background:#2a2a23}
+.notice{padding:.55rem .75rem;border-radius:6px;background:#263a39;border:1px solid #637f74;margin:.5rem 0}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#0d171a;padding:.85rem;border-radius:6px;max-height:330px;overflow:auto}
+#toast{position:fixed;bottom:1.1rem;right:1.1rem;background:#f2e5c9;color:#17262a;padding:.75rem 1rem;border-radius:8px;box-shadow:0 9px 24px #0008;max-width:440px;display:none;z-index:9}
+#toast.visible{display:block}
+#file-upload{display:none}
+@media(max-width:1100px){.shell{grid-template-columns:235px minmax(0,1fr)}aside:last-child{grid-column:1/-1;max-height:none;border:0;border-top:1px solid var(--line)}}
+@media(max-width:700px){header{align-items:flex-start;flex-direction:column}.shell{display:block}aside{max-height:none;border:0!important}aside:first-child{border-bottom:1px solid var(--line)}main{padding:1rem}.grid{grid-template-columns:1fr}.actionrow{grid-template-columns:1fr 1fr}.actionrow>*:last-child{justify-self:start}}
+</style></head>
 <body>
-    <div id="sidebar">
-        <h2>Storylets</h2>
-        <div id="storylet-list"></div>
-    </div>
-    <div id="editor">
-        <h2>Edit Storylet</h2>
-        <div id="form-container" style="display: none;">
-            <div class="form-group">
-                <label>Storylet ID</label>
-                <input type="text" id="story-id" readonly style="background: #f0f0f0; color: #666;">
-            </div>
-            <div class="form-group">
-                <label>Title</label>
-                <input type="text" id="story-title">
-            </div>
-            <div class="form-group">
-                <label>Kicker</label>
-                <input type="text" id="story-kicker">
-            </div>
-            <div class="form-group">
-                <label>Text</label>
-                <textarea id="story-text"></textarea>
-            </div>
-            <button id="save-btn">Save Changes (Stub)</button>
-        </div>
-        <p id="empty-state">Select a storylet from the sidebar to edit its properties.</p>
-    </div>
-    <script type="module" src="./app.js"></script>
-</body>
-</html>
+<header><div class="brand"><b id="project-name">QBN STUDIO</b><div><h1>Narrative workshop</h1><small>Original storylets · deliberate approvals</small></div></div>
+<nav><a href="../../index.html">← Play the game</a><button id="new-story" class="primary">+ New storylet</button><button id="download-all">Export drafts</button><button id="import-button">Import</button><input id="file-upload" type="file" accept="application/json,.json" aria-label="Import studio JSON"></nav></header>
+<div class="shell">
+<aside aria-label="Storylet catalogue"><h2>Your desk</h2><p class="muted">Drafts autosave in this browser. Export JSON before clearing data.</p>
+<label for="story-search">Find a storylet</label><input id="story-search" placeholder="Search titles or IDs">
+<label for="story-filter">Show</label><select id="story-filter"><option value="drafts">Your drafts</option><option value="all">Drafts and published references</option><option value="references">Published references</option></select>
+<div id="story-list" aria-live="polite"></div>
+</aside>
+<main><div id="welcome"><h2>Stories built with care</h2><p>Create a storylet, shape its branches, draft original prose, then move it through content, economy, mechanical, continuity and peer review.</p><p>Nothing is published to either game automatically. Approved JSON is built into the game only through a reviewed repository commit.</p></div>
+<section id="editor" hidden aria-label="Storylet editor">
+<div class="row between"><div><small id="editor-subtitle"></small><h2 id="editor-title">Storylet</h2></div><div class="row"><button id="clone-story">Duplicate</button><button id="delete-story">Delete draft</button></div></div>
+<div id="phase-bar" class="pills" aria-label="Writing phases"></div>
+<div class="toolbar"><button id="go-next" class="primary">Advance stage →</button><button id="save-story">Save draft</button><button id="export-story">Export JSON</button><button id="copy-prompt">Copy agent brief</button></div>
+<div id="fields"></div><section class="panel"><h3>Branching choices</h3><p class="muted">Each choice is a small state machine: requirements, stat test, success, failure and effects.</p><div id="branches"></div><button id="add-choice">+ Add choice</button></section>
+</section></main>
+<aside aria-label="Quality assurance and world references"><div class="row between"><h2>Quality gates</h2><button id="run-qa">Run QA</button></div><div id="qa-results"></div>
+<div id="qa-signoffs"></div>
+<hr style="border:0;border-top:1px solid var(--line);margin:1.5rem 0">
+<h2>Living world</h2><p class="muted">Secret depth is an upper bound. Rumours and deliberately conflicting accounts must be attributed, not silently canonised.</p>
+<label for="secret-search">Search secrets</label><input id="secret-search" placeholder="A person, secret or faction"><div id="secret-list"></div>
+<h3>Studio documents</h3><p><a href="./bible.md" target="_blank" rel="noreferrer">Project bible</a> · <a href="./secrets.md" target="_blank" rel="noreferrer">Secrets ledger</a> · <a href="./style.md" target="_blank" rel="noreferrer">Style guide</a> · <a href="./WORKFLOW.md" target="_blank" rel="noreferrer">Publishing workflow</a></p></aside>
+</div><div id="toast" role="status" aria-live="polite"></div>
+<!-- Optional game content reference scripts are injected by each game's adapter. -->
+<script type="module" src="./app.js"></script>
+</body></html>
