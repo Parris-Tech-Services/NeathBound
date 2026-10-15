@@ -3,7 +3,7 @@ import { requirementsMet } from "./rules.js?v=20261015-02";
 export function eligibleCards(state, deck, cards, context = {}) {
   return (deck.cardIds ?? [])
     .map((id) => ({ id, ...cards[id] }))
-    .filter((card) => card.title && requirementsMet(state, card.requirements, context));
+    .filter((card) => card.title && !state.hand?.includes(card.id) && requirementsMet(state, card.requirements, context));
 }
 
 export function drawWeightedCard(state, deck, cards, random = Math.random, context = {}) {

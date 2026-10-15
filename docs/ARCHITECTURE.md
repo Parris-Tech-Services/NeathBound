@@ -1,14 +1,15 @@
 # Architecture
 
-NeathBound copies Fallen London's architecture (not its content): a static
-single-page client, an authoritative JSON API, relational persistence, and a
-quality-based narrative (QBN) engine driven by authored data.
+NeathBound uses a broadly similar quality-based narrative architecture,
+based on publicly documented design principles. Failbetter's proprietary
+current source, hosting and database architecture have NOT been verified.
+NeathBound is local-first; its optional Supabase online backend is inactive.
 
 ```text
 Browser (GitHub Pages: index.html, src/)
   │ src/services/index.js
-  │   ├─ SupabaseGameService  (default, online)
-  │   └─ LocalGameService     (fallback / ?api=local, same engine, localStorage)
+  │   ├─ LocalGameService     (default / ?api=local, same engine, localStorage)
+  │   └─ SupabaseGameService  (opt-in ?api=supabase, fallback offline)
   │
   │ HTTPS/JSON, Authorization: anonymous Supabase session
   ▼

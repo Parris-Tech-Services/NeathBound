@@ -1,5 +1,6 @@
 import { resolveChoice, resetState, travelBlockedReason, drawCard, discard, setRefuge, equipItem } from "../game/engine.js?v=20261015-02";
 import { loadState, saveState } from "../game/state.js?v=20261015-02";
+import { locations } from "../game/content.js?v=20261015-02";
 
 export class LocalGameService {
   constructor(storage = globalThis.localStorage) {
@@ -15,7 +16,7 @@ export class LocalGameService {
     if (Number.isInteger(expectedRevision) && expectedRevision !== Number(this.state.revision ?? 0)) {
       return { error: "This save changed in another tab.", state: this.state };
     }
-    const outcome = resolveChoice(this.state, storyId, choiceId);
+    const outcome = resolveChoice(this.state, storyId, choiceId, Math.random, {}, { useLesson });
     if (outcome.error) return outcome;
     this.state = outcome.state;
     saveState(this.state, this.storage);
@@ -28,14 +29,14 @@ export class LocalGameService {
     }
     const blocked = travelBlockedReason(this.state);
     if (blocked) return { error: blocked, state: this.state };
-    if (!this.state.unlockedLocations.includes(locationId)) return this.state;
+    if (!locations[locationId] || !this.state.unlockedLocations.includes(locationId)) return { error: "This destination has not been discovered.", state: this.state };
     const revision = Number(this.state.revision ?? 0) + 1;
     this.state = {
       ...this.state,
       revision,
       flags: { ...this.state.flags, __revision: revision },
       locationId,
-      journal: [`Travelled to ${locationId.replaceAll("-", " ")}.`, ...this.state.journal].slice(0, 30)
+      journal: [`Travelled to ${locations[locationId].name}.`, ...this.state.journal].slice(0, 100)
     };
     saveState(this.state, this.storage);
     return this.state;

@@ -9,7 +9,7 @@ not from any protected setting, names, writing, art, or code.
 
 **Playtest the game:** https://parris-tech-services.github.io/NeathBound/?api=local
 
-This link uses your browser's local save. It works without an account or a running Supabase backend. Data is stored on the device and browser where you play, so clearing site data will erase the local save. The online Supabase project is currently inactive (restoring it is blocked by the two-active-free-project limit), so the linked local mode is the supported playtest route.
+This link uses your browser's local save. It works without an account or a running Supabase backend. Data is stored on the device and browser where you play, so clearing site data will erase the local save. The online Supabase project is currently inactive (restoring it is blocked by the two-active-free-project limit), so the linked local mode is the supported playtest route. Normal site entry also starts locally; `?api=supabase` explicitly tries the old online project and falls back to local if unavailable.
 
 ```bash
 npm test
@@ -24,21 +24,22 @@ the browser when the backend is unreachable (or with `?api=local`).
 
 ## Backend
 
-NeathBound follows Fallen London's architecture on free services
+NeathBound uses an independent quality-based narrative architecture inspired by public design discussions
 (see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)):
 
 | Fallen London | NeathBound |
 |---|---|
-| React SPA on S3 + CloudFront | Static site on GitHub Pages |
-| `api.fallenlondon.com` (C#/ASP.NET JSON API) | Supabase Edge Function `api` |
-| SQL Server via NHibernate | Supabase Postgres (relational player tables) |
-| Accounts | Supabase Auth, anonymous sign-in |
-| StoryNexus QBN engine | `src/game/` rules engine, run on the server |
+| Browser-based narrative UI (exact private frontend stack not established here) | Static client hosted on GitHub Pages |
+| Server-authoritative actions (exact current API implementation not verified here) | Optional Supabase Edge Function `api`, presently inactive |
+| Persistent qualities and story progression (private production schema not verified) | Supabase Postgres schema when backend operates; localStorage for current play |
+| Player identity and saves | Local-only by default; optional Supabase anonymous login |
+| Quality-based narrative design | Original, testable `src/game/` rules engine |
 
-The server is authoritative: players can read only their own rows and every
-change goes through the API. The same engine also runs in the browser for
-offline play. Editing `src/game/` and merging to `main` redeploys the API
-(`.github/workflows/backend.yml`).
+The *optional* Supabase API resolves choices on the server when it is online;
+the default game currently runs locally and saves in the browser. It cannot
+claim server-authoritative anti-cheat or cross-device saves in local mode.
+Changes to `src/game/` are mirrored into the Supabase function; deploying the
+function currently remains blocked by the inactive project and credential issues.
 
 `server/` is an optional local Node + SQLite API from the earlier migration
 plan. The game does not use it; the Supabase function is the online backend.

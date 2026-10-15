@@ -1,4 +1,4 @@
-import { locations, menaceAreas, stories, decks, cards, refuges } from "./content.js";
+import { locations, menaceAreas, stories, decks, cards, refuges, equipmentSlots, items } from "./content.js";
 import { drawCardToHand, discardCard as removeCardFromHand } from "./decks.js";
 import { cloneState, initialState } from "./state.js";
 import { applyEffects, awardProgress, describeChallenge, requirementsMet, resolveChallenge } from "./rules.js";
@@ -8,6 +8,12 @@ export { describeChallenge, effectiveStat };
 
 export const MENACE_WARNING_LEVEL = 5;
 export const MENACE_CONSEQUENCE_LEVEL = 8;
+
+function bumpRevision(state) {
+  state.revision = Number(state.revision ?? 0) + 1;
+  state.flags ??= {};
+  state.flags.__revision = state.revision;
+}
 
 export function currentLocation(state) {
   return locations[state.locationId] ?? locations["lantern-quay"];
@@ -101,7 +107,7 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
   // Momentum: a near miss (within 3) can be turned into a success by
   // spending one point of momentum.
   let usedMomentum = false;
-  if (challenge && !success && (next.momentum ?? 0) > 0 && check.total + 3 >= challenge.difficulty) {
+  if (challenge && !success && Number.isFinite(check.total) && (next.momentum ?? 0) > 0 && check.total + 3 >= challenge.difficulty) {
     next.momentum -= 1;
     check.total += 3;
     check.success = success = true;
@@ -233,31 +239,28 @@ export function drawCard(state, deckId = "whispers", random = Math.random) {
   if ((next.hand?.length ?? 0) >= maxHand) return { state: next, error: "Your hand is full." };
   
   const card = drawCardToHand(next, deck, cards, random);
-  next.flags = next.flags || {};
-  next.flags.__revision = (next.flags.__revision ?? 0) + 1;
+  if (card) bumpRevision(next);
   return { state: next, drawn: card ? card.id : null };
 }
 
 export function equipItem(state, slot, itemId) {
   const next = cloneState(state);
-  next.equipment = next.equipment ?? {};
-  
-  if (itemId === null) {
-    delete next.equipment[slot];
-  } else {
-    next.equipment[slot] = itemId;
+  if (!equipmentSlots.includes(slot)) return { state: next, error: "Unknown equipment slot." };
+  if (itemId !== null && (items[itemId]?.slot !== slot || Number(next.items?.[itemId] ?? 0) < 1)) {
+    return { state: next, error: "You do not own an item that fits this slot." };
   }
-  
-  next.flags = next.flags || {};
-  next.flags.__revision = (next.flags.__revision ?? 0) + 1;
+  next.equipment ??= {};
+  if ((next.equipment[slot] ?? null) === itemId) return { state: next };
+  if (itemId === null) delete next.equipment[slot];
+  else next.equipment[slot] = itemId;
+  bumpRevision(next);
   return { state: next };
 }
 
 export function setRefuge(state, refugeId) {
   const next = cloneState(state);
   next.refuge = refugeId;
-  next.flags = next.flags || {};
-  next.flags.__revision = (next.flags.__revision ?? 0) + 1;
+  bumpRevision(next);
   return { state: next };
 }
 

@@ -1,14 +1,12 @@
 import { config } from "../config.js?v=20261015-02";
 import { LocalGameService } from "./local-game-service.js?v=20261015-02";
 import { SupabaseGameService } from "./supabase-game-service.js?v=20261015-02";
-import { CloudflareGameService } from "./cloudflare-game-service.js?v=20261015-02";
 
-// Online (Supabase) by default; ?api=local forces offline play.
+// Offline-first until a tested online backend is connected. ?api=supabase explicitly opts in.
 export function createGameService({ settings = config, search = globalThis.location?.search ?? "", storage = globalThis.localStorage } = {}) {
   const provider = new URLSearchParams(search).get("api");
-  if (provider === "local") return new LocalGameService(storage);
   if (provider === "supabase") return new FallbackGameService(new SupabaseGameService(settings, storage), () => new LocalGameService(storage));
-  return new FallbackGameService(new CloudflareGameService(settings, storage), () => new LocalGameService(storage));
+  return new LocalGameService(storage);
 }
 
 // Tries the online service on first contact; if the backend is unreachable

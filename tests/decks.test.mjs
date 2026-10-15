@@ -31,3 +31,13 @@ test("weighted draw is deterministic under injected randomness", () => {
   assert.equal(drawWeightedCard(state, deck, cards, () => 0).id, "common");
   assert.equal(drawWeightedCard(state, deck, cards, () => 0.99).id, "rare");
 });
+
+
+test("draws cannot duplicate cards already in the player's hand", () => {
+  const state = initialState();
+  state.hand = ["common"];
+  assert.deepEqual(eligibleCards(state, deck, cards).map(card => card.id), ["rare"]);
+  assert.equal(drawWeightedCard(state, deck, cards, () => 0).id, "rare");
+  state.hand.push("rare");
+  assert.equal(drawWeightedCard(state, deck, cards, () => 0), null);
+});
