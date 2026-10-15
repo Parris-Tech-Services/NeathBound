@@ -548,6 +548,11 @@ export const gloomwingStories = {
             "type": "item",
             "id": "collector-feather",
             "amount": 1
+          },
+          {
+            "type": "quirk",
+            "id": "daring",
+            "amount": 2
           }
         ],
         "failureEffects": [
@@ -875,6 +880,11 @@ export const gloomwingStories = {
             "type": "flag",
             "id": "gloomwing-choice-04-2",
             "value": true
+          },
+          {
+            "type": "quirk",
+            "id": "magnanimous",
+            "amount": 2
           }
         ],
         "failureEffects": [
@@ -2033,6 +2043,14 @@ export const gloomwingStories = {
             "id": "scandal",
             "amount": 1
           }
+        ],
+        "requirements": [
+          {
+            "type": "quirk",
+            "id": "daring",
+            "op": ">=",
+            "value": 1
+          }
         ]
       }
     ]
@@ -2205,7 +2223,9 @@ export const gloomwingStories = {
           {
             "type": "living-story",
             "id": "moth-king-letter",
-            "delay_hours": 24
+            "delay_hours": 24,
+            "title": "An Envelope from the Paper Court",
+            "message": "At last, the seal opens. The King's witness has written your name beside the first debt of the Spire."
           }
         ],
         "failureEffects": [
@@ -2242,7 +2262,9 @@ export const gloomwingStories = {
           {
             "type": "living-story",
             "id": "moth-king-letter",
-            "delay_hours": 24
+            "delay_hours": 24,
+            "title": "An Envelope from the Paper Court",
+            "message": "At last, the seal opens. The King's witness has written your name beside the first debt of the Spire."
           }
         ],
         "failureEffects": [
@@ -2279,7 +2301,9 @@ export const gloomwingStories = {
           {
             "type": "living-story",
             "id": "moth-king-letter",
-            "delay_hours": 24
+            "delay_hours": 24,
+            "title": "An Envelope from the Paper Court",
+            "message": "At last, the seal opens. The King's witness has written your name beside the first debt of the Spire."
           }
         ],
         "failureEffects": [
@@ -2941,6 +2965,14 @@ export const gloomwingStories = {
             "type": "menace",
             "id": "scandal",
             "amount": 1
+          }
+        ],
+        "requirements": [
+          {
+            "type": "quirk",
+            "id": "magnanimous",
+            "op": ">=",
+            "value": 1
           }
         ]
       }
