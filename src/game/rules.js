@@ -1,4 +1,4 @@
-import { items, equipmentSlots, locations, destinies } from "./content.js?v=20261015-06";
+import { items, equipmentSlots, locations, destinies } from "./content.js?v=20261015-07";
 
 const operators = {
   "==": (actual, expected) => actual === expected,
