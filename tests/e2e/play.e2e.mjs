@@ -371,7 +371,7 @@ function escapeRegExp(text) {
 
 test("browsing and backing out are free, and bookmarking preserves the open story", async () => {
  const {context,page,problems}=await openGame({completeTutorial:true});
- const preview=page.locator('.storylet-disclosure').last();
+ const preview=page.locator('details[data-storylet-id="tea-for-the-tide"]');
  const id=await preview.getAttribute('data-storylet-id');
  const story=page.locator('details[data-storylet-id="'+id+'"]');
  if(!await story.evaluate(el=>el.open))await story.locator('summary').click();
