@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const css = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8");
-const marker = "/* Story-reading contrast and mobile legibility (Agent 7) */";
+const marker = "Story-reading contrast and mobile legibility (Agent 7)";
 assert.ok(css.includes(marker), "legibility stylesheet must exist");
 const section = css.slice(css.indexOf(marker));
 
