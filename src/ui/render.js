@@ -1,5 +1,5 @@
 import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20261015-03";
-import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions } from "../game/content.js?v=20261015-03";
+import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions, ambitions, destinies } from "../game/content.js?v=20261015-04";
 import { CITY_ROUTES, getQuestGuide } from "./narrative-guide.js?v=20261015-03";
 import { loadPreferences } from "./preferences.js?v=20261015-03";
 
@@ -349,6 +349,18 @@ const inventoryHtml = inventory.length
     ].join("");
   }
 
+  const pendingLetters=(state.living_stories??[]).filter(entry=>!entry.fired);
+  const letterMarkup=[
+    '<p class="small">Letters arrive after real-world time passes, even if the game is closed.</p>',
+    ...(pendingLetters.length?pendingLetters.map(entry=>{
+      const due=Number(entry.trigger_time)+Number(entry.delay_hours)*3600000;
+      const minutes=Math.max(0,Math.ceil((due-Date.now())/60000));
+      return '<div class="story"><h3>Pending: '+escapeHtml(entry.storylet_id)+'</h3><p>Due in '+minutes+' minutes · '+escapeHtml(new Date(due).toLocaleString())+'</p></div>';
+    }):['<p>No letters awaiting delivery.</p>']),
+    ...((state.messages??[]).map(message=>'<article class="story"><h3>'+escapeHtml(message.title)+'</h3><p>'+escapeHtml(message.text)+'</p><small>'+escapeHtml(message.at??"")+'</small></article>'))
+  ].join("");
+  const ambitionName=ambitions[state.ambition]?.name??"Not yet chosen";
+  const ambitionStage=state.ambition_progress?.[state.ambition]??0;
   app.innerHTML = [
         '<div class="game-shell outfit-', escapeClass(preferences.outfit), '">',
       '<header class="topbar">',
@@ -358,6 +370,7 @@ const inventoryHtml = inventory.length
           '<a href="#journal" data-view="story">Journal</a>',
           '<a href="#possessions" data-view="possessions">Possessions</a>',
           '<a href="#plans" data-view="plans">Plans</a>',
+          '<a href="#messages" data-view="messages">Messages (', (state.messages??[]).length, ')</a>',
           '<a href="#stories" data-view="story">Stories</a>',
         '</nav>',
       '</header>',
@@ -377,7 +390,7 @@ const inventoryHtml = inventory.length
 
       '<nav class="main-tabs" aria-label="Game sections">',
         '<a class="active" href="#stories" data-view="story">TALES</a>',
-        state.flags['tutorial.story'] ? '<a href="#journal" data-view="story">LETTERS</a>' : '',
+        '<a href="#messages" data-view="messages">MESSAGES</a>',
         state.flags['tutorial.myself'] ? '<a href="#myself" data-view="myself">SELF</a>' : '',
         state.flags['tutorial.possessions'] ? '<a href="#possessions" data-view="possessions">SATCHEL</a>' : '',
         state.flags['tutorial.possessions'] ? '<a href="#possessions">EXCHANGE</a>' : '',
@@ -442,7 +455,12 @@ const inventoryHtml = inventory.length
             '<ol>', journalHtml, '</ol>',
           '</section>',
           '</div>',
+          '<section class="plans-page parchment" id="messages" data-view-panel="messages" hidden>',
+            '<header class="plans-header"><h2>Messages</h2></header>',letterMarkup,
+          '</section>',
           '<section class="plans-page parchment" id="plans" data-view-panel="plans" hidden>',
+            '<p class="small">Personal ambition: ', escapeHtml(ambitionName),' · ',ambitionStage,'/',(ambitions[state.ambition]?.total??0),'</p>',
+            '<p class="small">Criminal record: ',Number(state.criminal_record??0),' / 7</p>',
             '<header class="plans-header"><p class="plans-kicker">Things worth returning to</p><h2>Plans</h2><p>Stories you have marked to pursue later. Plans are saved on this device.</p></header>',
             '<div class="plans-list">', plansHtml, '</div>',
           '</section>',
@@ -632,7 +650,7 @@ possessionCardsHtml,
   app.querySelector("[data-action=reset]").addEventListener("click", handlers.reset);
 
   const setView = (view) => {
-    const activeView = ["possessions", "myself", "plans"].includes(view) ? view : "story";
+    const activeView = ["possessions", "myself", "plans", "messages"].includes(view) ? view : "story";
     app.querySelectorAll("[data-view-panel]").forEach((panel) => {
       panel.hidden = panel.dataset.viewPanel !== activeView;
     });
@@ -644,6 +662,7 @@ possessionCardsHtml,
     if (globalThis.location?.hash === "#possessions") return "possessions";
     if (globalThis.location?.hash === "#myself") return "myself";
     if (globalThis.location?.hash === "#plans") return "plans";
+    if (globalThis.location?.hash === "#messages") return "messages";
     return "story";
   };
   app.querySelectorAll("[data-view]").forEach((link) => link.addEventListener("click", () => setView(link.dataset.view)));
