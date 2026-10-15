@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "title": "NeathBound Narrative Studio Review Packet",
+  "primary_stats": [
+    "nerve",
+    "insight",
+    "poise",
+    "shadow"
+  ],
+  "stages": [
+    "pitch",
+    "skeleton",
+    "prose",
+    "qa",
+    "approved"
+  ],
+  "qa_types": [
+    "content",
+    "design",
+    "mechanical",
+    "continuity"
+  ],
+  "max_secret_depth": 5,
+  "branch_count": {
+    "min": 2,
+    "max": 5
+  },
+  "notes": "Editorial envelope only; convert approved material to native storypack before runtime integration."
+}

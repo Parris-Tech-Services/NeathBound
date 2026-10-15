@@ -5,6 +5,10 @@ world, built around strange stories, branching choices, and consequence-rich
 exploration. It takes inspiration from the shape of text-led browser RPGs,
 not from any protected setting, names, writing, art, or code.
 
+## Narrative production workflow
+
+See **[Narrative Studio](docs/narrative-studio/README.md)** for the pitch → midflight skeleton → prose → content/design/mechanical/continuity QA → human sign-off pipeline, forty-topic spoiler-aware ledger and automated approval checks. Run `npm run studio:validate` before committing content. Draft packets are not playable until integrated and tested.
+
 ## Play
 
 **Playtest the game:** https://parris-tech-services.github.io/NeathBound/?api=local
