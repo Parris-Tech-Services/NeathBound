@@ -15,3 +15,7 @@ None of the new NPCs, items, flags, sublocations or calendar explanations has be
 The three `exemplar-*.pitch.json` envelopes are stage `pitch`, with empty skeleton branches, pending QA, `human_approved: false` and `runtime_integration: pending`. The supplied prose is archived as reference material. Passing the editorial envelope validator only establishes that these pitch records conform to that envelope; it is not a runtime or literary approval.
 
 Next permitted step: Josh approves or revises the three pitches and the above scope decisions. Then prepare the actual native-schema skeletons for structure review. Do not generate a replacement 200-secret canon ledger or publish the reference prose as a shortcut.
+
+## Subsequent user authorisation and completion
+
+The user expressly authorised taking all three through to complete playable integration. The pending-step description above is historical. Repairs, actual native-schema skeletons, prose, runtime IDs and review provenance are now recorded in `gloomwing-release-notes.md`. Historical pitches have runtime mappings and no false exact-prose human approval. The original 30-stage progression and treasures are preserved.

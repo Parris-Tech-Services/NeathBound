@@ -1,7 +1,7 @@
-import { config } from "../config.js?v=20261016-reader1";
-import { LocalGameService } from "./local-game-service.js?v=20261016-reader1";
-import { SupabaseGameService } from "./supabase-game-service.js?v=20261016-reader1";
-import { CloudflareGameService } from "./cloudflare-game-service.js?v=20261016-reader1";
+import { config } from "../config.js?v=20261016-gloomwing2";
+import { LocalGameService } from "./local-game-service.js?v=20261016-gloomwing2";
+import { SupabaseGameService } from "./supabase-game-service.js?v=20261016-gloomwing2";
+import { CloudflareGameService } from "./cloudflare-game-service.js?v=20261016-gloomwing2";
 
 // Verified Cloudflare Workers + D1 is online by default; ?api=local always stays offline.
 export function createGameService({ settings = config, search = globalThis.location?.search ?? "", storage = globalThis.localStorage } = {}) {

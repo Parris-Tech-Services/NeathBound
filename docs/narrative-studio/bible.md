@@ -54,3 +54,13 @@ Do not borrow protected prose, characters, story situations, illustrations or di
 
 ## Change control
 Every accepted new fact gets a ledger ID, reveal depth, NPC keeper, counterevidence and revision date. Never let an AI invent secret canon based on its own earlier draft.
+## Implemented Gloomwing side encounters — 15 October 2026
+
+Source: `content/ambitions/gloomwing-encounters.v1.json`. User authorised completing and integrating all three revised references; this is not a claim of exact-prose human peer approval.
+
+- **Mr Pell:** Bureau street-counter clerk at Lantern Quay; later at Bureau Hall. Raises/lowers a stamp; short procedural refusals. Wants an account with an accountable witness. Can offer confidence, lose his seal impression, or guarantee an honest loan. `pell-ally`, `pell-seal-stolen`, `pell-guarantor` record those different outcomes.
+- **Odile Vane:** absent Duskwater lamp-trimmer, associated with a knife, wick-ledger and internal Spire cupboard. A future-dated unfinished entry is evidence, not proof of time travel or a ratified conspiracy. Her service tools and supper diagram offer different cupboard approaches. Naming her publicly can trigger or avert an interview.
+- **Hesper Quill:** ill Bureau tracker at the Lantern Quay infirmary; counts breaths on three fingers, fourth folded. Wants her daughter’s winter lamp-oil paid. Explicit borrowing is permitted; no false betrayal flag. The real token buys either cupboard access or the allowance; a paid public permit exposes Vane. Forgery saves money at a cost in Scandal and Pell’s name.
+- **Mara Quill:** Hesper’s daughter, signs the winter allowance receipt with both hands around the nib. Accepts a concrete winter, not promises about the next. Paid receipts can still yield evidence through the cupboard glass.
+
+All three introductions are available only at Gloomwing progress 1–19. The internal cupboard supplements the existing Spire entrance. The Bureau counterfoil resolves incurred accounts before stage 20; every account has a free resolution, even with no actions or Obols. Delivery opens voluntary evidence filing as well. These encounters never increment hunt progress or change its three treasure endings.

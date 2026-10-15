@@ -1,9 +1,9 @@
-import { ambitions, destinies, festivals, qbnStories, qbnCards } from "./qbn-expansion.js?v=20261016-reader1";
+import { ambitions, destinies, festivals, qbnStories, qbnCards } from "./qbn-expansion.js?v=20261016-gloomwing2";
 export { ambitions, destinies, festivals };
-import { expansionLocations, expansionStories } from "./expansion.js?v=20261016-reader1";
-import { gloomwingLocations, gloomwingItems, gloomwingStories } from "./gloomwing-content.js?v=20261016-reader1";
-import { cmsPublishedStories, cmsPublishedLocations } from "./cms-published.js?v=20261016-reader1";
-import { approvedStories, approvedCards, approvedPlacements } from "./approved-storylets.js?v=20261016-reader1";
+import { expansionLocations, expansionStories } from "./expansion.js?v=20261016-gloomwing2";
+import { gloomwingLocations, gloomwingItems, gloomwingStories, gloomwingEncounterItems, gloomwingEncounterStories, gloomwingEncounterPlacements } from "./gloomwing-content.js?v=20261016-gloomwing2";
+import { cmsPublishedStories, cmsPublishedLocations } from "./cms-published.js?v=20261016-gloomwing2";
+import { approvedStories, approvedCards, approvedPlacements } from "./approved-storylets.js?v=20261016-gloomwing2";
 
 
 
@@ -2122,10 +2122,11 @@ for(const [menace,areaId] of Object.entries(menaceAreas)){
 }
 
 // Gloomwing storypack: its storylets are gated by ambition and exact chapter.
-Object.assign(items, gloomwingItems);
-Object.assign(stories, gloomwingStories);
+Object.assign(items, gloomwingItems, gloomwingEncounterItems);
+Object.assign(stories, gloomwingStories, gloomwingEncounterStories);
 Object.assign(locations, gloomwingLocations);
 locations["lantern-quay"].stories.push("gloomwing_hunt_00");
+for(const [locationId,storyIds] of Object.entries(gloomwingEncounterPlacements)) locations[locationId].stories.push(...storyIds);
 
 // The Bureau's Evidence Registry provides a use for every physical relic
 // collected in the 30-part Gloomwing hunt. Entries can be catalogued once;
