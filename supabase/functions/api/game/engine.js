@@ -35,11 +35,28 @@ export function tickLivingStories(state,now=Date.now()){
  for(const event of next.living_stories){
    if(event.fired||now<Number(event.trigger_time)+Number(event.delay_hours)*3600000)continue;
    event.fired=true;fired++;
-   next.messages.unshift({id:event.storylet_id,at:new Date(now).toISOString(),title:"A delayed letter arrives",
-      text:"The city has answered your earlier decision: "+event.storylet_id});
+   if(Array.isArray(event.on_arrival) && event.on_arrival.length) applyEffects(next,event.on_arrival);
+   next.flags??={};
+   next.flags["living-story-fired:"+event.storylet_id]=true;
+   next.messages.unshift({id:event.storylet_id,at:new Date(now).toISOString(),title:event.title??"A delayed letter arrives",
+      text:event.text??("The city has answered your earlier decision: "+event.storylet_id)});
  }
  if(fired)bumpRevision(next);
  return {state:next,fired};
+}
+export const ACTION_REGEN_MS=10*60*1000;
+export function refreshActions(state,now=Date.now()){
+ const next=cloneState(state);
+ const cap=Math.max(10,Math.min(20,Number(next.max_actions??10)));
+ next.max_actions=cap;
+ next.actions=Math.max(0,Math.min(cap,Number(next.actions??cap)));
+ const last=Number(next.last_action_tick);
+ if(!Number.isFinite(last)||last>now){next.last_action_tick=now;return next;}
+ if(next.actions>=cap){next.last_action_tick=now;return next;}
+ const earned=Math.max(0,Math.floor((now-last)/ACTION_REGEN_MS));
+ if(earned>0){next.actions=Math.min(cap,next.actions+earned);
+ next.last_action_tick=next.actions>=cap?now:last+earned*ACTION_REGEN_MS;}
+ return next;
 }
 export const MENACE_CONSEQUENCE_LEVEL = 8;
 
@@ -115,9 +132,9 @@ export function availableChoices(state, storyId, context = {}) {
 }
 
 export function resolveChoice(state, storyId, choiceId, random = Math.random, context = {}, options = {}) {
-  const before = cloneState(state);
-  const next = cloneState(state);
-  const story =  (stories[storyId] ?? cards[storyId]);
+  const before=refreshActions(state);
+  const next=cloneState(before);
+  const story = (stories[storyId] ?? cards[storyId]);
 
   if (!storyAvailable(next, storyId, context)) {
     return { state: next, error: "That story is no longer available. Your current state has been refreshed." };
@@ -128,6 +145,9 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     return { state: next, error: "That choice is no longer available. Your current state has been refreshed." };
   }
 
+  const actionCost=Math.max(0,Math.floor(Number(choice.action_cost ?? story.action_cost ?? (story.autofire?0:1))));
+  if(next.actions<actionCost)return {state:next,error:"Not enough actions. One action returns every ten minutes."};
+  next.actions-=actionCost;
   const challenge = effectiveChallenge({ ...story, id: storyId }, choice);
   let check = resolveChallenge(next, challenge, random);
   let success = check.success;
@@ -189,7 +209,8 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     }
   }
   next.flags[`${storyId}:${choiceId}`] = true;
-  if (story.once) next.flags[`story-complete:${storyId}`] = true;
+  // Failed checks must remain retryable; do not permanently consume a chapter.
+  if (story.once && success) next.flags[`story-complete:${storyId}`] = true;
   if (next.hand?.includes(storyId)) {
     next.hand.splice(next.hand.indexOf(storyId), 1);
     next.discard = [...(next.discard ?? []), storyId];
