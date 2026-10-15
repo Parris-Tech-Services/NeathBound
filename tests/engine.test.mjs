@@ -12,7 +12,7 @@ function initialState() {
 }
 
 test("actions never consume a finite action resource", () => {
-  const result = resolveChoice(initialState(), "bell-under-water", "listen", () => 0.9);
+  const result = resolveChoice(initialState(), "bell-under-water", "listen", () => 0.1);
   assert.equal(result.state.obols, 12);
   assert.equal(result.state.qualities.insight, 3);
   assert.equal("actions" in result.state, false);
@@ -39,7 +39,7 @@ test("required-item storylets stay locked until discovered", () => {
   const locked = resolveChoice(initialState(), "garden-appointment", "attend", () => 0.9);
   assert.match(locked.error, /no longer available/i);
   const equipped = { ...initialState(), locationId: "clockwork-gardens", items: { ...initialState().items, "tide-cup": 1 }, unlockedLocations: ["lantern-quay", "velvet-market", "hollow-archive", "clockwork-gardens"] };
-  const unlocked = resolveChoice(equipped, "garden-appointment", "attend", () => 0.9);
+  const unlocked = resolveChoice(equipped, "garden-appointment", "attend", () => 0.1);
   assert.equal(unlocked.success, true);
   assert.equal(unlocked.state.items["sun-seed"], 1);
 });
