@@ -1,4 +1,4 @@
-import { createGameService } from "./services/index.js?v=20261015-02";
+import { createGameService } from "./services/index.js?v=20261015-03";
 import { render } from "./ui/render.js?v=20261015-02";
 import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20261015-02";
 

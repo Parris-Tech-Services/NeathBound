@@ -11,8 +11,8 @@ function memory() {
   return { getItem: (key) => store.get(key) ?? null, setItem: (key, value) => store.set(key, value) };
 }
 
-test("default entry and ?api=local boot without an online Cloudflare module", () => {
-  assert.ok(createGameService({ search:"", storage:memory() }) instanceof LocalGameService);
+test("verified Cloudflare boots online by default and local mode remains explicit", () => {
+  assert.equal(createGameService({ search:"", storage:memory() }).mode, "online");
   assert.ok(createGameService({ search:"?api=local", storage:memory() }) instanceof LocalGameService);
 });
 
