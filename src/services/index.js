@@ -1,7 +1,7 @@
-import { config } from "../config.js?v=20261015-03";
-import { LocalGameService } from "./local-game-service.js?v=20261015-05";
-import { SupabaseGameService } from "./supabase-game-service.js?v=20261015-03";
-import { CloudflareGameService } from "./cloudflare-game-service.js?v=20261015-03";
+import { config } from "../config.js?v=20261015-06";
+import { LocalGameService } from "./local-game-service.js?v=20261015-06";
+import { SupabaseGameService } from "./supabase-game-service.js?v=20261015-06";
+import { CloudflareGameService } from "./cloudflare-game-service.js?v=20261015-06";
 
 // Verified Cloudflare Workers + D1 is online by default; ?api=local always stays offline.
 export function createGameService({ settings = config, search = globalThis.location?.search ?? "", storage = globalThis.localStorage } = {}) {
