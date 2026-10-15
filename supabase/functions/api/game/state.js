@@ -49,6 +49,18 @@ export function normaliseState(input = {}) {
     }
   }
 
+  // Preserve return routes for saves from before automatic district discovery.
+  const penaltyAreas = new Set(["the-holding-vaults", "the-pale-rooms", "the-stitchery", "the-whisper-court"]);
+  const visited = (input.events ?? []).flatMap((event) =>
+    (event.changes ?? []).filter((change) => change.type === "location").map((change) => change.after)
+  );
+  const olderRoutes = [
+    input.flags?.["story-complete:bell-under-water"] && "hollow-archive",
+    input.flags?.["story-complete:cartographer-at-dusk"] && "velvet-market"
+  ].filter(Boolean);
+  const knownLocations = [...(input.unlockedLocations ?? base.unlockedLocations), input.locationId, ...visited, ...olderRoutes]
+    .filter((id) => typeof id === "string" && !penaltyAreas.has(id));
+
   return {
     ...base,
     ...input,
@@ -61,7 +73,7 @@ export function normaliseState(input = {}) {
     globalFlags: { ...(input.globalFlags ?? {}) },
     items: { ...legacyItems },
     equipment: { ...(input.equipment ?? {}) },
-    unlockedLocations: [...new Set(input.unlockedLocations ?? base.unlockedLocations)],
+    unlockedLocations: [...new Set(knownLocations)],
     acquaintances: [...new Set(input.acquaintances ?? base.acquaintances)],
     flags: { ...(input.flags ?? {}), __revision: Number.isInteger(input.revision) ? input.revision : Number(input.flags?.__revision ?? 0) },
     refuge: input.refuge || base.refuge,
