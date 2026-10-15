@@ -90,8 +90,13 @@ export function audit(s,ctx,{strict=false,allowExisting=false}={}){
  const prose=[s.title,s.description,...(s.choices||[]).flatMap(c=>[c.label,c.success?.text,c.failure?.text,c.rare_success?.text])].join(" ").toLowerCase();
  for(const term of ctx.forbidden||[])if(term&&prose.includes(term.toLowerCase()))fail("prose","Forbidden phrase: "+term);
  if(strict){
-  for(const key of ["content","design","mechanical","continuity","peer"])if(!s.qa?.[key])fail("qa."+key,"QA sign-off missing.");
-  if(!filled(s.reviewer))fail("reviewer","Assign another human as reviewer.");
+  const solo=s.review_mode==="solo-creator"&&s.creator_approval?.method==="creator-confirmed"&&
+   filled(s.creator_approval.confirmed_at)&&s.creator_approval.schema_qa_passed===true;
+  if(s.review_mode==="solo-creator"&&!solo)fail("creator_approval","Solo approval needs the creator's explicit confirmation and a passing schema audit.");
+  if(!solo){
+   for(const key of ["content","design","mechanical","continuity","peer"])if(!s.qa?.[key])fail("qa."+key,"QA sign-off missing.");
+   if(!filled(s.reviewer))fail("reviewer","Assign another human as reviewer.");
+  }
   if(s.status!=="approved")fail("status","Only approved content can publish.");
  }
  return {ok:!errors.length,errors,warnings};
@@ -110,6 +115,33 @@ export function advance(s,target,ctx){
   if(!check.ok)return {ok:false,reason:check.errors[0].path+": "+check.errors[0].message};
  }
  return {ok:true};
+}
+/**
+ * Optional single-author pathway.  The user explicitly clicks to approve their
+ * own schema-valid work.  This is NEVER described as independent peer review.
+ * The normal five-check human editorial pathway remains unchanged.
+ */
+export function creatorApprove(input,ctx,{creatorConfirmed=false,aiReview=null}={}){
+ if(!creatorConfirmed)return {ok:false,reason:"Creator approval requires your explicit confirmation."};
+ const before=audit(input,ctx);
+ if(!before.ok)return {ok:false,reason:before.errors[0].path+": "+before.errors[0].message,errors:before.errors};
+ const s=copy(input),now=new Date().toISOString();
+ s.review_mode="solo-creator";
+ s.creator_approval={
+  method:"creator-confirmed",confirmed_at:now,schema_qa_passed:true,
+  independent_human_review:false,
+  ai_assistance:aiReview?.kind==="groq"?"groq":"none",
+  ai_claimed_approval:false
+ };
+ // Human review fields retain their true values; never forge a peer reviewer.
+ s.qa={content:false,design:false,mechanical:false,continuity:false,peer:false};
+ s.history=Array.isArray(s.history)?s.history:[];
+ s.history.push({from:s.status,to:"approved",at:now,reviewer:null,
+  pathway:"solo-creator",note:"Creator approved validated content; no independent human peer review."});
+ s.status="approved";
+ const verified=audit(s,ctx,{strict:true});
+ if(!verified.ok)return {ok:false,reason:verified.errors[0].path+": "+verified.errors[0].message,errors:verified.errors};
+ return {ok:true,story:s};
 }
 export function exportBundle(stories,game){return {format:"qbn-studio-export",schema_version:1,game,exported_at:new Date().toISOString(),stories:copy(stories)};}
 export function importBundle(value,game){
