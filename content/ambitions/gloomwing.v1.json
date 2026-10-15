@@ -1048,7 +1048,7 @@
         "value": 7
       },
       "once": true,
-      "text": "You find the Gloomwing sleeping upright between two ruined clock faces. Its ribs move with the rhythm of the city's pumps.",
+      "text": "Between two ruined clock faces, the Gloomwing sleeps upright in a sling of workman's canvas. Every breath keeps time with the pumps beneath Duskwater. It opens one eye. \"Another hunter,\" it says. \"Do they still send you with a price instead of a question?\"",
       "requirements": [],
       "choices": [
         {
@@ -1061,8 +1061,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The creature has been wounded by Bureau ammunition made from its own feathers. You set a fact down where another person may find it.",
-          "failure": "The evidence twists away before you can secure it. The hunt has not advanced; you can try another approach.",
+          "success": "You lift a silver splinter from the wing's old injury. The metal bears the Bureau's proof-mark; the creature watches you put it into a labelled envelope. \"Old Marrow knows that mark,\" it says. \"Ask him who supplied it.\"",
+          "failure": "You disturb the wound before you can lift a sample. The Gloomwing folds its injured wing. \"There are gentler ways to take evidence.\" You may return after cleaning your instruments.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -1098,8 +1098,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The creature has been wounded by Bureau ammunition made from its own feathers. The cost is real, but you leave the chamber unbowed.",
-          "failure": "You endure the encounter, but not without a cost. The hunt has not advanced; you can try another approach.",
+          "success": "You keep your ground when its wings unfold, although a clock wheel shears from the wall above you. The Gloomwing catches it and shudders under the strain. \"You can stand still,\" it says. \"Now see whether you can listen.\"",
+          "failure": "You brace against the clock face; its broken frame gives way and cuts your arm. The Gloomwing catches the falling metal rather than let it crush you. \"A brave mistake is still a mistake.\" The stair remains accessible.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -1130,8 +1130,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The creature has been wounded by Bureau ammunition made from its own feathers. You gain a witness who will remember which way you chose.",
-          "failure": "Your proposal falls on ears still loyal to the Bureau. The hunt has not advanced; you can try another approach.",
+          "success": "You speak the title scraped from the collectors' dispatches: Keeper of the Unpaid Bell. The creature lowers its head to hear the last syllable. \"That name carries an obligation,\" it says. \"Do you know whose?\"",
+          "failure": "You mistake an old title for a command. The Gloomwing goes quiet. \"Names are not keys, hunter.\" Its wing closes over the clock, and the conversation must begin again.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -1288,7 +1288,7 @@
         "value": 9
       },
       "once": true,
-      "text": "The Gloomwing speaks without moving its beak. It says the bounty is a price placed on the last lock of the city.",
+      "text": "A Bureau bounty notice hangs beside an older invoice for maintaining the Spire's deepest lock. The Gloomwing has nailed them to the same door. \"One prices my death,\" it says, \"and one prices the lives beneath it. Which sum did they show you?\"",
       "requirements": [],
       "choices": [
         {
@@ -1301,8 +1301,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The creature proposes a bargain: discover who made the lock before deciding its fate. You set a fact down where another person may find it.",
-          "failure": "The evidence twists away before you can secure it. The hunt has not advanced; you can try another approach.",
+          "success": "You compare the seals. The same clerk signed both documents, but the older one calls the Gloomwing a custodian. It lets you copy the line. \"Evidence weighs less than trust. Carry that first.\"",
+          "failure": "You touch the invoice and the ink loosens, leaving the name unreadable. The Gloomwing draws it away. \"The Bureau sells certainty by the bottle.\" You need another way to prove its account.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -1349,7 +1349,8 @@
               "id": "gloomwing-rare-8",
               "value": true
             }
-          ]
+          ],
+          "rare_success": "Beneath the invoice you find a second impression sunk into the damp timber. The Gloomwing lets you take a rubbing. \"The office may deny the page,\" it says, \"but let us see them deny the nail.\""
         },
         {
           "id": "endure",
@@ -1361,8 +1362,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The creature proposes a bargain: discover who made the lock before deciding its fate. The cost is real, but you leave the chamber unbowed.",
-          "failure": "You endure the encounter, but not without a cost. The hunt has not advanced; you can try another approach.",
+          "success": "You set down your weapon and promise not to strike before hearing the lock's terms. The Gloomwing moves aside so you can examine a cracked retaining bolt. It grants access, not forgiveness.",
+          "failure": "You hesitate when asked who would carry the debt if the guardian died. Your hand returns to the weapon. \"Then we are not bargaining yet,\" the Gloomwing says, withdrawing the invoice.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -1393,8 +1394,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The creature proposes a bargain: discover who made the lock before deciding its fate. You gain a witness who will remember which way you chose.",
-          "failure": "Your proposal falls on ears still loyal to the Bureau. The hunt has not advanced; you can try another approach.",
+          "success": "You ask why the Bureau fears its survival. \"A surviving witness can present a bill,\" the Gloomwing replies, pointing to the names erased from the margin. \"Find out who crossed those out.\"",
+          "failure": "You repeat the Bureau's assurance of fair dealing. The Gloomwing turns the bounty notice around; your own name appears under expenses. \"They have priced you as well.\" It ends the conversation.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -2347,7 +2348,7 @@
         "value": 17
       },
       "once": true,
-      "text": "The sealed envelope now contains a name, a date, and one sentence written in a hand you recall from a dream.",
+      "text": "The Paper Court's promised day has passed. The sealed envelope now bears tomorrow's date and a signature from the Bureau's earliest accounts. Its witness identifies the founder as the Spire's first debtor, then supplies an address where the claim may be tested.",
       "requirements": [
         {
           "type": "flag",
@@ -2367,8 +2368,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The reply identifies the Bureau's founder as the first debtor to the Spire. You set a fact down where another person may find it.",
-          "failure": "The evidence twists away before you can secure it. The hunt has not advanced; you can try another approach.",
+          "success": "You place the reply beside the original commission. Both use the same misprinted crest; the debt was entered against the Bureau itself. The messenger asks you to quote the page, not the witness's name. You keep the returned letter as evidence.",
+          "failure": "Three dead clerks used that signature. You cannot yet tell which one wrote the reply. The messenger offers to wait. \"A claim is not evidence until someone can answer it.\"",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -2404,8 +2405,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The reply identifies the Bureau's founder as the first debtor to the Spire. The cost is real, but you leave the chamber unbowed.",
-          "failure": "You endure the encounter, but not without a cost. The hunt has not advanced; you can try another approach.",
+          "success": "You burn the forged duplicate while the real witness waits behind an iron screen. The smoke sends searching Bureau clerks down the wrong stair. \"You have protected a person,\" the messenger says, \"not settled the account.\"",
+          "failure": "The damp forgery smokes instead of burning and attracts the guard. You and the messenger stamp out the embers before the door opens. The original letter survives, but the ruse needs better timing.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -2436,8 +2437,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The reply identifies the Bureau's founder as the first debtor to the Spire. You gain a witness who will remember which way you chose.",
-          "failure": "Your proposal falls on ears still loyal to the Bureau. The hunt has not advanced; you can try another approach.",
+          "success": "You bring the letter to the last clerk willing to acknowledge the original accounts. They deny the seal until you recite the founder's first unpaid entry. \"I can confirm the ledger,\" they whisper. \"Keep my family out of the register.\"",
+          "failure": "The clerk sees the Paper Court seal and closes the hatch. A slip appears beneath the door: \"Return without an audience.\" The potential witness is not lost.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -3543,7 +3544,7 @@
         "value": 26
       },
       "once": true,
-      "text": "The Bureau's guns point at the nest. The Gloomwing cannot fly. You finally have the power to end the hunt by force, mercy, or an oath witnessed by both.",
+      "text": "Three loaded Bureau rifles face the nest while the Gloomwing shelters its fledgling beneath one damaged wing. Old Marrow stands beside the Pale Archivist, who holds the commission that once called this creature a guardian. The director wants a cheap ending. None of the people in the room will receive one.",
       "requirements": [],
       "choices": [
         {
@@ -3556,8 +3557,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "This decision will determine the treasure you carry and the story the city tells. You set a fact down where another person may find it.",
-          "failure": "The evidence twists away before you can secure it. The hunt has not advanced; you can try another approach.",
+          "success": "You lay the first commission beneath the rifles and insist on safe passage for the creature and its young. Marrow carries the evidence through the ranks while the Archivist reads the names aloud. One by one, the guns lower. The Bureau must now explain why its bounty targeted a keeper it had employed.",
+          "failure": "The captain folds the commission before the other hunters can read it. A shot splits the nest rail; the Gloomwing throws its wing around the fledgling. Marrow drags you out of the splinters. \"Bring proof they cannot fold,\" he says. You still have a chance to stop this.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -3598,8 +3599,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "This decision will determine the treasure you carry and the story the city tells. The cost is real, but you leave the chamber unbowed.",
-          "failure": "You endure the encounter, but not without a cost. The hunt has not advanced; you can try another approach.",
+          "success": "You take the Bureau's weapon and kill the guardian before the soldiers fire into the nest. Marrow offers no congratulations. The Archivist closes the commission without striking your name from it. The lock stands without its keeper, and every witness knows who made the choice.",
+          "failure": "You strike as the rifles rise, but the floor gives under your heel. The Gloomwing drags its young behind a clock face. \"If you mean to choose this,\" it says, \"stand where everyone can see you.\" The decision has not been made.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -3635,8 +3636,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "This decision will determine the treasure you carry and the story the city tells. You gain a witness who will remember which way you chose.",
-          "failure": "Your proposal falls on ears still loyal to the Bureau. The hunt has not advanced; you can try another approach.",
+          "success": "You require the director and guardian to answer the same question before the witnesses: who pays if the lock fails? A clerk drafts a covenant obliging the Bureau to repair the works and the Gloomwing to warn the streets. Neither party calls it peace. The fledgling sleeps through the signatures.",
+          "failure": "The director tears the first covenant in half and orders the clerk away. The Archivist gathers the scraps before the room can claim no agreement was offered. \"Bring terms with witnesses attached,\" the Gloomwing says. It has not refused a truce.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -3678,7 +3679,7 @@
         "value": 27
       },
       "once": true,
-      "text": "The tower releases a great breath of dust. Every loosened stone bears a name and every name calls for somebody to answer.",
+      "text": "The Spire begins to fail while the witnesses are still counting the survivors of Bureau Hall. Dust falls with scraps of civic record. The Pale Archivist holds a register open; Old Marrow wrestles the lower gate, and a young Bureau messenger refuses to leave without the names entrusted to them.",
       "requirements": [],
       "choices": [
         {
@@ -3691,8 +3692,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "You leave carrying evidence of what truly happened beneath the collapsed roof. You set a fact down where another person may find it.",
-          "failure": "The evidence twists away before you can secure it. The hunt has not advanced; you can try another approach.",
+          "success": "You catch the register before its binding parts and carry it through the breaking arch. The Archivist calls each living name as you pass, turning a list into testimony. The records survive; the upper instruments vanish beneath the stone.",
+          "failure": "You reach for the heaviest ledger and its cover breaks apart. Pages drift into the stairwell. The Archivist pulls you clear and points toward a smaller register. \"People first. Copies later.\" There is still time to recover evidence.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -3728,8 +3729,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "You leave carrying evidence of what truly happened beneath the collapsed roof. The cost is real, but you leave the chamber unbowed.",
-          "failure": "You endure the encounter, but not without a cost. The hunt has not advanced; you can try another approach.",
+          "success": "You wedge the jammed gate with a broken clock axle. Old Marrow ushers the last evacuees through while the weight bears down on your shoulders. \"There,\" he tells the Bureau messenger. \"A hunter who knows what a door is for.\" The upper archive takes the collapse.",
+          "failure": "You try to hold the gate alone and the axle slips beneath your palm. Marrow catches it and calls for the workers below. \"This is not a medal to win.\" The corridor remains open long enough for you to try with help.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -3760,8 +3761,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "You leave carrying evidence of what truly happened beneath the collapsed roof. You gain a witness who will remember which way you chose.",
-          "failure": "Your proposal falls on ears still loyal to the Bureau. The hunt has not advanced; you can try another approach.",
+          "success": "You find the young Bureau messenger guarding testimony they were ordered to burn. You promise that their name will appear on the public record whether or not the institution survives. They hand the bundle to the Archivist and follow you to safety. One more witness remains alive.",
+          "failure": "The messenger mistakes your offer for another order and bolts into the smoke. You call them by the name stitched to their cuff, not their rank. They stop on the next landing, within reach of a second attempt.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -4061,15 +4062,15 @@
         "value": 30
       },
       "once": true,
-      "text": "A new clerk sits at the Bureau's window. They ask whether you have brought a trophy. You place your proof on the counter and watch them decide what to call it.",
+      "text": "The rebuilt Bureau window has three forms where the trophy ledger once stood: sanctuary, execution and covenant. A new clerk places a pen beside your evidence. Old Marrow waits outside to see which account is entered. \"A record is not an ending,\" the clerk says. \"It is what the next person can hold us to.\"",
       "requirements": [],
       "choices": [
         {
           "id": "investigate",
           "label": "Present the guardian's scale",
           "challenge": false,
-          "success": "The city records the truth of your hunt. A permanent treasure marks the path you chose. You set a fact down where another person may find it.",
-          "failure": "The evidence twists away before you can secure it. The hunt has not advanced; you can try another approach.",
+          "success": "You lay the guardian's scale on the sanctuary form. The clerk records that the Bureau withdrew its bounty and accepted responsibility for the nest. Marrow witnesses the entry; the Gloomwing remains beyond the lamps, protected by a written obligation. You carry the scale as proof that mercy became more than a promise.",
+          "failure": "The clerk cannot close a sanctuary record without the written commission. They leave the page open for the evidence of the decision already made.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -4110,8 +4111,8 @@
           "id": "endure",
           "label": "Present the hunter's claw",
           "challenge": false,
-          "success": "The city records the truth of your hunt. A permanent treasure marks the path you chose. The cost is real, but you leave the chamber unbowed.",
-          "failure": "You endure the encounter, but not without a cost. The hunt has not advanced; you can try another approach.",
+          "success": "You place the hunter's claw beside the execution form. The clerk writes death instead of the Bureau's preferred word, success. Marrow signs as a witness and nothing more. The empty lock and its cost now belong to those who chose the killing. The claw is yours, but no one calls it a prize.",
+          "failure": "The clerk refuses to substitute the official account for what the witnesses saw. The execution page remains unsigned until an honest record is presented.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -4152,8 +4153,8 @@
           "id": "negotiate",
           "label": "Present the signed treaty",
           "challenge": false,
-          "success": "The city records the truth of your hunt. A permanent treasure marks the path you chose. You gain a witness who will remember which way you chose.",
-          "failure": "Your proposal falls on ears still loyal to the Bureau. The hunt has not advanced; you can try another approach.",
+          "success": "You unfold the covenant across the counter. The clerk records both signatures and names the households who must be warned if repairs fail. The Gloomwing keeps its post, the Bureau funds the works and a breach can no longer be filed as an accident. You leave with a copy of the treaty that both parties must answer to.",
+          "failure": "The clerk will not certify a treaty from memory alone. The page remains open while the original signatures are brought forward.",
           "successEffects": [
             {
               "type": "ambition-progress",
