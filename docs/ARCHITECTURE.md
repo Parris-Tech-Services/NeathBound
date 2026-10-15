@@ -1,28 +1,34 @@
 # Architecture
 
-NeathBound uses a broadly similar quality-based narrative architecture,
-based on publicly documented design principles. Failbetter's proprietary
-current source, hosting and database architecture have NOT been verified.
-NeathBound is local-first; its optional Supabase online backend is inactive.
+NeathBound is an original quality-based narrative game inspired by public
+narrative design research, not a copy of Failbetter's source or alleged
+database internals. Its online mode currently targets Cloudflare Workers +
+D1; the browser explicitly supports offline play.
 
 ```text
-Browser (GitHub Pages: index.html, src/)
-  │ src/services/index.js
-  │   ├─ LocalGameService     (default / ?api=local, same engine, localStorage)
-  │   └─ SupabaseGameService  (opt-in ?api=supabase, fallback offline)
-  │
-  │ HTTPS/JSON, Authorization: anonymous Supabase session
-  ▼
-Supabase Edge Function `api`            supabase/functions/api/
-  index.ts    auth, CORS, Postgres repository (load_player / save_player)
-  handler.js  routes
-  game/       copy of src/game (npm run sync:engine; tests fail on drift)
-  │
-  ▼
-Supabase Postgres                       supabase/migrations/
-  players, player_qualities, player_menaces, player_items, player_flags,
-  player_locations, player_acquaintances, journal_entries, world_qualities
+Browser / GitHub Pages
+  | src/services/index.js
+  +-- CloudflareGameService (default when no ?api= selector)
+  |      anonymous 256-bit session token -> Worker API -> D1
+  +-- LocalGameService (?api=local or first-contact offline fallback)
+  |      original shared rules -> localStorage (device/browser only)
+  +-- SupabaseGameService (?api=supabase, legacy inactive experiment)
+
+Original engine source: src/game/
+Historical Supabase content mirror: supabase/functions/api/game/
+Legacy local Node API: server/
 ```
+
+**Deployment caveat:** Cloudflare service code and automated client tests are
+present in this repository. Runtime health and production protection must be
+verified independently; CI passing is not proof of cross-device save safety.
+Cloudflare and local saves are not identical accounts. Cloudflare session
+tokens must be guarded as account access credentials.
+
+**Public-source boundary:** [FailbetterGames engineering research](https://github.com/joshualparris/FailbetterGames/tree/main/fallen-london/engineering)
+marks the original game's private frontend, server stack and schemas as
+unverified. Earlier documentation guessed specific infrastructure; those
+claims must not be treated as discoveries.
 
 ## API
 
@@ -39,16 +45,20 @@ Supabase Postgres                       supabase/migrations/
 
 ## Security model
 
-- Every request needs a Supabase session (anonymous is fine); the function
-  verifies it and uses the user id as the player id.
-- Row level security: players may read only their own rows. There are no
-  write policies; `save_player` and `load_player` are callable only by the
-  service role inside the function. Players cannot edit their own state.
+- Cloudflare mode authenticates requests with a browser-generated random
+  session token; the API maps it to an isolated player record. Treat that
+  token like a password. Do not log it or put it in URL query strings.
+- Historical Supabase code instead uses Supabase Auth and row-level security.
+- Local mode has no trusted server and therefore offers no anti-cheat or
+  cross-device account promises.
 
 ## Changing the game
 
 - **Content or rules:** edit `src/game/`, run `npm run sync:engine` and
-  `npm test`, open a PR. Merging to `main` redeploys the function
-  (`backend.yml`, secret `SUPABASE_ACCESS_TOKEN`) and the site (`pages.yml`).
-- **Database:** add a file to `supabase/migrations/` and apply it to project
-  `ynrfskgfrgqxwjswtnka`.
+  `npm test`, open a PR. Merging to `main` deploys the website (`pages.yml`). The
+  Supabase backend deployment workflow is legacy and may fail while the
+  Supabase project remains inactive; check current Cloudflare deployment
+  separately.
+- **Database:** maintain the active Cloudflare D1 schema/migrations in
+  its separately managed backend project; do not apply Supabase migrations
+  to D1 as if the schemas were identical.
