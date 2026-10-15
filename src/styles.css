@@ -1346,7 +1346,7 @@ button, select { font: inherit; }
 }
 .storylet .go-button {
   min-height: 44px;
-  color: #fff;
+  color: #ffffff;
   background: linear-gradient(#22676b, #1d5659);
   border-color: #123f42;
   font: 700 .95rem/1.2 Arial, sans-serif;
@@ -1368,7 +1368,7 @@ button, select { font: inherit; }
   outline-offset: 3px;
 }
 .storylet ::selection {
-  color: #fff;
+  color: #ffffff;
   background: #1d5659;
 }
 @media (max-width: 700px) {
