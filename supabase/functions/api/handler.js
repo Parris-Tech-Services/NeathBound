@@ -10,7 +10,7 @@
 //   GET  /api/journal                                       journal
 //   POST /api/reset                                         new life
 //   POST /api/storylets/:storyId/branches/:choiceId/choose  resolve a choice
-import { availableChoices, availableStories, currentLocation, effectiveChallenge, resolveChoice, travelBlockedReason , drawCard, discard, setRefuge, equipItem } from "./game/engine.js";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge, resolveChoice, travelBlockedReason , drawCard, discard, setRefuge, equipItem, refreshActions, tickLivingStories } from "./game/engine.js";
 import { locations } from "./game/content.js";
 import { initialState, normaliseState } from "./game/state.js";
 
@@ -19,7 +19,18 @@ export async function handle({ method, path, userId, body = {} }, { repo, random
 
   const loadOrCreate = async () => {
     const existing = await repo.loadPlayer(userId);
-    if (existing) return normaliseState(existing);
+    if (existing) {
+      const state=normaliseState(existing);
+      const actionState=refreshActions(state);
+      const living=tickLivingStories(actionState);
+      if(living.fired || actionState.actions!==state.actions){
+        living.state.revision=Number(state.revision??0)+1;
+        living.state.flags.__revision=living.state.revision;
+        await repo.savePlayer(userId,living.state);
+        return living.state;
+      }
+      return state;
+    }
     const fresh = initialState();
     await repo.savePlayer(userId, fresh);
     return fresh;
