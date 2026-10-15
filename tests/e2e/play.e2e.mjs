@@ -210,6 +210,44 @@ test("Myself opens a full character screen and outfit changes stay in sync", asy
   await context.close();
 });
 
+test("Travel opens on demand and never covers the story after choices", async () => {
+  const { context, page, problems } = await openGame({ completeTutorial: true });
+  const storyPanel = page.locator('[data-view-panel="story"]');
+  const mapPanel = page.locator('#travel-map');
+
+  assert.equal(await storyPanel.isVisible(), true, "the player arrives at the story");
+  assert.equal(await mapPanel.isHidden(), true, "the map starts hidden, not expanded above storylets");
+
+  await page.locator('.main-tabs [data-action="open-map"]').click();
+  assert.equal(await mapPanel.isVisible(), true, "Travel opens a dedicated map");
+  assert.equal(await storyPanel.isHidden(), true, "the map replaces rather than pushes down the story");
+  assert.match(await mapPanel.innerText(), /Lantern Quay/);
+
+  await page.locator('[data-action="close-map"]').click();
+  assert.equal(await mapPanel.isHidden(), true, "Back to stories closes the map");
+  assert.equal(await storyPanel.isVisible(), true);
+
+  // A normal storylet result and the Onwards transition must not re-open the map.
+  const branch = page.locator('[data-story="bell-under-water"][data-choice="descend"]');
+  await branch.click();
+  await page.locator('[data-action="onwards"]').waitFor();
+  assert.equal(await mapPanel.isHidden(), true, "result screen never displays the Travel map");
+  await page.locator('[data-action="onwards"]').click();
+  assert.equal(await mapPanel.isHidden(), true, "Onwards returns to stories with map hidden");
+
+  // Selecting a destination also returns the player to story mode automatically.
+  await page.locator('.main-tabs [data-action="open-map"]').click();
+  const before = (await readSave(page)).locationId;
+  const destination = page.locator('#travel-map [data-action="travel-to"]').first();
+  await destination.waitFor();
+  await destination.click();
+  await page.waitForFunction(({ key, prior }) => JSON.parse(localStorage.getItem(key) ?? "{}").locationId !== prior, { key: SAVE_KEY, prior: before });
+  assert.equal(await mapPanel.isHidden(), true, "travelling closes the map");
+  assert.equal(await storyPanel.isVisible(), true, "travelling shows the new area's stories");
+  assert.deepEqual(problems, []);
+  await context.close();
+});
+
 test("accessibility audit (axe-core)", async (t) => {
   const { context, page } = await openGame();
   const axeSource = await readFile(createRequire(import.meta.url).resolve("axe-core/axe.min.js"), "utf8");
