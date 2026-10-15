@@ -34,6 +34,14 @@ Choose **Deep writer (120B)** for richer responses or **Fast assistant (20B)** f
 
 The assistant receives the active draft, game-specific references and, when checked, limited excerpts from the world documents. These are sent to Groq for inference. The browser does **not** send your Groq API keys; the Worker authenticates to Groq using private server-side bindings.
 
+## Why Advance can be blocked at Pitch
+
+The editor requires a narrative **Pitch (beat, mechanics, scope and stakes)** before advancing from **01 · Pitch** to **02 · Structure**. Earlier versions omitted the pitch from QA, so Autofill could report zero errors while the stage advance remained blocked.
+
+The pitch is now a regular, visible QA issue. **Autofill & Fix All** or **Fix schema issues offline** can derive a grounded first pitch from an already-authored scene, choices and setbacks. Groq can further polish this pitch when connected. If the story has no meaningful scene content yet, the editor preserves the empty field and reports it rather than inventing a premise.
+
+The **Advance stage** button now explains what field is missing and how to fix it. Pitch advancement is not an AI peer review or a human sign-off for publishing.
+
 ## One-click autofill and repair
 
 The largest button in the editor is **✦ Autofill & Fix All**. It automatically:
