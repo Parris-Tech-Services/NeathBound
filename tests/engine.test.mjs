@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { choiceAvailable, resolveChoice, storyAvailable } from "../src/game/engine.js";
 import { initialState as baseInitialState } from "../src/game/state.js";
+import { stories } from "../src/game/content.js";
 function initialState() {
   const s = baseInitialState();
   s.locationId = "lantern-quay";
@@ -18,7 +19,7 @@ test("actions never consume a finite action resource", () => {
 });
 
 test("challenge success applies configured effects", () => {
-  const result = resolveChoice(initialState(), "bell-under-water", "descend", () => 0.9);
+  const result = resolveChoice(initialState(), "bell-under-water", "descend", () => 0.1);
   assert.equal(result.success, true);
   assert.equal(result.state.items["black-sand"], 1);
   assert.equal(result.state.locationId, "hollow-archive");
@@ -26,7 +27,7 @@ test("challenge success applies configured effects", () => {
 });
 
 test("challenge failure applies failure effects and still advances the story", () => {
-  const result = resolveChoice(initialState(), "bell-under-water", "descend", () => 0);
+  const result = resolveChoice(initialState(), "bell-under-water", "descend", () => 0.99);
   assert.equal(result.success, false);
   assert.equal(result.state.locationId, "hollow-archive");
   assert.equal(result.state.items["black-sand"], 1);
@@ -67,8 +68,13 @@ test("story and choice availability are explicit predicates", () => {
 test("momentum turns a near-miss challenge into a success and is spent", () => {
   const state = initialState();
   state.momentum = 1;
-  // die 1 + nerve 2 = 3 vs difficulty 5: a near miss that momentum (+3) rescues
-  const result = resolveChoice(state, "bell-under-water", "descend", () => 0);
+  // Explicit legacy d10 checks still support the momentum near-miss mechanic.
+  const choice = stories["bell-under-water"].choices.find(c => c.id === "descend");
+  const previous = choice.challenge;
+  choice.challenge = { ...(previous ?? stories["bell-under-water"].challenge), mode: "classic" };
+  let result;
+  try { result = resolveChoice(state, "bell-under-water", "descend", () => 0); }
+  finally { choice.challenge = previous; }
   assert.equal(result.success, true);
   assert.equal(result.usedMomentum, true);
   assert.equal(result.state.momentum, 0);
@@ -76,8 +82,13 @@ test("momentum turns a near-miss challenge into a success and is spent", () => {
   assert.ok(result.changes.some((change) => change.type === "momentum" && change.delta === -1));
 });
 
-test("without momentum the same near miss fails", () => {
-  const result = resolveChoice(initialState(), "bell-under-water", "descend", () => 0);
+test("without momentum the same legacy near miss fails", () => {
+  const choice = stories["bell-under-water"].choices.find(c => c.id === "descend");
+  const previous = choice.challenge;
+  choice.challenge = { ...(previous ?? stories["bell-under-water"].challenge), mode: "classic" };
+  let result;
+  try { result = resolveChoice(initialState(), "bell-under-water", "descend", () => 0); }
+  finally { choice.challenge = previous; }
   assert.equal(result.success, false);
   assert.equal(result.usedMomentum, false);
 });
