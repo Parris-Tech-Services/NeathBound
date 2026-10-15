@@ -28,8 +28,8 @@ export const expansionStories = {
     kicker: "Where can you go?", tags: ["always-available"],
     text: "A ferryman marks three roads on a freight docket. The northbound iron line reaches Ashrail Station, where the city removes cancelled journeys from the timetables. The east stair climbs to Cinder Ward, where neighbours remember people the officials deny exist. Your first visit teaches you the route; thereafter you can return using the city map.",
     choices: [
-      { id: "take-north-line", label: "Take the north line to Ashrail Station", success: "The conductor punches a ticket without a destination. At Ashrail Station, someone has painted over a twelfth platform on the wall map.", successEffects: [{type:"location",id:"ashrail-station"},{type:"flag",id:"route:ashrail",value:true}] },
-      { id: "climb-east-stair", label: "Climb the east stair to Cinder Ward", success: "You pass a row of doors whose house numbers have been chiselled away. Families have chalked their own names underneath.", successEffects: [{type:"location",id:"cinder-ward"},{type:"flag",id:"route:cinder",value:true}] },
+      { id: "take-north-line", label: "Take the north line to Ashrail Station", success: "The conductor punches a ticket without a destination. At Ashrail Station, someone has painted over a twelfth platform on the wall map.", successEffects: [{type:"location",id:"ashrail-station"},{type:"unlock-location",id:"ashrail-station"},{type:"flag",id:"route:ashrail",value:true}] },
+      { id: "climb-east-stair", label: "Climb the east stair to Cinder Ward", success: "You pass a row of doors whose house numbers have been chiselled away. Families have chalked their own names underneath.", successEffects: [{type:"location",id:"cinder-ward"},{type:"unlock-location",id:"cinder-ward"},{type:"flag",id:"route:cinder",value:true}] },
       { id: "ask-about-registry", label: "Ask who erased these destinations", success: "The ferryman taps the clock tower above the station. 'Registry of Hours. They'll tell you what they removed, if you can persuade them you ought to exist.'", successEffects: [{type:"flag",id:"heard-about-registry",value:true}] }
     ]
   },
@@ -71,8 +71,8 @@ export const expansionStories = {
     once: true, requirements:[{type:"flag",id:"chapter-two:ticket",op:"==",value:true}],
     text: "The service code on the ticket leads upstairs to the Registry of Hours. The same ticket bears a former passenger's address in Cinder Ward. The city map now shows the Registry; you can go there at any time, or look for the passenger first.",
     choices: [
-      {id:"go-registry",label:"Go to the Registry and join the queue",success:"A clerk gives you a queue number. There is nobody else in line. Behind the glass, a clock strikes thirteen.",successEffects:[{type:"location",id:"registry-of-hours"}]},
-      {id:"find-passenger",label:"Go to Cinder Ward and search for the passenger",success:"The neighbours recognise the ticket punch. A child draws you a chalk map to a blue door without a number.",successEffects:[{type:"location",id:"cinder-ward"}]}
+      {id:"go-registry",label:"Go to the Registry and join the queue",success:"A clerk gives you a queue number. There is nobody else in line. Behind the glass, a clock strikes thirteen.",successEffects:[{type:"location",id:"registry-of-hours"},{type:"unlock-location",id:"registry-of-hours"}]},
+      {id:"find-passenger",label:"Go to Cinder Ward and search for the passenger",success:"The neighbours recognise the ticket punch. A child draws you a chalk map to a blue door without a number.",successEffects:[{type:"location",id:"cinder-ward"},{type:"unlock-location",id:"cinder-ward"}]}
     ]
   },
   "cinder-communal-stove": {
@@ -105,8 +105,8 @@ export const expansionStories = {
     text:"The Registry has three windows: Arrivals, Departures, and Corrections. Behind the third sits a clerk whose wristwatch runs backwards. She asks if you intend to restore a name, or to erase one. Neither answer seems satisfactory to her.",
     choices:[
       {id:"ask-price",label:"Ask the price of correcting a record",success:"'Memory,' she says. 'Somebody must remember what the book forgets.' She shows you where to present evidence about your own name.",successEffects:[{type:"flag",id:"registry:heard-price",value:true}]},
-      {id:"return-rails",label:"Return to Ashrail Station",success:"The station whistle is the most reassuringly ordinary thing you have heard all day.",successEffects:[{type:"location",id:"ashrail-station"}]},
-      {id:"visit-neighbours",label:"Visit the families of Cinder Ward",success:"You leave the Registry's queue and join the neighbours keeping vigil outside its gates.",successEffects:[{type:"location",id:"cinder-ward"}]}
+      {id:"return-rails",label:"Return to Ashrail Station",success:"The station whistle is the most reassuringly ordinary thing you have heard all day.",successEffects:[{type:"location",id:"ashrail-station"},{type:"unlock-location",id:"ashrail-station"}]},
+      {id:"visit-neighbours",label:"Visit the families of Cinder Ward",success:"You leave the Registry's queue and join the neighbours keeping vigil outside its gates.",successEffects:[{type:"location",id:"cinder-ward"},{type:"unlock-location",id:"cinder-ward"}]}
     ]
   },
   "registry-thirteenth-correction": {
