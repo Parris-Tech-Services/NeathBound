@@ -402,3 +402,21 @@ test('mobile: all three Gloomwing scenes and both consequence scenes are playabl
  await travel('black-spire');await choose('gloomwing-lamp-cupboard','diagram');await travel('bureau-hall');await choose('gloomwing-bureau-counterfoil','admit');
  await page.reload({waitUntil:'networkidle'});s=await readSave(page);assert.equal(s.flags['quill-account-pending'],false);assert.equal(s.flags['quill-public-debt'],true);assert.equal(s.items['spire-oil-carbon'],1);assert.equal(s.ambition_progress['gloomwing-hunt'],1);assert.equal(s.items['quill-claim-token'],undefined);assert.equal(s.actions,7);assert.deepEqual(problems,[]);await context.close();
 });
+
+
+test('landing stays centred and fully visible on narrow phones and desktop', async () => {
+ const context=await browser.newContext();const page=await context.newPage();
+ for(const width of [320,360,390,412,700,1280]){
+  await page.setViewportSize({width,height:850});
+  await page.goto(new URL('?api=local',baseUrl).href,{waitUntil:'networkidle'});
+  const layout=await page.evaluate(()=>{
+   const rect=sel=>{const r=document.querySelector(sel).getBoundingClientRect();return {left:r.left,right:r.right,centre:(r.left+r.right)/2};};
+   const title=document.querySelector('.landing-title'),range=document.createRange();range.selectNodeContents(title);const text=range.getBoundingClientRect();
+   return {width:innerWidth,scroll:document.documentElement.scrollWidth,card:rect('.landing-card'),mark:rect('.landing-mark'),title:rect('.landing-title'),text:{left:text.left,right:text.right},buttons:[...document.querySelectorAll('.landing-actions > *')].map(el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right};})};
+  });
+  assert.ok(layout.scroll<=width,`no horizontal overflow at ${width}`);
+  for(const name of ['card','mark','title'])assert.ok(Math.abs(layout[name].centre-width/2)<1,`${name} centred at ${width}`);
+  for(const rect of [layout.text,...layout.buttons])assert.ok(rect.left>=0&&rect.right<=width,`content fully visible at ${width}`);
+ }
+ await context.close();
+});
