@@ -31,7 +31,7 @@ test("a new player can reach Ashrail, the Registry and Cinder Ward by stories", 
 test("chapter two offers a permanent moral decision with a follow-on", () => {
   let s = initialState();
   s.locationId = "registry-of-hours";
-  s.unlockedLocations.push("registry-of-hours");
+  s.unlockedLocations.push("registry-of-hours", "glass-observatory");
   s.flags["far-crack-answered"] = true;
   for (const flag of ["story-complete:bell-under-water", "story-complete:index-of-lost-things", "read-own-entry", "found-the-far-crack"]) s.flags[flag] = true;
   s.flags["chapter-two:ticket"] = true;
