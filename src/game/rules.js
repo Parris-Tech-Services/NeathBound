@@ -1,4 +1,4 @@
-import { items, equipmentSlots } from "./content.js?v=20260930-22";
+import { items, equipmentSlots, locations } from "./content.js?v=20260930-22";
 
 const operators = {
   "==": (actual, expected) => actual === expected,
@@ -68,6 +68,11 @@ export function applyEffect(state, effect) {
       break;
     case "location":
       state.locationId = effect.id;
+      // Story travel discovers normal destinations, but not menace-only areas.
+      if (!locations[effect.id]?.consequenceOf) {
+        state.unlockedLocations ??= [];
+        if (!state.unlockedLocations.includes(effect.id)) state.unlockedLocations.push(effect.id);
+      }
       break;
     case "unlock-location":
       state.unlockedLocations ??= [];

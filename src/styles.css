@@ -1170,3 +1170,50 @@ button, select { font: inherit; }
 .plan-actions button, .plan-actions a { font: inherit; }
 .empty-plans { padding: 2rem 1rem; text-align: center; }
 @media (max-width: 720px) { .plan-card { flex-direction: column; } .plan-actions { min-width: 0; width: 100%; } }
+
+/* Narrative objective & navigation: remain visible when the right rail is hidden on mobile. */
+.quest-guide {
+  margin: 0 0 14px;
+  padding: 18px 20px;
+  border: 1px solid #668180;
+  border-left: 4px solid #5da9a9;
+  background: #202d2b;
+  color: #eae5d6;
+  border-radius: 5px;
+}
+.quest-guide h2 { color: #f6e7c9; font: 1.35rem Georgia,serif; margin: 5px 0 10px; }
+.quest-guide p { margin: 9px 0; line-height: 1.55; }
+.quest-label,.story-role { color: #9fcdcb; font: 700 .75rem Arial,sans-serif; letter-spacing: .08em; }
+.quest-guide .quest-objective { background: #30403b; padding: 10px 12px; border-radius: 4px; }
+.quest-direction { font-size: .95rem; }
+.quest-jump { display: inline-block; color: #9ee9e5; font-weight: bold; margin-top: 3px; }
+.main-storylet { outline: 2px solid #477b78; outline-offset: -2px; }
+.story-role { margin: 0 0 6px; }
+.city-route-map {
+  margin: 0 0 14px; background: #222b29; border: 1px solid #6a7670;
+  color: #f0e6d2; border-radius: 5px; padding: 11px 14px;
+}
+.city-route-map summary { cursor: pointer; font: bold 1rem Georgia,serif; }
+.city-route-map summary span { color: #c3cbc4; font: normal .78rem Arial,sans-serif; margin-left: 8px; }
+.route-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 15px; }
+.route-card { border: 1px solid #52645c; border-radius: 4px; padding: 10px 12px; background: #303b36; }
+.route-card.current { border-color: #90b8a0; }
+.route-card.locked { opacity: .83; background: #282e2c; }
+.route-card > div:first-child { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; justify-content: space-between; }
+.route-card strong { color: #eee3cb; font: 1rem Georgia,serif; }
+.route-card span { font-size: .72rem; color: #b0c6be; }
+.route-card p { margin: 8px 0; line-height: 1.4; font-size: .84rem; color: #d4d2c8; }
+.route-travel { border: 1px solid #98bdb6; border-radius: 3px; padding: 7px 12px; background: #336c6c; color: #fff; cursor: pointer; font-weight: 700; }
+.route-travel:focus-visible,.quest-jump:focus-visible,.city-route-map summary:focus-visible { outline: 3px solid #f0d279; outline-offset: 3px; }
+.route-warning { color: #ebbc86; }
+.route-footnote { margin: 9px 0 0; color: #bfcac3; font: .78rem/1.5 Arial,sans-serif; }
+@media (max-width: 930px) {
+  .city-route-map { /* Old right rail is hidden at this breakpoint. This map is not. */ }
+  .city-route-map > summary { min-height: 32px; }
+}
+@media (max-width: 700px) {
+  .quest-guide { padding: 14px; }
+  .route-grid { grid-template-columns: 1fr; }
+  .city-route-map summary span { display: block; margin: 5px 0 0; }
+  .route-travel { min-height: 42px; width: 100%; }
+}

@@ -1,5 +1,6 @@
 import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20260930-22";
 import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions } from "../game/content.js?v=20260930-22";
+import { CITY_ROUTES, getQuestGuide } from "./narrative-guide.js?v=20260930-22";
 import { loadPreferences } from "./preferences.js?v=20260930-22";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
@@ -55,6 +56,7 @@ const ITEM_DETAILS = {
 
 export function render(app, state, handlers, outcome = null) {
   const location = currentLocation(state);
+  const quest = getQuestGuide(state);
   const stories = availableStories(state);
   const inventory = Object.entries(state.items ?? {}).filter(([, quantity]) => quantity > 0);
   const preferences = loadPreferences();
@@ -104,18 +106,52 @@ export function render(app, state, handlers, outcome = null) {
     }).join("");
 
     const planned = preferences.bookmarks.includes(story.id);
+    const mainStory = quest.storyId === story.id;
     return [
-      '<article class="storylet', isCard ? ' opportunity-card' : '', '">',
+      '<article class="storylet', isCard ? ' opportunity-card' : '', mainStory ? ' main-storylet' : '', '"', mainStory ? ' id="main-story"' : '', '>',
       isCard ? '<div class="card-discard-header"><button class="discard-button" data-action="discard" data-card="' + story.id + '" aria-label="Discard">✗</button></div>' : '',
       '<div class="story-art story-art-', escapeClass(story.id), '" aria-hidden="true">', storyArtMarkup(story.id, state.locationId), '</div>',
       '<div class="story-body">',
       '<button class="bookmark', planned ? ' is-bookmarked' : '', '" type="button" data-action="bookmark" data-story="', story.id, '" aria-label="', planned ? 'Remove from Plans' : 'Add to Plans', '" title="', planned ? 'Remove from Plans' : 'Add to Plans', '" aria-pressed="', planned, '">◆</button>',
+      mainStory ? '<p class="story-role">◆ MAIN STORY · CURRENT LEAD</p>' : '',
       '<h3>', escapeHtml(story.title), '</h3>',
       '<p>', escapeHtml(story.text), '</p>',
       '<div class="story-choices">', choicesHtml, '</div>',
       '</div></article>'
     ].join("");
   };
+
+  const questHere = quest.nextLocation === state.locationId && Boolean(quest.storyId) && stories.some((story) => story.id === quest.storyId);
+  const questHtml = [
+    '<section class="quest-guide" aria-label="Current story objective">',
+    '<div class="quest-label">YOUR JOURNEY · ', escapeHtml(quest.chapter), ' · LEAD ', quest.step, ' OF ', quest.total, '</div>',
+    '<h2>', escapeHtml(quest.title), '</h2>',
+    '<p><strong>What you know:</strong> ', escapeHtml(quest.knownFact), '</p>',
+    '<p class="quest-objective"><strong>What to do next:</strong> ', escapeHtml(quest.objective), '</p>',
+    questHere ? '<a class="quest-jump" href="#main-story">Jump to this story ↓</a>' : '',
+    quest.storyId && !questHere ? '<p class="quest-direction">Next destination: <strong>' + escapeHtml(locations[quest.nextLocation]?.name ?? quest.nextLocation) + '</strong></p>' : '',
+    '</section>'
+  ].join("");
+  const routeHtml = CITY_ROUTES.map(({ id, hint }) => {
+    const place = locations[id];
+    const current = id === state.locationId;
+    const unlocked = current || (state.unlockedLocations ?? []).includes(id);
+    return [
+      '<div class="route-card', current ? ' current' : '', unlocked ? '' : ' locked', '">',
+      '<div><strong>', escapeHtml(place.name), '</strong><span>', current ? 'You are here' : unlocked ? 'Discovered' : 'Undiscovered', '</span></div>',
+      '<p>', escapeHtml(unlocked ? place.subtitle : hint), '</p>',
+      unlocked && !current && !location.consequenceOf ? '<button type="button" class="route-travel" data-action="travel-to" data-location="' + escapeHtml(id) + '">Travel here</button>' : '',
+      '</div>'
+    ].join("");
+  }).join("");
+  const mapHtml = [
+    '<details class="city-route-map" open>',
+    '<summary>Explore the city <span>', (state.unlockedLocations ?? []).filter(id => CITY_ROUTES.some(route => route.id === id)).length, ' / ', CITY_ROUTES.length, ' locations discovered · open map</span></summary>',
+    '<div class="route-grid">', routeHtml, '</div>',
+    location.consequenceOf ? '<p class="route-warning">You must resolve your predicament here before travelling elsewhere.</p>' : '',
+    '<p class="route-footnote">Undiscovered locations show clues instead of travel buttons. Other dangerous places may appear through story consequences.</p>',
+    '</details>'
+  ].join("");
 
   const storiesHtml = stories.map((story) => renderStory(story, false)).join("");
   let deckHtml = "";
@@ -380,6 +416,7 @@ const inventoryHtml = inventory.length
 
         '<main class="story-column" id="stories">',
           '<div data-view-panel="story">',
+          outcome ? "" : questHtml + mapHtml,
           outcome
             ? outcomeHtml
             : [
@@ -589,6 +626,7 @@ possessionCardsHtml,
   app.querySelectorAll("[data-action=bookmark]").forEach((button) => button.addEventListener("click", () => handlers.bookmark(button.dataset.story)));
   app.querySelectorAll("[data-action=outfit]").forEach((select) => select.addEventListener("change", (event) => handlers.outfit(event.target.value)));
   app.querySelector("[data-action=travel]")?.addEventListener("click", () => handlers.travel(app.querySelector("#travel-location")?.value));
+  app.querySelectorAll("[data-action=travel-to]").forEach((button) => button.addEventListener("click", () => handlers.travel(button.dataset.location)));
   app.querySelectorAll("[data-action=edit-note]").forEach((button) => button.addEventListener("click", () => handlers.editNote(button.dataset.noteKey)));
   app.querySelector("[data-action=reset]").addEventListener("click", handlers.reset);
 

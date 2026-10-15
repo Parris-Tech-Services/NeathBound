@@ -22,7 +22,7 @@ export function initialState() {
     globalFlags: {},
     hand: [],
     discard: [],
-    journal: ["You woke beneath a sky made of stone, with a brass key in your hand."],
+    journal: ["You woke in a locked municipal chamber. The file on its door bears someone else\u0027s name. A bell is stamped into the iron."],
     events: [],
     lastDraw: "bell-under-water"
   };

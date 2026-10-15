@@ -83,14 +83,14 @@ export const locations = {
     region: "The Lower City",
     subtitle: "A bazaar for memories, rumours, and perfectly ordinary knives.",
     atmosphere: "Every stall has a curtain. Every curtain has a shadow behind it.",
-    stories: ["borrowed-face", "red-thread", "market-gossip", "market-exchange", "circle-diplomacy", "the-sand-reader", "unwritten-ink", "the-debt-collector", "the-loose-end", "a-fresher-scandal"]
+    stories: ["borrowed-face", "red-thread", "a-name-sold", "market-gossip", "market-exchange", "circle-diplomacy", "the-sand-reader", "unwritten-ink", "the-debt-collector", "the-loose-end", "a-fresher-scandal"]
   },
   "hollow-archive": {
     name: "The Hollow Archive",
     region: "The Lower City",
     subtitle: "A library where the books remember who borrowed them.",
     atmosphere: "Dust hangs in the air like a second, slower snowfall.",
-    stories: ["index-of-lost-things", "the-quiet-librarian", "catalogue-the-dark", "the-locked-stacks", "finish-the-page", "an-entry-in-the-index", "the-margin-note", "the-quiet-carrel"]
+    stories: ["index-of-lost-things", "the-quiet-librarian", "catalogue-the-dark", "archive-paper-trail", "the-locked-stacks", "finish-the-page", "an-entry-in-the-index", "the-margin-note", "the-quiet-carrel"]
   },
   "clockwork-gardens": {
     name: "The Clockwork Gardens",
@@ -282,14 +282,14 @@ export const stories = {
   "lair-escape": {
     id: "lair-escape",
     title: "A Way Out",
-    text: "The heavy iron door is locked. There must be a way out.",
+    text: "You wake on a stone bench beneath a city you cannot remember entering. The registry on the sealed iron door lists somebody else as its occupant, although you know your own name. A bell has been stamped into the lock. Escape, find out who changed the record, and discover why.",
     once: true,
     choices: [
       {
         id: "force",
         label: "Force the lock",
         challenge: { quality: "nerve", difficulty: 1 },
-        success: "The mechanism gives way with a screech. The door swings open.",
+        success: "The lock breaks. Inside it is a brass key stamped with the same bell as the door. A departing clerk mutters that the last person registered under your name vanished at Lantern Quay. You take the key and head for the docks.",
         successEffects: [
           { type: "location", id: "lantern-quay" },
           { type: "unlock-location", id: "lantern-quay" },
@@ -307,7 +307,7 @@ export const stories = {
         id: "pick",
         label: "Pick the lock",
         challenge: { quality: "insight", difficulty: 1 },
-        success: "You study the tumblers and slip the lock open.",
+        success: "You read the lock's mechanism and lift the last tumbler. A brass key marked with a bell drops from the plate. A nearby intake ledger directs the bearer of that symbol to Lantern Quay. You take the key and follow the lead.",
         successEffects: [
           { type: "location", id: "lantern-quay" },
           { type: "unlock-location", id: "lantern-quay" },
@@ -363,7 +363,7 @@ export const stories = {
     once: true,
     title: "The Bell Under Water",
     kicker: "A sound from below",
-    text: "At low tide, the quay reveals a stairway descending into black water. A bell tolls somewhere beneath the last step. The brass key in your pocket warms.",
+    text: "At Lantern Quay, a bell rings under the black water. Its symbol matches the key you found in the Lair. A ferryman explains that the bell once guided clerks to a submerged records passage leading to the Hollow Archive. If somebody altered your registration, the Archive may hold the original.",
     requirements: [],
     choices: [
       {
@@ -371,8 +371,8 @@ export const stories = {
         label: "Descend toward the bell",
         requirements: [],
         challenge: { quality: "nerve", difficulty: 5 },
-        success: "You find a submerged door and unlock it. Something on the other side learns your name.",
-        failure: "The water closes over your head. You return with a pocketful of black sand.",
+        success: "The brass key opens a flooded records passage. You follow the clerks' old stair out of the water and into the Hollow Archive. In a margin, someone has crossed out the name under which you were detained.",
+        failure: "The flooded door will not open, but a keeper hears your knocking and leads you up a service stair into the Hollow Archive. You have black sand in your pocket, and an archive register lists your detention under another name.",
         successEffects: [
           { type: "obols", amount: 8 },
           { type: "item", id: "black-sand", amount: 1 },
@@ -388,13 +388,13 @@ export const stories = {
         label: "Listen for the pattern",
         requirements: [],
         challenge: { quality: "nerve", difficulty: 5 },
-        success: "The bell's rhythm maps a route through the city.",
-        failure: "You hear only your own heartbeat, which is embarrassing but useful.",
+        success: "The bell tolls in the pattern of an old archives code. A dockworker recognises the signal and shows you the public entrance to the Hollow Archive, where your registration may have been copied.",
+        failure: "You cannot decipher the signal, but a ferryman explains that the bell belongs to the city's record keepers. He takes you to the Hollow Archive so you can ask them directly.",
         successEffects: [
           { type: "quality", id: "insight", amount: 1 },
-          { type: "location", id: "lantern-quay" }
+          { type: "location", id: "hollow-archive" }
         ],
-        failureEffects: [{ type: "location", id: "lantern-quay" }]
+        failureEffects: [{ type: "location", id: "hollow-archive" }]
       }
     ]
   },
@@ -402,16 +402,18 @@ export const stories = {
     once: true,
     title: "The Cartographer at Dusk",
     kicker: "A map with an appetite",
-    text: "A one-eyed cartographer offers you a map that redraws itself whenever you blink. She wants a true name in exchange for the eastern road.",
+    text: "A one-eyed cartographer offers a salt-stiffened map of the Lower City. She knows a route to the Velvet Market, where names can be exchanged like goods. The price is your name: not ownership of it, she says, only permission to repeat it to her clients. Is reaching the Market worth being recognised there?",
     requirements: [],
     choices: [
       {
         id: "trade",
-        label: "Offer the name you were given",
+        label: "Let her tell the Market your name",
         requirements: [],
-        success: "The map accepts the name and opens a red road to the market.",
+        success: "She writes your name into her client book and hands over a salt-stiffened map. You can now follow the red route to the Velvet Market, but strangers may recognise you before you recognise them.",
         successEffects: [
           { type: "obols", amount: 4 },
+          { type: "item", id: "salted-map", amount: 1 },
+          { type: "flag", id: "cartographer:gave-name", value: true },
           { type: "location", id: "velvet-market" }
         ],
         failureEffects: []
@@ -420,10 +422,11 @@ export const stories = {
         id: "decline",
         label: "Keep your name",
         requirements: [],
-        success: "The cartographer nods. She marks a safer route in invisible ink.",
+        success: "The cartographer keeps her book closed. She draws you a route to the market but does not tell her clients your name. You earn a measure of her respect, although the road will be less certain.",
         successEffects: [
           { type: "quality", id: "poise", amount: 1 },
-          { type: "location", id: "lantern-quay" }
+          { type: "flag", id: "cartographer:kept-name", value: true },
+          { type: "location", id: "velvet-market" }
         ],
         failureEffects: []
       }
@@ -499,7 +502,7 @@ export const stories = {
     once: true,
     title: "The Index of Lost Things",
     kicker: "A volume that knows you",
-    text: "The archive's index opens to a page describing the thing you miss most. The entry is written in ink that is still wet.",
+    text: "The archivist shows you the Index of Lost Things: a catalogue of missing identities, altered civic records and people the city officially refuses to remember. An entry in handwriting like yours gives the date you were admitted to the Lair. Someone has cut out the last line. This is the first evidence that your erased record was deliberate.",
     requirements: [],
     choices: [
       {
@@ -529,11 +532,38 @@ export const stories = {
       }
     ]
   },
+  "archive-paper-trail": {
+    title: "The Page They Overlooked",
+    kicker: "Main story: The Missing Name",
+    text: "The Index confirmed that someone altered your detention record, but the last line is still missing. An archivist offers to show you the misfiled slips left behind when an entry is removed. One bears your handwriting. Take it to the reading desk and try to finish the sentence.",
+    requirements: [
+      { type: "flag", id: "story-complete:index-of-lost-things", op: "==", value: true },
+      { type: "flag", id: "read-own-entry", op: "!=", value: true },
+      { type: "item", id: "unfinished-page", op: "<", value: 1 }
+    ],
+    choices: [
+      { id: "request-page", label: "Ask for the missing page", success: "The archivist retrieves a torn page: 'If I come back down here, I must remember to...' You recognise the handwriting. You can now investigate it in Finish the Page.", successEffects: [{ type: "item", id: "unfinished-page", amount: 1 }] },
+      { id: "help-search", label: "Help search the misfiled records", success: "After sorting a stack of duplicates, you find a page in your own handwriting. It is the missing half of your official entry. You can now investigate it in Finish the Page.", successEffects: [{ type: "item", id: "unfinished-page", amount: 1 }, { type: "quality", id: "insight", amount: 1 }] }
+    ]
+  },
+  "a-name-sold": {
+    title: "Someone Knows Your Name",
+    kicker: "A bargain comes due",
+    text: "In the Velvet Market, a masked broker greets you by name before you introduce yourself. The cartographer has been sharing her client book. The broker offers information about the city's altered registers, but only if you agree to be recognised again.",
+    requirements: [
+      { type: "flag", id: "cartographer:gave-name", op: "==", value: true },
+      { type: "flag", id: "cartographer:debt-resolved", op: "!=", value: true }
+    ],
+    choices: [
+      { id: "question-broker", label: "Demand to know who copied your name", success: "The broker shows you an Archive invoice bearing your name, and warns that somebody paid to see your file changed. You gain a lead, though the questioning attracts unwanted attention.", successEffects: [{ type: "quality", id: "insight", amount: 1 }, { type: "menace", id: "suspicion", amount: 1 }, { type: "flag", id: "cartographer:debt-resolved", value: true }] },
+      { id: "accept-introduction", label: "Accept the introduction and hear the rumour", success: "The broker admits that the Archive has been correcting inconvenient identities. Being known earns you an invitation and a few coins, but the cartographer's clients will remember you.", successEffects: [{ type: "quality", id: "poise", amount: 1 }, { type: "obols", amount: 4 }, { type: "flag", id: "cartographer:debt-resolved", value: true }] }
+    ]
+  },
   "the-quiet-librarian": {
     once: true,
     title: "The Quiet Librarian",
     kicker: "A question without a mouth",
-    text: "The librarian points to three shelves: what you were, what you are, and what the city expects you to become. Only one shelf is dusty.",
+    text: "The quiet librarian says the Archive keeps three shelves for every lost person: the past as recorded, the present as witnessed, and the future as predicted. Your past has a page torn from it. She points to a dusty shelf where the missing page may have been filed.",
     requirements: [],
     choices: [
       {
@@ -706,7 +736,7 @@ export const stories = {
   "salt-on-the-map": {
     title: "Salt on the Map",
     kicker: "The first thing you owned",
-    text: "The map you woke holding has dried stiff with salt. Where the crust is thickest, faint lines show through: a coastline that is not the quay's, and a stair climbing toward warm glass.",
+    text: "The cartographer's salt-stiffened map shows a coastline that does not match Lantern Quay. If you wash away the salt, you may expose a stairway up to the Clockwork Gardens. The route will become visible, but the cartographer will notice her map has changed.",
     requirements: [
       { type: "item", id: "salted-map", op: ">=", value: 1 },
       { type: "flag", id: "salt-on-the-map:soak", op: "!=", value: true }
@@ -830,11 +860,13 @@ export const stories = {
         label: "Write the ending yourself",
         requirements: [],
         challenge: { quality: "insight", difficulty: 6 },
-        success: "You finish the sentence without knowing what you meant, and it is exactly right. The page folds itself into your coat and stops insisting.",
+        success: "You finish the line in your own words: 'the record was changed, not lost'. A hidden shelf-mark appears, pointing to a skyward annex. You keep this discovery out of the Archive's official index.",
         failure: "Every ending you write slides off the paper and pools at the bottom of the page. The sentence stays unfinished, and a little smug.",
         successEffects: [
           { type: "item", id: "unfinished-page", amount: -1 },
           { type: "quality", id: "insight", amount: 1 },
+          { type: "flag", id: "read-own-entry", value: true },
+          { type: "flag", id: "main-quest:kept-record-private", value: true },
           { type: "obols", amount: 10 },
           { type: "location", id: "hollow-archive" }
         ],
@@ -851,6 +883,7 @@ export const stories = {
           { type: "quality", id: "poise", amount: 1 },
           { type: "obols", amount: 18 },
           { type: "flag", id: "bound-into-the-index", value: true },
+          { type: "flag", id: "read-own-entry", value: true },
           { type: "location", id: "hollow-archive" }
         ],
         failureEffects: []
@@ -1190,7 +1223,7 @@ export const stories = {
   "the-margin-note": {
     title: "The Margin Note",
     kicker: "Returned early. Handle kindly.",
-    text: "The note in the margin of your index entry carries a second shelf mark, written very small. It does not belong to any shelf in the archive. The librarian, asked, points silently upward.",
+    text: "Your recovered record contains a reference number that belongs to no shelf in the Archive. The librarian identifies it as a bearing to the Glass Observatory in the High Galleries. Someone there was studying the same mysterious light when your name disappeared. Following the lead could bring you closer to whoever changed your file.",
     requirements: [{ type: "flag", id: "read-own-entry", op: "==", value: true }],
     choices: [
       {

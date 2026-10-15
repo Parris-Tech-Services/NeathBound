@@ -39,6 +39,12 @@ offline play. Editing `src/game/` and merging to `main` redeploys the API
 `server/` is an optional local Node + SQLite API from the earlier migration
 plan. The game does not use it; the Supabase function is the online backend.
 
+## Story and exploration
+
+The Missing Name is the guided opening mystery. Follow the **Current lead** panel to investigate the bell, trace your record through the Hollow Archive, and pursue its skyward reference. The City Map shows both visited destinations and clues for opening new routes; on mobile, it appears in the main story column rather than the hidden sidebar. Choices still allow detours, and failed checks never strand a character in the opening investigation.
+
+See [Narrative clarity and continuity](docs/NARRATIVE-CLARITY.md) for the authored chapter route, alternative choices, and outstanding narrative work.
+
 ## Testing
 
 ```bash
