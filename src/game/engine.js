@@ -35,6 +35,8 @@ export function tickLivingStories(state,now=Date.now()){
  for(const event of next.living_stories){
    if(event.fired||now<Number(event.trigger_time)+Number(event.delay_hours)*3600000)continue;
    event.fired=true;fired++;
+   next.flags??={};
+   next.flags["living-story-fired:"+event.storylet_id]=true;
    next.messages.unshift({id:event.storylet_id,at:new Date(now).toISOString(),title:"A delayed letter arrives",
       text:"The city has answered your earlier decision: "+event.storylet_id});
  }
@@ -189,7 +191,8 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     }
   }
   next.flags[`${storyId}:${choiceId}`] = true;
-  if (story.once) next.flags[`story-complete:${storyId}`] = true;
+  // Failed checks must remain retryable; do not permanently consume a chapter.
+  if (story.once && success) next.flags[`story-complete:${storyId}`] = true;
   if (next.hand?.includes(storyId)) {
     next.hand.splice(next.hand.indexOf(storyId), 1);
     next.discard = [...(next.discard ?? []), storyId];
