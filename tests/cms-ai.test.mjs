@@ -49,3 +49,37 @@ test("Studio integration offers reversible suggestions and cannot approve an AI 
  assert.match(helper,/next\.qa=\{content:false/);
  assert.match(helper,/never interpret as an approved/i);
 });
+
+test("authenticated mock Groq generation returns JSON proposal and never discloses the key",async()=>{
+ const gateway=read("tools/cms/groq-worker.js");
+ let receiver,authorisation="";
+ const fakeKey="gsk_fabricated_test_key_not_real";
+ const sandbox=vm.createContext({
+  addEventListener:(name,fn)=>{if(name==="fetch")receiver=fn;},
+  Response,Request,Headers,URL,Date,Map,Set,JSON,Array,Math,AbortSignal,
+  CMS_ACCESS_TOKEN:"test-only-access",
+  GROQ_KEYS:JSON.stringify([fakeKey]),
+  fetch:async(url,options)=>{
+   assert.equal(url,"https://api.groq.com/openai/v1/chat/completions");
+   authorisation=options.headers.Authorization;
+   const payload=JSON.parse(options.body);
+   assert.equal(payload.model,"openai/gpt-oss-20b");
+   assert.equal(payload.response_format.type,"json_object");
+   assert.ok(payload.messages[0].content.includes("NeathBound")||payload.messages[0].content.includes("neathbound"));
+   return new Response(JSON.stringify({model:payload.model,
+    choices:[{message:{content:JSON.stringify({summary:"A tested narrative proposal",proposal:{title:"The Other Door"},issues:[],notes:[]})}}],
+    usage:{prompt_tokens:50,completion_tokens:70}}),{status:200});
+  }
+ });
+ new vm.Script(gateway).runInContext(sandbox);
+ let result;receiver({request:new Request("https://qbn-studio-ai.parris-neathaustralia.workers.dev/v1/assist",{
+   method:"POST",headers:{"Origin":"https://parris-tech-services.github.io",
+    "X-Studio-Access":"test-only-access","Content-Type":"application/json"},
+   body:JSON.stringify({game:"neathbound",mode:"pitch",model:"openai/gpt-oss-20b",
+    context:{active_story:{title:"A new scene"},game:{stats:["nerve","insight"]}}})
+  }),respondWith:p=>{result=p}});
+ const response=await result,data=await response.json();
+ assert.equal(response.status,200);assert.equal(data.proposal.title,"The Other Door");
+ assert.equal(authorisation,"Bearer "+fakeKey);
+ assert.ok(!JSON.stringify(data).includes(fakeKey),"secret key must never be returned");
+});
