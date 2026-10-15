@@ -661,12 +661,12 @@ button, select { font: inherit; }
   .game-footer { margin: 0 10px; flex-direction: column; }
 }
 
-/* High-quality open/public-domain asset layer.
-   Source and license details: ATTRIBUTION.md */
+/* Stable, locally served original artwork — no third-party image hotlinks.
+   See assets/art/README.md for provenance; keep attribution history in ATTRIBUTION.md. */
 .city-banner {
   background:
     linear-gradient(rgba(38,55,31,.34), rgba(48,63,37,.52)),
-    url("https://upload.wikimedia.org/wikipedia/commons/0/0d/Ishigaki_Stalactite_Cave_01.jpg") center 46% / cover no-repeat;
+    url("../assets/art/neath-hero.webp") center 46% / cover no-repeat;
 }
 .city-banner::after {
   content:"";
@@ -690,14 +690,14 @@ button, select { font: inherit; }
 .storylet {
   background-image:
     linear-gradient(rgba(222,214,193,.78),rgba(210,201,180,.86)),
-    url("https://upload.wikimedia.org/wikipedia/commons/8/83/%D0%A2%D0%B5%D0%BA%D1%81%D1%82%D1%83%D1%80%D0%B0_%D0%B1%D1%83%D0%BC%D0%B0%D0%B3%D0%B8.jpg");
+    url("../assets/art/archive.webp");
   background-size: auto, 620px auto;
   background-blend-mode: normal, multiply;
 }
 .story-board {
   background:
     linear-gradient(rgba(143,132,111,.18),rgba(114,104,86,.24)),
-    url("https://upload.wikimedia.org/wikipedia/commons/8/83/%D0%A2%D0%B5%D0%BA%D1%81%D1%82%D1%83%D1%80%D0%B0_%D0%B1%D1%83%D0%BC%D0%B0%D0%B3%D0%B8.jpg") center / 520px auto;
+    url("../assets/art/archive.webp") center / 520px auto;
 }
 
 .story-art {
@@ -712,33 +712,33 @@ button, select { font: inherit; }
     radial-gradient(circle at 50% 42%,transparent 0 42%,rgba(27,22,16,.22) 100%);
 }
 .art-1 {
-  background-image:url("https://upload.wikimedia.org/wikipedia/commons/9/90/Magnifying-glass.jpg");
+  background-image:url("../assets/art/archive.webp");
   background-position:center 48%;
 }
 .art-2 {
-  background-image:url("https://upload.wikimedia.org/wikipedia/commons/4/47/Old_map_1807_plan.jpg");
+  background-image:url("../assets/art/market.webp");
   background-position:center 32%;
 }
 .art-3 {
-  background-image:url("https://upload.wikimedia.org/wikipedia/commons/e/e7/Teacup.png");
+  background-image:url("../assets/art/waterway.webp");
   background-color:#9a8066;
   background-size:cover;
 }
 .art-4 {
-  background-image:url("https://upload.wikimedia.org/wikipedia/commons/c/c1/Old_Books_in_the_library.jpg");
+  background-image:url("../assets/art/archive.webp");
   background-position:center 48%;
 }
 .art-5 {
   background-image:
     linear-gradient(rgba(55,72,54,.18),rgba(26,31,25,.22)),
-    url("https://upload.wikimedia.org/wikipedia/commons/0/0d/Ishigaki_Stalactite_Cave_01.jpg");
+    url("../assets/art/neath-hero.webp");
   background-position:center 60%;
 }
 
 .feature-art {
   background-image:
     linear-gradient(rgba(62,92,80,.20),rgba(65,49,34,.18)),
-    url("https://upload.wikimedia.org/wikipedia/commons/4/47/Old_map_1807_plan.jpg");
+    url("../assets/art/market.webp");
   background-size:cover;
   background-position:center;
   filter:sepia(.5) saturate(.8) contrast(1.03);
@@ -758,7 +758,7 @@ button, select { font: inherit; }
 .promo-scene {
   background:
     linear-gradient(rgba(26,52,42,.18),rgba(42,20,32,.46)),
-    url("https://upload.wikimedia.org/wikipedia/commons/0/0d/Ishigaki_Stalactite_Cave_01.jpg") center 54% / cover no-repeat;
+    url("../assets/art/neath-hero.webp") center 54% / cover no-repeat;
   filter:saturate(.7) sepia(.22);
 }
 
