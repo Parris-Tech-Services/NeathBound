@@ -41,3 +41,15 @@ test("the navigable map has explicit discovery hints", () => {
   assert.match(style, /\.city-route-map/);
   assert.match(style, /@media \(max-width: 700px\)/);
 });
+
+
+test("both failed bell approaches advance the guide into the Archive", async()=>{
+ const {resolveChoice}=await import('../src/game/engine.js');
+ for(const choice of ['descend','listen']){
+  const s=initialState();s.locationId='lantern-quay';s.momentum=0;
+  const outcome=resolveChoice(s,'bell-under-water',choice,()=>0);
+  assert.equal(outcome.success,false);
+  assert.equal(outcome.state.locationId,'hollow-archive');
+  assert.equal(getQuestGuide(outcome.state).storyId,'index-of-lost-things');
+ }
+});

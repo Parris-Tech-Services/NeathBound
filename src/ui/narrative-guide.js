@@ -21,7 +21,9 @@ export function getQuestGuide(state) {
   if (state.locationId === "the-lair") {
     return make("Prologue", "The Missing Name", "The Lair's registry lists another person in your place. A bell is stamped into the lock.", "Escape through A Way Out and follow the clue to Lantern Quay.", "the-lair", "lair-escape", 1);
   }
-  if (!flags["story-complete:bell-under-water"]) {
+  // Both failed approaches still reveal the Archive and move the player there.
+  const bellInvestigated=flags["story-complete:bell-under-water"] || flags["bell-under-water:descend"] || flags["bell-under-water:listen"];
+  if (!bellInvestigated) {
     return make("Chapter One", "Find the bell", "Your cell had the wrong name on its records. The escape key bears the image of a bell.", "At Lantern Quay, investigate The Bell Under Water to find where your registration was copied.", "lantern-quay", "bell-under-water", 2);
   }
   if (!flags["story-complete:index-of-lost-things"]) {
