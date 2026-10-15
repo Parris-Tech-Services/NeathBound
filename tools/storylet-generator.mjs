@@ -134,7 +134,7 @@ export function adapt(s){
    const x={id:b.id,label:b.text,success:b.success.text,successEffects:effects(b.success.effects),failureEffects:effects(b.failure?.effects||[])};
    if(b.challenge){x.challenge={quality:b.challenge.stat,difficulty:b.challenge.difficulty,mode:"broad",scaler:0.6,rareChance:b.challenge.rareChance??0.04};x.failure=b.failure.text;}
    if(b.rare_success){x.rare_success=b.rare_success.text;x.rareSuccessEffects=effects(b.rare_success.effects);}
-   else x.challenge=false;
+   else if(!b.challenge) x.challenge=false;
    return x;
   })
  }};
