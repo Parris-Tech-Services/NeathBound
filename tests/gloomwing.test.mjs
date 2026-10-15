@@ -57,6 +57,8 @@ for(const [choiceIndex,trophy] of [
       }
       const choice=n===25||n===29 ? ["investigate","endure","negotiate"][choiceIndex] : "investigate";
       assert.equal(storyAvailable(state,id(n)),true,"locked chapter "+n);
+      // Simulate the next ten-minute action tick between chapter visits.
+      state.last_action_tick=Date.now()-600001;
       const result=resolveChoice(state,id(n),choice,()=>0);
       assert.equal(result.error,undefined,"error at "+id(n));
       assert.equal(result.success,true,"failed "+id(n));
