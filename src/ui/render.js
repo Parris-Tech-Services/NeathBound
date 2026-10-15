@@ -129,7 +129,7 @@ export function render(app, state, handlers, outcome = null) {
     '<p><strong>What you know:</strong> ', escapeHtml(quest.knownFact), '</p>',
     '<p class="quest-objective"><strong>What to do next:</strong> ', escapeHtml(quest.objective), '</p>',
     questHere ? '<a class="quest-jump" href="#main-story">Jump to this story ↓</a>' : '',
-    quest.storyId && !questHere ? '<p class="quest-direction">Next destination: <strong>' + escapeHtml(locations[quest.nextLocation]?.name ?? quest.nextLocation) + '</strong></p>' : '',
+    quest.storyId && !questHere ? '<p class="quest-direction">Next destination: <strong>' + escapeHtml(locations[quest.nextLocation]?.name ?? quest.nextLocation) + '</strong> <button type="button" class="quest-travel" data-action="open-map" aria-controls="travel-map">Open travel map →</button></p>' : '',
     '</section>'
   ].join("");
   const routeHtml = CITY_ROUTES.map(({ id, hint }) => {
@@ -145,13 +145,13 @@ export function render(app, state, handlers, outcome = null) {
     ].join("");
   }).join("");
   const mapHtml = [
-    '<details class="city-route-map" open>',
-    '<summary>Explore the city <span>', (state.unlockedLocations ?? []).filter(id => CITY_ROUTES.some(route => route.id === id)).length, ' / ', CITY_ROUTES.length, ' locations discovered · open map</span></summary>',
+    '<section class="city-route-map" aria-labelledby="travel-map-title">',
+    '<div class="travel-map-heading"><div><p class="travel-map-kicker">Where would you like to go?</p><h2 id="travel-map-title" tabindex="-1">Travel around NeathBound</h2><p>', (state.unlockedLocations ?? []).filter(id => CITY_ROUTES.some(route => route.id === id)).length, ' / ', CITY_ROUTES.length, ' locations discovered</p></div><button type="button" class="close-travel-map" data-action="close-map">← Back to stories</button></div>',
     '<p class="route-footnote">Each district has different stories. Choose a road in a story to discover a place; after your first visit it stays unlocked on this map for easy return.</p>',
     '<div class="route-grid">', routeHtml, '</div>',
     location.consequenceOf ? '<p class="route-warning">You must resolve your predicament here before travelling elsewhere.</p>' : '',
     '<p class="route-footnote">Undiscovered locations show clues instead of travel buttons. Other dangerous places may appear through story consequences.</p>',
-    '</details>'
+    '</section>'
   ].join("");
 
   const storiesHtml = stories.map((story) => renderStory(story, false)).join("");
@@ -390,6 +390,7 @@ const inventoryHtml = inventory.length
 
       '<nav class="main-tabs" aria-label="Game sections">',
         '<a class="active" href="#stories" data-view="story">TALES</a>',
+        '<button type="button" class="nav-travel" data-action="open-map" aria-controls="travel-map" aria-pressed="false">✥ TRAVEL</button>',
         '<a href="#messages" data-view="messages">MESSAGES</a>',
         state.flags['tutorial.myself'] ? '<a href="#myself" data-view="myself">SELF</a>' : '',
         state.flags['tutorial.possessions'] ? '<a href="#possessions" data-view="possessions">SATCHEL</a>' : '',
@@ -430,7 +431,7 @@ const inventoryHtml = inventory.length
 
         '<main class="story-column" id="stories">',
           '<div data-view-panel="story">',
-          outcome ? "" : questHtml + mapHtml,
+          outcome ? "" : questHtml,
           outcome
             ? outcomeHtml
             : [
@@ -455,6 +456,7 @@ const inventoryHtml = inventory.length
             '<ol>', journalHtml, '</ol>',
           '</section>',
           '</div>',
+          '<div id="travel-map" data-view-panel="map" hidden>', mapHtml, '</div>',
           '<section class="plans-page parchment" id="messages" data-view-panel="messages" hidden>',
             '<header class="plans-header"><h2>Messages</h2></header>',letterMarkup,
           '</section>',
@@ -646,17 +648,31 @@ possessionCardsHtml,
   app.querySelectorAll("[data-action=outfit]").forEach((select) => select.addEventListener("change", (event) => handlers.outfit(event.target.value)));
   app.querySelector("[data-action=travel]")?.addEventListener("click", () => handlers.travel(app.querySelector("#travel-location")?.value));
   app.querySelectorAll("[data-action=travel-to]").forEach((button) => button.addEventListener("click", () => handlers.travel(button.dataset.location)));
+  // Like Fallen London's Travel control, the city map is a separate view.
+  // Opening it never changes the player state or spends an action.
+  app.querySelectorAll("[data-action=open-map]").forEach((button) => button.addEventListener("click", () => {
+    setView("map");
+    app.querySelector("#travel-map-title")?.focus({ preventScroll: true });
+    app.querySelector("#travel-map")?.scrollIntoView?.({ block: "start", behavior: "smooth" });
+  }));
+  app.querySelector("[data-action=close-map]")?.addEventListener("click", () => {
+    setView("story");
+    app.querySelector("#stories")?.scrollIntoView?.({ block: "start", behavior: "smooth" });
+  });
   app.querySelectorAll("[data-action=edit-note]").forEach((button) => button.addEventListener("click", () => handlers.editNote(button.dataset.noteKey)));
   app.querySelector("[data-action=reset]").addEventListener("click", handlers.reset);
 
   const setView = (view) => {
-    const activeView = ["possessions", "myself", "plans", "messages"].includes(view) ? view : "story";
+    const activeView = ["possessions", "myself", "plans", "messages", "map"].includes(view) ? view : "story";
     app.querySelectorAll("[data-view-panel]").forEach((panel) => {
       panel.hidden = panel.dataset.viewPanel !== activeView;
     });
     app.querySelectorAll(".main-tabs [data-view]").forEach((link) => {
       link.classList.toggle("active", link.dataset.view === activeView);
     });
+    const travelControl = app.querySelector(".nav-travel");
+    travelControl?.classList.toggle("active", activeView === "map");
+    travelControl?.setAttribute("aria-pressed", String(activeView === "map"));
   };
   const viewFromHash = () => {
     if (globalThis.location?.hash === "#possessions") return "possessions";
