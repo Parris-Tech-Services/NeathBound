@@ -7,7 +7,7 @@ not from any protected setting, names, writing, art, or code.
 
 ## Narrative production workflow
 
-**[Open the QBN Studio CMS](tools/cms/index.html)** to draft branching stories, export them as JSON, and review secret-depth and QA requirements. The separate [Studio workflow](docs/narrative-studio/README.md) is our release standard.
+**[Open the QBN Studio CMS](tools/cms/index.html)**\n\n**[Groq AI writing assistant — setup and safety](tools/cms/GROQ_AI.md)**: 14 creative and editorial workflows, private server-side Groq gateway, proposal review, and AI-ready handoff exports for both games. Groq generation requires two private Cloudflare Worker secret bindings; no credentials are stored in this repository. to draft branching stories, export them as JSON, and review secret-depth and QA requirements. The separate [Studio workflow](docs/narrative-studio/README.md) is our release standard.
 
 See **[Narrative Studio](docs/narrative-studio/README.md)** for the pitch → midflight skeleton → prose → content/design/mechanical/continuity QA → human sign-off pipeline, forty-topic spoiler-aware ledger and automated approval checks. Run `npm run studio:validate` before committing content. Draft packets are not playable until integrated and tested.
 
