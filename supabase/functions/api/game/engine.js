@@ -69,7 +69,11 @@ function requirementsFor(entry) {
 export function effectiveChallenge(story, choice) {
   if (!story || !choice) return null;
   if (choice.challenge === false || choice.challenge === null) return null;
-  return choice.challenge ?? story.challenge ?? null;
+  const challenge = choice.challenge ?? story.challenge ?? null;
+  // Original hand-authored stories were tuned for d10. Keep their odds intact
+  // while new QBN stories default to broad unless authors override mode.
+  if (!challenge || !story.id || story.id.startsWith("qbn-") || challenge.mode) return challenge;
+  return { ...challenge, mode: "classic" };
 }
 
 // While in a menace consequence area the only way out is its storylets.
@@ -124,7 +128,7 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     return { state: next, error: "That choice is no longer available. Your current state has been refreshed." };
   }
 
-  const challenge = effectiveChallenge(story, choice);
+  const challenge = effectiveChallenge({ ...story, id: storyId }, choice);
   let check = resolveChallenge(next, challenge, random);
   let success = check.success;
   let usedLesson = false;
