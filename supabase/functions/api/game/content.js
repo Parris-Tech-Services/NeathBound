@@ -2124,3 +2124,29 @@ Object.assign(items, gloomwingItems);
 Object.assign(stories, gloomwingStories);
 Object.assign(locations, gloomwingLocations);
 locations["lantern-quay"].stories.push("gloomwing_hunt_00");
+
+// The Bureau's Evidence Registry provides a use for every physical relic
+// collected in the 30-part Gloomwing hunt. Entries can be catalogued once;
+// the record persists, while the original quest objects remain in inventory.
+const registryRelics=Object.entries(gloomwingItems)
+  .filter(([, item]) => !item.slot)
+  .map(([id]) => id);
+for(let section=0;section<Math.ceil(registryRelics.length/7);section++){
+ const id="gloomwing-registry-"+(section+1);
+ stories[id]={
+  title:"The Bureau's Evidence Registry · "+(section+1),
+  text:"The registrar leaves space beside every recovered relic. An object can testify to an injustice more reliably than an official report. You may catalogue each clue exactly once.",
+  pattern:"decoupled",
+  choices:registryRelics.slice(section*7,(section+1)*7).map(itemId=>({
+    id:"catalogue-"+itemId,
+    label:"Catalogue "+gloomwingItems[itemId].name,
+    requirements:[
+      {type:"item",id:itemId,op:">=",value:1},
+      {type:"flag",id:"evidence-catalogued:"+itemId,op:"!=",value:true}
+    ],
+    success:"You record where the relic came from and who may need the evidence preserved. A public archive keeps a duplicate of your notes.",
+    successEffects:[{type:"flag",id:"evidence-catalogued:"+itemId,value:true},{type:"obols",amount:1}]
+  }))
+ };
+ locations["lantern-quay"].stories.push(id);
+}
