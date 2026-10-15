@@ -161,7 +161,59 @@ export function render(app, state, handlers, outcome = null) {
     '</section>'
   ].join("");
 
-  const storiesHtml = stories.map((story) => renderStory(story, false)).join("");
+  // Keep one story open at a time. The district is a catalogue of storylets,
+  // not an endless list of every available branch and locked requirement.
+  // Native <details> preserves keyboard operation even without JavaScript.
+  const currentAmbition = stories.find((story) => state.ambition && story.ambition_id === state.ambition);
+  const primaryId = questHere ? quest.storyId : (currentAmbition?.id ?? stories[0]?.id);
+  const makePreview = (story, open = false, isCard = false) => {
+    const availableCount = availableChoices(state, story.id).length;
+    const preview = (story.text ?? "").replace(/\s+/g, " ").trim();
+    return [
+      '<details class="storylet-disclosure', open ? ' is-featured' : '', '" name="neathbound-story-focus" data-storylet-id="', escapeHtml(story.id), '"', open ? ' open' : '', '>',
+        '<summary class="storylet-headline" aria-label="', escapeHtml(story.title), ' — open or close story">',
+          '<span class="storylet-headline-glyph" aria-hidden="true">', storyArtMarkup(story.id, state.locationId), '</span>',
+          '<span class="storylet-headline-copy">',
+            '<strong>', escapeHtml(story.title), '</strong>',
+            '<small>', escapeHtml(preview.length > 105 ? preview.slice(0, 102).trimEnd() + '…' : preview), '</small>',
+            '<span class="storylet-headline-count">', availableCount, ' available ', availableCount === 1 ? 'choice' : 'choices',
+              ' · ', story.choices.length, ' total</span>',
+          '</span>',
+          '<span class="storylet-headline-indicator" aria-hidden="true">', open ? '−' : '+', '</span>',
+        '</summary>',
+        renderStory(story, isCard),
+      '</details>'
+    ].join("");
+  };
+  const registryStories = stories.filter((story) => story.id.startsWith("gloomwing-registry-"));
+  const priorityStories = stories.filter((story) => !story.id.startsWith("gloomwing-registry-") &&
+    (story.id === quest.storyId || (state.ambition && story.ambition_id === state.ambition) ||
+      story.id === "qbn-choose-ambition" || preferences.bookmarks.includes(story.id)));
+  const remainingStories = stories.filter((story) => !registryStories.includes(story) && !priorityStories.includes(story));
+  const storiesHtml = [
+    priorityStories.length ? [
+      '<section class="storylet-group" aria-label="Your active stories">',
+        '<h3 class="storylet-group-heading">Your current stories</h3>',
+        priorityStories.map((story) => makePreview(story, story.id === primaryId)).join(""),
+      '</section>'
+    ].join("") : '',
+    remainingStories.length ? [
+      '<section class="storylet-group" aria-label="Stories around this district">',
+        '<h3 class="storylet-group-heading">Around ', escapeHtml(location.name), '</h3>',
+        remainingStories.map((story) => makePreview(story, story.id === primaryId)).join(""),
+      '</section>'
+    ].join("") : '',
+    registryStories.length ? [
+      '<details class="storylet-archive">',
+        '<summary>◆ The Bureau’s Evidence Registry <span>(', registryStories.length,
+        ' volumes) · Open only when you have evidence</span></summary>',
+        '<div class="storylet-archive-list">',
+          registryStories.map((story) => makePreview(story, story.id === primaryId)).join(""),
+        '</div>',
+      '</details>'
+    ].join("") : '',
+  ].join("");
+
   let deckHtml = "";
   if (state.flags["tutorial.cards"]) {
     const hand = state.hand || [];
@@ -169,7 +221,7 @@ export function render(app, state, handlers, outcome = null) {
     const drawButton = hand.length < maxHand
       ? `<button class="draw-card-button" data-action="draw-card" data-deck="whispers">Draw a Card (${hand.length}/${maxHand})</button>`
       : `<button class="draw-card-button disabled" disabled>Hand Full (${maxHand}/${maxHand})</button>`;
-    const handHtml = hand.map((id) => cards[id] ? renderStory({ id, ...cards[id] }, true) : "").join("");
+    const handHtml = hand.map((id) => cards[id] ? makePreview({ id, ...cards[id] }, false, true) : "").join("");
     deckHtml = `<section class="whispers-deck"><div class="deck-controls">${drawButton}</div><div class="deck-hand">${handHtml}</div></section>`;
   }
 
@@ -623,6 +675,21 @@ possessionCardsHtml,
     '</div>'
   ].join("");
 
+  // The native name attribute enforces single-open behaviour in modern
+  // browsers; this also supports older browsers without that feature.
+  app.querySelectorAll(".storylet-disclosure").forEach((section) => {
+    section.addEventListener("toggle", () => {
+      if (!section.open) return;
+      app.querySelectorAll(".storylet-disclosure").forEach((other) => {
+        if (other !== section && other.open) other.open = false;
+      });
+      section.querySelector(".storylet-headline-indicator").textContent = "−";
+    });
+    section.querySelector("summary")?.addEventListener("click", () => {
+      if (section.open) section.querySelector(".storylet-headline-indicator").textContent = "+";
+      else section.querySelector(".storylet-headline-indicator").textContent = "−";
+    });
+  });
   app.querySelectorAll("[data-choice]").forEach((button) => {
     button.dataset.originallyDisabled = String(button.disabled);
     button.addEventListener("click", () => {
