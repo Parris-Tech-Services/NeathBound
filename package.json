@@ -2,7 +2,7 @@
   "name": "neathbound",
   "version": "0.2.0",
   "private": false,
-  "description": "An original open-source quality-based narrative browser RPG with unlimited actions.",
+  "description": "An original quality-based narrative browser RPG with a regenerating action pool.",
   "type": "module",
   "scripts": {
     "dev": "python3 -m http.server 4173 --directory .",
@@ -12,7 +12,7 @@
     "api:test": "node --test server/tests/*.test.mjs",
     "validate:content": "node tools/build-gloomwing.mjs --check && node tools/build-catalogue.mjs --check && node tools/validate-content.mjs",
     "sync:engine": "node scripts/sync-engine.mjs",
-    "release:check": "npm test && npm run api:test && npm run validate:content && npm run smoke && npm run storylets:check",
+    "release:check": "npm test && npm run api:test && npm run validate:content && npm run smoke && npm run storylets:check && npm run studio:validate",
     "test:e2e": "node --test tests/e2e/play.e2e.mjs",
     "build:content": "node tools/build-gloomwing.mjs",
     "catalogue:build": "node tools/build-catalogue.mjs",
@@ -20,6 +20,8 @@
     "storylets:validate": "node tools/storylet-generator.mjs validate",
     "storylets:approve": "node tools/storylet-generator.mjs approve",
     "storylets:publish": "node tools/storylet-generator.mjs publish",
-    "storylets:check": "node tools/storylet-generator.mjs publish --check"
+    "storylets:check": "node tools/storylet-generator.mjs publish --check",
+    "studio:validate": "node tools/narrative-studio/validate.mjs",
+    "studio:report": "node tools/narrative-studio/validate.mjs report"
   }
 }

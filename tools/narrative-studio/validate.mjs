@@ -18,8 +18,17 @@ const subdir=path.join(base,"submissions");
 if(!fs.existsSync(subdir))fs.mkdirSync(subdir,{recursive:true});
 const records=[];
 for(const file of fs.readdirSync(subdir).filter(x=>x.endsWith(".json"))){
- const at="submissions/"+file;let r;
- try{r=JSON.parse(fs.readFileSync(path.join(subdir,file),"utf8"))}catch(e){errors.push(at+": invalid JSON "+e.message);continue}
+ const at="submissions/"+file;let raw;
+ try{raw=JSON.parse(fs.readFileSync(path.join(subdir,file),"utf8"))}catch(e){errors.push(at+": invalid JSON "+e.message);continue}
+ if(raw.format==="qbn-studio-export"&&!Array.isArray(raw.stories)){errors.push(at+": missing exported stories");continue}
+ const incoming=raw.format==="qbn-studio-export"?raw.stories:[raw];
+ for(const source of incoming){
+ const cms=Array.isArray(source.choices);
+ const stages={"pitch":"pitch","midflight":"skeleton","prose":"prose","content-qa":"qa","design-qa":"qa","mechanical-qa":"qa","continuity":"qa","review":"qa","approved":"approved"};
+ const r=cms?{...source,game:"NeathBound",stage:stages[source.status]??"pitch",
+  branches:source.choices.map(c=>({id:c.id,challenge:{stat:c.stat,difficulty:c.difficulty},action_cost:Number(c.action_cost),success:c.success,failure:c.failure})),
+  qa:Object.fromEntries(["content","design","mechanical","continuity"].map(k=>[k,source.qa?.[k]?"pass":"pending"])),
+  human_approved:Boolean(source.qa?.peer&&source.reviewer&&source.reviewer.toLowerCase()!==source.author?.toLowerCase())}:source;
  records.push(r);
  const fail=message=>errors.push(at+": "+message);
  if(r.schema_version!==1||r.game!=="NeathBound")fail("wrong schema/game");
@@ -52,7 +61,7 @@ for(const file of fs.readdirSync(subdir).filter(x=>x.endsWith(".json"))){
   for(const role of schema.qa_types)if(r.qa?.[role]!=="pass")fail("QA "+role+" not passed");
   if(r.runtime_integration!=="verified")fail("runtime adapter and game tests must be verified before sign-off");
  }
-}
+}}
 const counts=Object.fromEntries(schema.stages.map(s=>[s,records.filter(x=>x.stage===s).length]));
 if(process.argv.includes("report"))console.log("Narrative Studio packets: "+JSON.stringify(counts));
 if(errors.length){for(const e of errors)console.error("✗ "+e);process.exitCode=1;}

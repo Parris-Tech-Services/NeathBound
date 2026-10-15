@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "game": "NeathBound",
+  "id": "draft-editorial-sample",
+  "stage": "pitch",
+  "title": "The Unclaimed Register",
+  "location": "lantern-quay",
+  "pitch": "A clerk refuses to sign the harbour register because a living neighbour's name is missing. Pitch a choice between protecting a witness and creating a public record. No final outcome is canon until approved.",
+  "secret_ids": [
+    "NB-S02"
+  ],
+  "reveal_depth": 2,
+  "description": "[PROSE PENDING]",
+  "branches": [],
+  "qa": {
+    "content": "pending",
+    "design": "pending",
+    "mechanical": "pending",
+    "continuity": "pending"
+  },
+  "human_approved": false,
+  "runtime_integration": "pending"
+}

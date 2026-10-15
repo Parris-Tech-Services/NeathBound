@@ -9,7 +9,7 @@ This project adopts the useful StoryNexus-inspired **editorial process**, not th
 - `agents.md` contains narrowly scoped pitch, skeleton, prose, QA, continuity, weekly review and economy prompts. Pass the latest versions to every run.
 
 ## Phase 1 — engine and CMS
-Keep the current `src/game/` engine, `tools/cms/` browser editor and `content/schema/` format. Do **not** replace the playable UI with a React prompt. The **Studio Editor** at `tools/narrative-studio/editor.html` exports draft-review JSON; it cannot silently alter production game JS. Production requires a deliberate conversion into the existing storypack architecture and existing validators.
+Keep the current `src/game/` engine, `tools/cms/` browser editor and `content/schema/` format. Do **not** replace the playable UI with a React prompt. The **Studio Editor** at [QBN Studio](../../tools/cms/index.html) exports draft-review JSON; it cannot silently alter production game JS. Production requires a deliberate conversion into the existing storypack architecture and existing validators.
 
 ## Phase 2 — gated editorial loop
 1. **Pitch:** <=200 words, location, beat, unique hook, budget, 2–5 distinct branches, secret depth, new qualities/items. Human: approve/reject.
@@ -32,3 +32,5 @@ Run individual-review loops at least **fifty times** before allowing ten-at-once
 - GitHub CI runs the studio gate alongside the existing game checks.
 
 The first imported files are `content/narrative-studio/submissions/`; drafts stay out of the runtime until adapted. All generated text must be original. No API keys or unverified AI output is committed by default.
+## Existing QBN Studio CMS and Groq Foundry
+The [no-code QBN Studio editor](../../tools/cms/index.html) has dropdowns for branches, qualities, outcomes and effects; its exports use `format: qbn-studio-export` with `stories[]`. Copy exported JSON to `content/narrative-studio/submissions/` for the editorial gate; the validator accepts either native editorial packets or this CMS bundle. The [Storylet Foundry](../../tools/storylet-generator.mjs) offers optional Groq-assisted drafting with separate review/publishing commands. **Neither CMS export nor AI generation is automatic player-content publication.** A CMS draft with `approved` status also needs `runtime_integration: verified` and actual tests before the editorial gate calls it shipped. Use the full `npm run release:check` (NeathBound) or `npm test` plus `npm run studio:validate` (Undercity).
