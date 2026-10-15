@@ -877,7 +877,7 @@ const STORY_ART = {
   "the-quiet-carrel": ["⌑", "a desk between endless shelves", "#2a302c", "#8f927b"],
   "the-gardeners-salve": ["✿", "a brass flower and green salve", "#31402e", "#9cad75"],
   "card-a-stranger-approaches": ["♟", "a stranger with a rusted lamp", "#283239", "#a88765"],
-  "card-lost-obols": ["¤", "coins glinting in black muck", "#2e302b", "#a59665"]
+  "card-lost-obols": ["¤", "coins glinting in black muck", "#2e302b", "#a59665"],
   "qbn-gloomwing-hunt-1": ["◈","gloomwing hunt","#293638","#b0a77f"],
   "qbn-gloomwing-hunt-2": ["◇","gloomwing hunt","#332c41","#b8a5c8"],
   "qbn-gloomwing-hunt-3": ["✦","gloomwing hunt","#283b37","#9bbaac"],
