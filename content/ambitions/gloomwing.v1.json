@@ -1048,7 +1048,7 @@
         "value": 7
       },
       "once": true,
-      "text": "You find the Gloomwing sleeping upright between two ruined clock faces. Its ribs move with the rhythm of the city's pumps.",
+      "text": "Between two ruined clock faces, the Gloomwing sleeps upright in a sling of workman's canvas. Every breath keeps time with the pumps beneath Duskwater. It opens one eye. \"Another hunter,\" it says. \"Do they still send you with a price instead of a question?\"",
       "requirements": [],
       "choices": [
         {
@@ -1061,8 +1061,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The creature has been wounded by Bureau ammunition made from its own feathers. You set a fact down where another person may find it.",
-          "failure": "The evidence twists away before you can secure it. The hunt has not advanced; you can try another approach.",
+          "success": "You lift a silver splinter from the wing's old injury. The metal bears the Bureau's proof-mark; the creature watches you put it into a labelled envelope. \"Old Marrow knows that mark,\" it says. \"Ask him who supplied it.\"",
+          "failure": "You disturb the wound before you can lift a sample. The Gloomwing folds its injured wing. \"There are gentler ways to take evidence.\" You may return after cleaning your instruments.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -1098,8 +1098,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The creature has been wounded by Bureau ammunition made from its own feathers. The cost is real, but you leave the chamber unbowed.",
-          "failure": "You endure the encounter, but not without a cost. The hunt has not advanced; you can try another approach.",
+          "success": "You keep your ground when its wings unfold, although a clock wheel shears from the wall above you. The Gloomwing catches it and shudders under the strain. \"You can stand still,\" it says. \"Now see whether you can listen.\"",
+          "failure": "You brace against the clock face; its broken frame gives way and cuts your arm. The Gloomwing catches the falling metal rather than let it crush you. \"A brave mistake is still a mistake.\" The stair remains accessible.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -1130,8 +1130,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The creature has been wounded by Bureau ammunition made from its own feathers. You gain a witness who will remember which way you chose.",
-          "failure": "Your proposal falls on ears still loyal to the Bureau. The hunt has not advanced; you can try another approach.",
+          "success": "You speak the title scraped from the collectors' dispatches: Keeper of the Unpaid Bell. The creature lowers its head to hear the last syllable. \"That name carries an obligation,\" it says. \"Do you know whose?\"",
+          "failure": "You mistake an old title for a command. The Gloomwing goes quiet. \"Names are not keys, hunter.\" Its wing closes over the clock, and the conversation must begin again.",
           "successEffects": [
             {
               "type": "ambition-progress",
