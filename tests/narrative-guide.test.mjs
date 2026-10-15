@@ -8,7 +8,10 @@ test("opening objective is present without needing a hidden sidebar", () => {
   const initial = initialState();
   assert.match(getQuestGuide(initial).objective, /escape/i);
   const source = readFileSync(new URL("../src/ui/render.js", import.meta.url), "utf8");
-  assert.match(source, /questHtml \+ mapHtml/);
+  assert.match(source, /outcome \\? "" : questHtml/);
+  assert.match(source, /data-view-panel="map"/);
+  assert.match(source, /data-action="open-map"/);
+  assert.doesNotMatch(source, /<details class=\\"city-route-map\\" open>/);
   assert.match(source, /\[data-action=travel-to\]/);
   assert.match(source, /main-storylet/);
 });
