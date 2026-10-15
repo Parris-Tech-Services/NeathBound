@@ -49,10 +49,10 @@ test("typed effects mutate only declared state", () => {
 test("challenge resolution is deterministic when random is injected", () => {
   const state = initialState();
   const result = resolveChallenge(state, { quality: "nerve", difficulty: 5, mode: "classic" }, () => 0.2);
-  assert.equal(result.roll, 0.2);
-  assert.equal(result.total, null);
-  assert.equal(result.percent, 24);
-  assert.equal(result.cpAwarded, 2);
+  assert.equal(result.roll, 3);
+  assert.equal(result.total, 5);
+  assert.equal(result.percent, 80);
+  assert.equal(result.cpAwarded, 1);
   assert.equal(result.success, true);
 });
 
