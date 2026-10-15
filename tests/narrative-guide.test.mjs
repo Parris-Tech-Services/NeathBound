@@ -29,7 +29,7 @@ test("chapter objectives advance through each meaningful milestone", () => {
   s.flags["found-the-far-crack"] = true;
   assert.match(getQuestGuide(s).objective, /Far Crack/i);
   s.flags["far-crack-answered"] = true;
-  assert.match(getQuestGuide(s).chapter, /complete/i);
+  assert.match(getQuestGuide(s).chapter, /Chapter Two/i);
 });
 test("the navigable map has explicit discovery hints", () => {
   assert.equal(new Set(CITY_ROUTES.map(route => route.id)).size, CITY_ROUTES.length);
