@@ -10,7 +10,7 @@ const read=relative=>fs.readFileSync(path.join(root,relative),"utf8");
 const pkg=JSON.parse(read("package.json"));
 const game=pkg.name==="neathbound"?"neathbound":"undercity";
 const sources=path.join(root,"content/storylets/cms");
-const output=path.join(root,"content/cms-published.js");
+const output=path.join(root,game==="neathbound"?"src/game/cms-published.js":"content/cms-published.js");
 const files=fs.existsSync(sources)?fs.readdirSync(sources).filter(f=>f.endsWith(".json")).sort():[];
 const ledger=JSON.parse(read("tools/cms/ledger.json"));
 async function getContext(){
