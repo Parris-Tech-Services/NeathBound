@@ -57,15 +57,14 @@ for(const [choiceIndex,trophy] of [
       }
       const choice=n===25||n===29 ? ["investigate","endure","negotiate"][choiceIndex] : "investigate";
       assert.equal(storyAvailable(state,id(n)),true,"locked chapter "+n);
-      // Simulate the next ten-minute action tick between chapter visits.
+      // Simulate ten minutes of action regeneration between chapters.
       state.last_action_tick=Date.now()-600001;
-      // Advance the simulated clock by 10 minutes between chapters.
-      state.last_action_tick=Date.now()-600000;
       const result=resolveChoice(state,id(n),choice,()=>0);
       assert.equal(result.error,undefined,"error at "+id(n));
       assert.equal(result.success,true,"failed "+id(n));
       state=result.state;
       assert.equal(state.ambition_progress["gloomwing-hunt"],n+1,"progress at "+id(n));
+      assert.equal(state.qualities.gloomwing_hunt_progress,n+1,"visible progress quality at "+id(n));
     }
     assert.equal(state.flags["gloomwing-hunt-complete"],true);
     assert.equal(state.items[trophy],1);
