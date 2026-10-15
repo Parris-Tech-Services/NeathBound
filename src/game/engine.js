@@ -1,7 +1,7 @@
 import { locations, menaceAreas, stories, decks, cards, refuges, equipmentSlots, items, ambitions, festivals, destinies } from "./content.js?v=20261015-04";
 import { drawCardToHand, discardCard as removeCardFromHand } from "./decks.js?v=20261015-04";
 import { cloneState, initialState } from "./state.js?v=20261015-04";
-import { applyEffects, awardProgress, describeChallenge, requirementsMet, resolveChallenge } from "./rules.js?v=20261015-04";
+import { applyEffects, awardProgress, cpAward, describeChallenge, requirementsMet, resolveChallenge } from "./rules.js?v=20261015-04";
 
 import { effectiveStat } from "./rules.js?v=20261015-04";
 export { describeChallenge, effectiveStat };
@@ -147,16 +147,22 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     next.momentum -= 1;
     check.total += 3;
     check.success = success = true;
+    check.outcome = "success";
+    check.cpAwarded = cpAward(check.percent, true);
     usedMomentum = true;
   }
-  const rare=Boolean(success && (choice.rareSuccessEffects || choice.rare_success) &&
-    random()<Math.max(0,Math.min(1,Number(choice.rare_success_chance??0.04))));
-  const resultText=rare?(choice.rare_success??"An extraordinary success changes the outcome."):
-    success?choice.success:(choice.failure??"The city refuses to explain itself.");
-  // Only rare effects fire on a rare success (not ordinary success + rare).
-  applyEffects(next,rare?(choice.rareSuccessEffects??[]):success?(choice.successEffects??[]):(choice.failureEffects??[]));
+  // The rules resolver has already performed the single rare roll after success.
+  const rare = Boolean(success && check.rare);
+  const resultText = success
+    ? (rare ? (choice.rare_success ?? choice.rareSuccess ?? choice.success) : choice.success)
+    : (choice.failure ?? "The city refuses to explain itself.");
+  // A branch with no special rare reward keeps ordinary success rewards.
+  const effects = !success ? (choice.failureEffects ?? [])
+    : rare ? (choice.rareSuccessEffects ?? choice.successEffects ?? [])
+    : (choice.successEffects ?? []);
+  applyEffects(next, effects);
 
-  // Progress on success AND failure, by difficulty band (progress pyramid).
+  // Progress on success AND failure using the canonical 2/1 CP award.
   const progress = challenge?.quality
     ? awardProgress(next, challenge.quality, check.cpAwarded)
     : null;
@@ -214,7 +220,7 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     storyId,
     choiceId,
     title: story.title,
-    outcome: check.rare ? "rare_success" : (success ? "success" : "failure"),
+    outcome: rare ? "rare_success" : (success ? "success" : "failure"),
     text: resultText,
     changes
   }, ...(next.events ?? [])].slice(0, 250);
