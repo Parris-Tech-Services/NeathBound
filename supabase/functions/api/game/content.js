@@ -1,6 +1,7 @@
 import { ambitions, destinies, festivals, qbnStories, qbnCards } from "./qbn-expansion.js";
 export { ambitions, destinies, festivals };
 import { expansionLocations, expansionStories } from "./expansion.js";
+import { gloomwingLocations, gloomwingItems, gloomwingStories } from "./gloomwing-content.js";
 
 
 
@@ -2117,3 +2118,9 @@ locations["lantern-quay"].stories.push("qbn-choose-ambition",
 for(const [menace,areaId] of Object.entries(menaceAreas)){
  if(locations[areaId])locations[areaId].stories.push("qbn-arrival-"+menace);
 }
+
+// Gloomwing storypack: its storylets are gated by ambition and exact chapter.
+Object.assign(items, gloomwingItems);
+Object.assign(stories, gloomwingStories);
+Object.assign(locations, gloomwingLocations);
+locations["lantern-quay"].stories.push("gloomwing_hunt_00");
