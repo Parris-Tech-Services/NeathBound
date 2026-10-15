@@ -50,6 +50,24 @@ export function applyEffect(state, effect) {
     case "set-quality":
       state.qualities[effect.id] = Math.max(0, Number(effect.value ?? 0));
       break;
+    case "quirk": {
+      state.quirks ??= {};
+      const change = Number(effect.amount ?? 0);
+      state.quirks[effect.id] = clamp((state.quirks[effect.id] ?? 0) + change, 0, 15);
+      if (change > 0) for (const opposite of QUIRK_OPPOSITES[effect.id] ?? []) {
+        state.quirks[opposite] = clamp((state.quirks[opposite] ?? 0) - change, 0, 15);
+      }
+      break;
+    }
+    case "living-story":
+      state.living_stories ??= [];
+      if (!state.living_stories.some(entry => entry.storylet_id === effect.id && !entry.fired)) {
+        state.living_stories.push({ storylet_id: effect.id, trigger_time: Date.now(), delay_hours: Math.max(0, Number(effect.delay_hours ?? 1)), fired: false });
+      }
+      break;
+    case "progress":
+      awardProgress(state, effect.id, effect.amount ?? 1);
+      break;
     case "menace":
       state.menaces ??= {};
       state.menaces[effect.id] = Math.max(0, (state.menaces[effect.id] ?? 0) + Number(effect.amount ?? 0));
@@ -127,9 +145,9 @@ export function challengeChance(state, challenge) {
   if (!challenge) return 1;
   const level = effectiveStat(state, challenge.quality);
   const difficulty = Math.max(1, Number(challenge.difficulty ?? 1));
-  switch (challenge.mode ?? "classic") {
+  switch (challenge.mode ?? "broad") {
     case "broad":
-      return clamp((0.6 * level) / difficulty, 0, 1);
+      return clamp(Math.floor(Number(challenge.scaler ?? 0.60) * level / difficulty * 100) / 100, 0.1, 1);
     case "narrow":
       return clamp(0.5 + 0.1 * (level - difficulty), 0.1, 1);
     case "luck":
@@ -159,7 +177,7 @@ export function describeChallenge(state, challenge) {
   if (!challenge) return null;
   const chance = challengeChance(state, challenge);
   const band = challengeBand(chance);
-  return { ...challenge, mode: challenge.mode ?? "classic", chance, percent: band.percent, label: band.label };
+  return { ...challenge, mode: challenge.mode ?? "broad", chance, percent: band.percent, label: band.label };
 }
 
 export function resolveChallenge(state, challenge, random = Math.random) {
@@ -167,7 +185,7 @@ export function resolveChallenge(state, challenge, random = Math.random) {
   const chance = challengeChance(state, challenge);
   const band = challengeBand(chance);
   const quality = effectiveStat(state, challenge.quality);
-  if ((challenge.mode ?? "classic") === "classic") {
+  if ((challenge.mode ?? "broad") === "classic") {
     const die = Math.floor(random() * 10) + 1;
     const total = die + quality;
     return { success: total >= challenge.difficulty, roll: die, total, quality, chance, percent: band.percent, label: band.label, band };
@@ -176,9 +194,39 @@ export function resolveChallenge(state, challenge, random = Math.random) {
   return { success: roll < chance, roll, total: null, quality, chance, percent: band.percent, label: band.label, band };
 }
 
-// Progress pyramid: reaching level n costs n progress (flat above LEVEL_COST_CAP).
+// The four primary attributes require triangular CP to level 70, then 70 per level.
+// 70 * 71 / 2 = 2485 (1275 is the total at level 50).
 export const LEVEL_COST_CAP = 70;
-export const levelCost = (targetLevel) => Math.min(targetLevel, LEVEL_COST_CAP);
+export const LEVEL_70_CP = 2485;
+export const CP_PER_LEVEL_AFTER_70 = 70;
+export const levelCost = (targetLevel) => Math.max(1, Math.min(Math.floor(targetLevel), LEVEL_COST_CAP));
+export function levelToCp(level, cap = LEVEL_COST_CAP) {
+  const n = Math.max(0, Math.floor(Number(level) || 0));
+  const threshold = Math.max(1, Math.floor(cap));
+  return n <= threshold ? n * (n + 1) / 2 : threshold * (threshold + 1) / 2 + (n - threshold) * threshold;
+}
+export function cpToLevel(cp, cap = LEVEL_COST_CAP) {
+  const amount = Math.max(0, Math.floor(Number(cp) || 0));
+  const threshold = Math.max(1, Math.floor(cap));
+  const thresholdCp = threshold * (threshold + 1) / 2;
+  return amount < thresholdCp ? Math.floor((Math.sqrt(8 * amount + 1) - 1) / 2)
+    : threshold + Math.floor((amount - thresholdCp) / threshold);
+}
+export const QUIRK_OPPOSITES = {
+  austere: ["hedonist"], hedonist: ["austere"],
+  daring: ["forceful"], subtle: ["forceful"], forceful: ["daring", "subtle"],
+  magnanimous: ["ruthless"], ruthless: ["magnanimous"],
+  steadfast: ["fickle"], fickle: ["steadfast"],
+  honest: ["devious"], devious: ["honest"]
+};
+export const QUIRK_TITLES = {
+  austere: [[2,"Restrained"],[4,"Temperate"],[9,"Disciplined"],[15,"Ascetic"]],
+  daring: [[2,"Bold"],[4,"Dashing"],[9,"Intrepid"],[15,"Fearless"]]
+};
+export function quirkTitle(id, level) {
+  return (QUIRK_TITLES[id] ?? []).find(([max]) => level <= max)?.[1] ?? id.replace(/(^|-)./g, match => match.toUpperCase());
+}
+
 
 export function awardProgress(state, qualityId, points) {
   state.qualities ??= {};
@@ -193,5 +241,7 @@ export function awardProgress(state, qualityId, points) {
   }
   state.qualities[qualityId] = level;
   state.progress[qualityId] = progress;
+  state.progress_total ??= {};
+  state.progress_total[qualityId] = levelToCp(level) + progress;
   return { qualityId, points, levelsGained, level, progress, nextLevelCost: levelCost(level + 1) };
 }
