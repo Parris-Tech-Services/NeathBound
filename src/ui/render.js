@@ -1,7 +1,7 @@
-import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20261015-06";
-import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions, ambitions, destinies } from "../game/content.js?v=20261015-06";
-import { CITY_ROUTES, getQuestGuide } from "./narrative-guide.js?v=20261015-06";
-import { loadPreferences } from "./preferences.js?v=20261015-06";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20261015-07";
+import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions, ambitions, destinies } from "../game/content.js?v=20261015-07";
+import { CITY_ROUTES, getQuestGuide } from "./narrative-guide.js?v=20261015-07";
+import { loadPreferences } from "./preferences.js?v=20261015-07";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
 
