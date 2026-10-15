@@ -429,6 +429,78 @@ button, select { font: inherit; }
 .featured-story .feature-note { font-style: italic; font-size: .81rem; }
 
 .story-stack { display: grid; gap: 10px; }
+
+/* A place lists opportunities compactly; reading one opens its choices.
+   Named disclosure groups ensure there is never a wall of open storylets. */
+.storylet-group{display:grid;gap:8px}
+.storylet-group + .storylet-group{margin-top:17px}
+.storylet-group-heading{
+  margin:4px 0 1px;padding:0 0 6px;border-bottom:1px solid #a39780;
+  font:700 .83rem/1.3 Arial,sans-serif;letter-spacing:.055em;
+  text-transform:uppercase;color:#443d30
+}
+.storylet-disclosure{
+  background:linear-gradient(105deg,#e6dec9,#d6ccb5);
+  border:1px solid #a79b82;
+  box-shadow:0 1px 2px rgba(0,0,0,.18);
+  color:#2a261e
+}
+.storylet-disclosure[open]{border-color:#7a694d;box-shadow:0 2px 7px #31271930}
+.storylet-headline{
+  display:grid;grid-template-columns:54px minmax(0,1fr) 18px;
+  gap:10px;align-items:center;min-height:71px;padding:7px 9px;
+  list-style:none;cursor:pointer
+}
+.storylet-headline::-webkit-details-marker{display:none}
+.storylet-headline::marker{content:""}
+.storylet-headline:hover,.storylet-headline:focus-visible{background:#eee4cf}
+.storylet-headline:focus-visible{outline:3px solid #227a83;outline-offset:1px}
+.storylet-headline-glyph{
+  display:flex;align-items:center;justify-content:center;
+  width:54px;height:54px;overflow:hidden;background:#344342;
+  border:1px solid #81745b;color:#f2dfc2
+}
+.storylet-headline-glyph svg,.storylet-headline-glyph img,.storylet-headline-glyph picture{
+  display:block;width:100%;height:100%;object-fit:cover
+}
+.storylet-headline-copy{display:grid;gap:3px;min-width:0}
+.storylet-headline-copy strong{font:700 1rem/1.2 Georgia,serif;color:#26231d}
+.storylet-headline-copy small{
+  font:400 .75rem/1.4 Georgia,serif;color:#514637;
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical
+}
+.storylet-headline-count{
+  font:600 .68rem/1.15 Arial,sans-serif;
+  color:#615440
+}
+.storylet-headline-indicator{
+  color:#406969;font:700 1.25rem/1 Arial,sans-serif;text-align:center
+}
+.storylet-disclosure[open]>.storylet-headline{border-bottom:1px solid #aa9a7d}
+.storylet-disclosure>.storylet{border:0;box-shadow:none}
+.storylet-archive{
+  margin-top:12px;background:#d2c8b4;color:#322a20;
+  border:1px solid #958872
+}
+.storylet-archive>summary{
+  cursor:pointer;padding:13px;list-style:none;
+  font:700 .88rem/1.35 Arial,sans-serif
+}
+.storylet-archive>summary::-webkit-details-marker{display:none}
+.storylet-archive>summary::marker{content:""}
+.storylet-archive>summary:focus-visible{outline:3px solid #227a83}
+.storylet-archive>summary span{font-size:.73rem;font-weight:400}
+.storylet-archive-list{padding:8px;display:grid;gap:8px}
+.storylet-archive:not([open]) .storylet-archive-list{display:none}
+@media(max-width:600px){
+ .storylet-headline{grid-template-columns:45px minmax(0,1fr) 18px;gap:8px;min-height:67px;padding:7px}
+ .storylet-headline-glyph{width:45px;height:49px}
+ .storylet-headline-copy strong{font-size:.91rem}
+ .storylet-headline-copy small{font-size:.73rem;-webkit-line-clamp:1}
+ .storylet-headline-count{font-size:.64rem}
+ .storylet-disclosure>.storylet{grid-template-columns:62px minmax(0,1fr)}
+}
+
 .storylet {
   display: grid;
   grid-template-columns: 90px minmax(0,1fr);
