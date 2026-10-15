@@ -1,6 +1,6 @@
-import { createGameService } from "./services/index.js?v=20261015-art1";
-import { render } from "./ui/render.js?v=20261015-art1";
-import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20261015-art1";
+import { createGameService } from "./services/index.js?v=20261015-play2";
+import { render } from "./ui/render.js?v=20261015-play2";
+import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20261015-play2";
 
 const app = document.querySelector("#app");
 const bootScreen = document.querySelector("#boot-screen");
@@ -204,10 +204,17 @@ async function draw(state) {
       }
     },
 
-    onwards() {
+    async onwards() {
       lastOutcome = null;
-      draw(currentState).catch(showError);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      try {
+        await draw(currentState);
+        const heading = app.querySelector(".main-storylet h3") ?? app.querySelector("#stories h2");
+        if (heading) {
+          heading.setAttribute("tabindex", "-1");
+          heading.focus({ preventScroll: true });
+          heading.scrollIntoView({ block: "center", behavior: "instant" });
+        }
+      } catch (error) { showError(error); }
     },
 
     bookmark(storyId) {

@@ -1,9 +1,9 @@
-import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20261015-art1";
-import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions, ambitions, destinies } from "../game/content.js?v=20261015-art1";
-import { CITY_ROUTES, getQuestGuide } from "./narrative-guide.js?v=20261015-art1";
-import { loadPreferences } from "./preferences.js?v=20261015-art1";
-import { cmsPublishedStories } from "../game/cms-published.js?v=20261015-art1";
-import { quirkTitle } from "../game/rules.js?v=20261015-art1";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20261015-play2";
+import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions, ambitions, destinies } from "../game/content.js?v=20261015-play2";
+import { CITY_ROUTES, getQuestGuide } from "./narrative-guide.js?v=20261015-play2";
+import { loadPreferences } from "./preferences.js?v=20261015-play2";
+import { cmsPublishedStories } from "../game/cms-published.js?v=20261015-play2";
+import { quirkTitle } from "../game/rules.js?v=20261015-play2";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
 
@@ -318,7 +318,7 @@ const inventoryHtml = inventory.length
     const challengeQuality = outcome.challenge?.quality ?? outcome.challenge?.stat;
     const verdict = outcome.challenge
       ? outcome.success
-        ? `You succeeded in a ${formatName(challengeQuality)} challenge! (${outcomeOdds(outcome)}${outcome.usedMomentum ? ", with Momentum" : ""})`
+        ? `You succeeded in ${/^[aeiou]/i.test(formatName(challengeQuality)) ? "an" : "a"} ${formatName(challengeQuality)} challenge! (${outcomeOdds(outcome)}${outcome.usedMomentum ? ", with Momentum" : ""})`
         : `Your ${formatName(challengeQuality)} challenge failed. (${outcomeOdds(outcome)})`
       : "";
 
@@ -631,6 +631,16 @@ possessionCardsHtml,
     });
   });
   app.querySelector("[data-action=onwards]")?.addEventListener("click", handlers.onwards);
+  // A modal result must retain keyboard focus until the reader leaves it.
+  app.querySelector('.outcome-panel[role="dialog"]')?.addEventListener("keydown", (event) => {
+    if (event.key === "Tab") {
+      event.preventDefault();
+      app.querySelector("[data-action=onwards]")?.focus();
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      handlers.onwards();
+    }
+  });
   app.querySelectorAll("[data-action=draw-card]").forEach((button) => {
     button.dataset.originallyDisabled = String(button.disabled);
     button.addEventListener("click", () => handlers.drawCard(button.dataset.deck));
