@@ -1,3 +1,5 @@
+import { expansionLocations, expansionStories } from "./expansion.js";
+
 
 
 export const circles = {
@@ -2051,3 +2053,8 @@ export const refuges = {
     handSize: 5
   }
 };
+
+// The expansion deliberately reuses the same data-driven QBN engine.
+Object.assign(locations, expansionLocations);
+Object.assign(stories, expansionStories);
+locations["lantern-quay"].stories.unshift("quay-roads");
