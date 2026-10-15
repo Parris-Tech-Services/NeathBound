@@ -11,11 +11,12 @@ function initialState() {
   return s;
 }
 
-test("actions never consume a finite action resource", () => {
+test("story choices cost actions but continue to resolve their intended effects", () => {
   const result = resolveChoice(initialState(), "bell-under-water", "listen", () => 0.9);
   assert.equal(result.state.obols, 12);
   assert.equal(result.state.qualities.insight, 3);
-  assert.equal("actions" in result.state, false);
+  assert.equal(result.state.actions, 9);
+  assert.equal(result.state.max_actions, 10);
 });
 
 test("challenge success applies configured effects", () => {
