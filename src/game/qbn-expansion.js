@@ -1,5 +1,6 @@
 // Original NeathBound QBN content; written for this game's setting and player choices.
 export const ambitions = {
+  "gloomwing-hunt": { name:"The Hunt for the Gloomwing", description:"Discover why the Bureau pays a fortune to destroy the last guardian of the Spire.", treasure:"gloomwing-treasure-treaty", total:30 },
   "missing-name": { name:"The Missing Name", description:"Recover the person the city refuses to remember.", treasure:"treasure-ledger", total:30 },
   "last-light": { name:"The Last Light", description:"Protect the lamplighters from a darkness they helped to create.", treasure:"treasure-lamp", total:5 },
   "river-debt": { name:"The River Debt", description:"Discover the terms of a bargain made with the drowned streets.", treasure:"treasure-oath", total:5 },
