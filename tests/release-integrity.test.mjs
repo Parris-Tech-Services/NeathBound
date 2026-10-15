@@ -45,22 +45,20 @@ test("all browser module imports follow the main.js cache token", async () => {
   }
 });
 
-test("every remote CSS image is approved and licence-documented", async () => {
+test("historical open-asset provenance stays archived but production CSS uses local art", async () => {
   const css = await read("src/styles.css");
-  const assets = JSON.parse(await read("assets/open-assets.json"));
+  const archived = JSON.parse(await read("assets/open-assets.json"));
   const attribution = await read("ATTRIBUTION.md");
-  const approved = new Map(assets.map((asset) => [asset.assetUrl, asset]));
-  const urls = [...css.matchAll(/url\(["']?(https:\/\/[^"')]+)["']?\)/g)].map((match) => match[1]);
 
-  assert.ok(urls.length > 0, "expected at least one remote visual asset");
+  assert.doesNotMatch(css, /url\(\s*["']?https?:\/\//i, "runtime CSS must not depend on hotlinked images");
+  assert.ok(archived.length >= 8, "retain the historical asset catalogue");
+  assert.match(attribution, /historical/i);
+  assert.match(attribution, /assets\/open-assets\.json/);
 
-  for (const url of new Set(urls)) {
-    const asset = approved.get(url);
-    assert.ok(asset, `unregistered remote asset in CSS: ${url}`);
+  for (const asset of archived) {
     assert.match(asset.sourcePage, /^https:\/\/commons\.wikimedia\.org\//);
-    assert.ok(["CC0-1.0", "Public-Domain", "CC-BY-4.0", "CC-BY-SA-4.0"].includes(asset.license), `unsupported licence for ${asset.id}`);
-    assert.ok(asset.author);
-    assert.ok(attribution.includes(asset.sourcePage), `ATTRIBUTION.md is missing source page for ${asset.id}`);
+    assert.ok(["CC0-1.0", "Public-Domain", "CC-BY-4.0", "CC-BY-SA-4.0"].includes(asset.license), `unsupported archived licence for ${asset.id}`);
+    assert.ok(asset.author, `missing archived author for ${asset.id}`);
   }
 });
 
