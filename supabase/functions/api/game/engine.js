@@ -167,7 +167,7 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
   // Momentum: a near miss (within 3) can be turned into a success by
   // spending one point of momentum.
   let usedMomentum = false;
-  if (challenge && !success && Number.isFinite(check.total) && (next.momentum ?? 0) > 0 && check.total + 3 >= challenge.difficulty) {
+  if (challenge && !success && (challenge.mode ?? "broad") === "classic" && Number.isFinite(check.total) && (next.momentum ?? 0) > 0 && check.total + 3 >= challenge.difficulty) {
     next.momentum -= 1;
     check.total += 3;
     check.success = success = true;
