@@ -147,6 +147,7 @@ export function render(app, state, handlers, outcome = null) {
   const mapHtml = [
     '<details class="city-route-map" open>',
     '<summary>Explore the city <span>', (state.unlockedLocations ?? []).filter(id => CITY_ROUTES.some(route => route.id === id)).length, ' / ', CITY_ROUTES.length, ' locations discovered · open map</span></summary>',
+    '<p class="route-footnote">Each district has different stories. Choose a road in a story to discover a place; after your first visit it stays unlocked on this map for easy return.</p>',
     '<div class="route-grid">', routeHtml, '</div>',
     location.consequenceOf ? '<p class="route-warning">You must resolve your predicament here before travelling elsewhere.</p>' : '',
     '<p class="route-footnote">Undiscovered locations show clues instead of travel buttons. Other dangerous places may appear through story consequences.</p>',
