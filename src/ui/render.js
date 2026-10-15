@@ -82,10 +82,15 @@ export function render(app, state, handlers, outcome = null) {
     const available = new Set(availableChoices(state, story.id).map((choice) => choice.id));
     const choicesHtml = story.choices.map((choice) => {
       const isAvailable = available.has(choice.id);
+      const actionCost = Math.max(0, Math.floor(Number(choice.action_cost ?? story.action_cost ?? (story.autofire ? 0 : 1))));
+      const hasActions = Number(state.actions ?? 0) >= actionCost;
+      const canGo = isAvailable && hasActions;
       const requirements = requirementList(choice);
       const lockedReason = !isAvailable && requirements.length
         ? '<p class="locked-requirement">Locked: ' + escapeHtml(requirementSummary(state, requirements)) + '</p>'
-        : '';
+        : !hasActions && isAvailable
+          ? '<p class="locked-requirement" role="status">No actions remaining. One action returns every ten minutes.</p>'
+          : '';
       const resolvedChallenge = effectiveChallenge(story, choice);
       const challengeQuality = resolvedChallenge?.quality ?? resolvedChallenge?.stat;
       const challenge = resolvedChallenge
@@ -98,11 +103,11 @@ export function render(app, state, handlers, outcome = null) {
         : '<div class="challenge-line simple"><span class="challenge-icon">◆</span><span><strong>A straightforward choice</strong><small>No challenge roll</small></span></div>';
 
       return [
-        '<div class="choice-row', isAvailable ? '' : ' is-locked', '">',
+        '<div class="choice-row', canGo ? '' : ' is-locked', '">',
         '<div class="choice-copy"><strong>', escapeHtml(choice.label), '</strong>', challenge, lockedReason, '</div>',
         '<button class="go-button" data-story="', story.id, '" data-choice="', choice.id, '" ',
-        isAvailable ? "" : "disabled",
-        '>', isAvailable ? 'GO' : 'LOCKED', '</button></div>'
+        canGo ? "" : "disabled",
+        '>', !isAvailable ? 'LOCKED' : hasActions ? 'GO' : 'WAIT', '</button></div>'
       ].join("");
     }).join("");
 
@@ -340,13 +345,13 @@ const inventoryHtml = inventory.length
     }).join("");
 
     outcomeHtml = [
-      '<section class="outcome-panel parchment" aria-live="polite">',
-      '<h2>', escapeHtml(outcome.title ?? "Outcome"), '</h2>',
+      '<div class="outcome-screen-overlay"><section class="outcome-panel parchment" role="dialog" aria-modal="true" aria-labelledby="outcome-heading" tabindex="-1" aria-live="polite">',
+      '<h2 id="outcome-heading">', escapeHtml(outcome.title ?? "Outcome"), '</h2>',
       verdict ? '<p class="outcome-verdict ' + (outcome.success ? 'success' : 'failure') + '">' + escapeHtml(verdict) + '</p>' : '',
       '<p class="outcome-text">', escapeHtml(outcome.result ?? ""), '</p>',
       changesList ? '<ul class="outcome-changes">' + changesList + '</ul>' : '',
       '<button class="outcome-onwards" type="button" data-action="onwards">Onwards</button>',
-      '</section>'
+      '</section></div>'
     ].join("");
   }
 
