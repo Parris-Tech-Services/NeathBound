@@ -1217,3 +1217,55 @@ button, select { font: inherit; }
   .city-route-map summary span { display: block; margin: 5px 0 0; }
   .route-travel { min-height: 42px; width: 100%; }
 }
+
+
+/* Fallen London-style travel workflow: map only appears when Travel is chosen.
+   The story and its result stay the primary reading view on every redraw. */
+.story-column [data-view-panel][hidden] { display: none !important; }
+.main-tabs .nav-travel {
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px 8px;
+  border: 0;
+  border-bottom: 4px solid transparent;
+  background: transparent;
+  color: #72c8d0;
+  font: 700 .84rem Arial, sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.main-tabs .nav-travel.active { color: #f0e4cb; border-bottom-color: #c4b895; }
+.main-tabs .nav-travel:focus-visible, .close-travel-map:focus-visible, .quest-travel:focus-visible,
+.route-travel:focus-visible {
+  outline: 3px solid #f0d279;
+  outline-offset: 3px;
+}
+#travel-map { scroll-margin-top: 12px; }
+.travel-map-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.travel-map-heading h2 { margin: 4px 0 8px; font: 1.4rem Georgia, serif; color: #f0e6d2; }
+.travel-map-heading p { margin: 0; color: #bfcac3; }
+.travel-map-kicker { text-transform: uppercase; letter-spacing: .12em; font: 700 .74rem Arial, sans-serif; }
+.close-travel-map, .quest-travel {
+  background: #315e60;
+  border: 1px solid #9bc4bd;
+  color: #fff5dc;
+  border-radius: 4px;
+  padding: 9px 12px;
+  font: 700 .88rem Arial, sans-serif;
+  cursor: pointer;
+}
+.quest-travel { margin: 8px 0 0; display: inline-block; }
+@media (max-width: 700px) {
+  .main-tabs .nav-travel { padding-bottom: 8px; }
+  .close-travel-map { width: 100%; min-height: 44px; }
+  .quest-travel { min-height: 44px; }
+  .route-travel { min-height: 44px; }
+}
