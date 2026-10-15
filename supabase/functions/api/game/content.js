@@ -2,6 +2,7 @@ import { ambitions, destinies, festivals, qbnStories, qbnCards } from "./qbn-exp
 export { ambitions, destinies, festivals };
 import { expansionLocations, expansionStories } from "./expansion.js";
 import { gloomwingLocations, gloomwingItems, gloomwingStories } from "./gloomwing-content.js";
+import { approvedStories, approvedCards, approvedPlacements } from "./approved-storylets.js";
 
 
 
@@ -2149,4 +2150,19 @@ for(let section=0;section<Math.ceil(registryRelics.length/7);section++){
   }))
  };
  locations["lantern-quay"].stories.push(id);
+}
+
+// Storylet Foundry: compile human-approved originals only. Never overwrite existing stories.
+for(const [id,story] of Object.entries(approvedStories)){
+ if(stories[id]||cards[id])throw new Error("Storylet Foundry duplicate "+id);
+ stories[id]=story;
+}
+for(const entry of approvedPlacements){
+ if(!locations[entry.location])throw new Error("Storylet Foundry unknown location "+entry.location);
+ if(!locations[entry.location].stories.includes(entry.id))locations[entry.location].stories.push(entry.id);
+}
+for(const [id,card] of Object.entries(approvedCards)){
+ if(stories[id]||cards[id])throw new Error("Storylet Foundry duplicate card "+id);
+ cards[id]=card;
+ decks.whispers.cardIds.push(id);
 }

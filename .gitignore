@@ -5,3 +5,8 @@ coverage/
 *.log
 supabase/.temp/
 supabase/.branches/
+
+# Never commit provider secrets
+.env
+.env.*
+!.env.example

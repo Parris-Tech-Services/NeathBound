@@ -2,7 +2,7 @@
   "name": "neathbound",
   "version": "0.2.0",
   "private": false,
-  "description": "An original open-source quality-based narrative browser RPG with branching ambitions.",
+  "description": "An original open-source quality-based narrative browser RPG with unlimited actions.",
   "type": "module",
   "scripts": {
     "dev": "python3 -m http.server 4173 --directory .",
@@ -10,13 +10,16 @@
     "smoke": "node tests/smoke.mjs",
     "api": "node server/index.mjs",
     "api:test": "node --test server/tests/*.test.mjs",
-    "validate:content": "node tools/build-gloomwing.mjs --check && node tools/build-catalogue.mjs --check && node tools/validate-content.mjs && npm run studio:validate",
+    "validate:content": "node tools/build-gloomwing.mjs --check && node tools/build-catalogue.mjs --check && node tools/validate-content.mjs",
     "sync:engine": "node scripts/sync-engine.mjs",
-    "release:check": "npm test && npm run api:test && npm run validate:content && npm run smoke",
+    "release:check": "npm test && npm run api:test && npm run validate:content && npm run smoke && npm run storylets:check",
     "test:e2e": "node --test tests/e2e/play.e2e.mjs",
     "build:content": "node tools/build-gloomwing.mjs",
     "catalogue:build": "node tools/build-catalogue.mjs",
-    "studio:validate": "node tools/narrative-studio/validate.mjs",
-    "studio:report": "node tools/narrative-studio/validate.mjs report"
+    "storylets:generate": "node tools/storylet-generator.mjs generate",
+    "storylets:validate": "node tools/storylet-generator.mjs validate",
+    "storylets:approve": "node tools/storylet-generator.mjs approve",
+    "storylets:publish": "node tools/storylet-generator.mjs publish",
+    "storylets:check": "node tools/storylet-generator.mjs publish --check"
   }
 }
