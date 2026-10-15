@@ -1,4 +1,5 @@
 import {project} from "./game-config.js";
+import {mountGroqAssistant} from "./ai-assistant.js";
 import {PHASES,STAGE_NAMES,EFFECTS,REQUIREMENTS,OPERATORS,slug,copy,freshStory,freshChoice,freshEffect,freshRequirement,audit,advance,exportBundle,importBundle} from "./studio-core.js";
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
@@ -221,4 +222,15 @@ $("copy-prompt").onclick=async()=>{
 Promise.all(["ledger.json","bible.md","secrets.md","style.md"].map(name=>fetch("./"+name).then(r=>{if(!r.ok)throw Error(name);return name.endsWith(".json")?r.json():r.text()}).catch(()=>name.endsWith(".json")?[]:""))).then(([list,bible,secretsDoc,style])=>{
  secrets=Array.isArray(list)?list:[];docs={bible,secrets:secretsDoc,style};renderSecrets();renderQA();
 });
+mountGroqAssistant({project,getStory:active,isReference:()=>reference,getContext:context,getDocs:()=>docs,
+ createStory:()=>{const draft=freshStory(project);addDraft(draft);return draft},
+ updateStory:(current,updated)=>{
+  const i=drafts.findIndex(x=>x===current||x.id===current.id);
+  if(i<0){toast("Could not find the draft to update.");return}
+  if(updated.id!==current.id&&drafts.some((x,j)=>j!==i&&x.id===updated.id)){
+   toast("AI suggestion has a duplicate draft ID.");return
+  }
+  drafts[i]=updated;save();openStory(updated.id,false);renderQA();
+ },
+ notify:toast});
 renderList();renderQA();
