@@ -213,3 +213,7 @@ for(let step=1;step<=5;step++){
    choice.successEffects=choice.successEffects.filter(effect=>effect.type!=="equip-treasure"&&!(effect.type==="item"&&effect.id===ambitions["last-light"].treasure));
  }
 }
+
+// The separate fully authored 30-part Gloomwing storypack supersedes these
+// five prototype entries. Keep old saves' ambition IDs, but remove orphan cards.
+for(let i=1;i<=5;i++)delete qbnStories["qbn-gloomwing-hunt-"+i];
