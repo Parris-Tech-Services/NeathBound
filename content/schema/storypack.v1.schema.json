@@ -1,0 +1,329 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://parris-tech-services.github.io/NeathBound/schema/storypack.v1.schema.json",
+  "title": "NeathBound Storypack v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "metadata",
+    "locations",
+    "items",
+    "stories"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "chapter_count"
+      ],
+      "properties": {
+        "chapter_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "source": {
+          "type": "string"
+        },
+        "created_on": {
+          "type": "string"
+        }
+      }
+    },
+    "locations": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "name",
+          "stories"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "region": {
+            "type": "string"
+          },
+          "stories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "items": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "name",
+          "category"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "slot": {
+            "type": "string"
+          },
+          "stats": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "stories": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/storylet"
+      }
+    }
+  },
+  "$defs": {
+    "requirement": {
+      "type": "object",
+      "required": [
+        "type",
+        "id",
+        "op",
+        "value"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "quality",
+            "item",
+            "flag",
+            "menace"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "op": {
+          "enum": [
+            "==",
+            "!=",
+            ">",
+            ">=",
+            "<",
+            "<="
+          ]
+        },
+        "value": {}
+      },
+      "additionalProperties": false
+    },
+    "effect": {
+      "type": "object",
+      "required": [
+        "type",
+        "id"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "quality",
+            "set-quality",
+            "item",
+            "flag",
+            "menace",
+            "obols",
+            "ambition-progress",
+            "unlock-location",
+            "location",
+            "living-story",
+            "equip-treasure"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number"
+        },
+        "value": {},
+        "delay_hours": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": true
+    },
+    "branch": {
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "success",
+        "successEffects",
+        "failureEffects"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 3
+        },
+        "challenge": {
+          "oneOf": [
+            {
+              "const": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "quality": {
+                  "enum": [
+                    "nerve",
+                    "insight",
+                    "poise",
+                    "shadow"
+                  ]
+                },
+                "difficulty": {
+                  "type": "number",
+                  "minimum": 1
+                },
+                "scaler": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "mode": {
+                  "enum": [
+                    "broad",
+                    "narrow",
+                    "luck",
+                    "classic"
+                  ]
+                },
+                "rareChance": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "required": [
+                "quality",
+                "difficulty"
+              ],
+              "additionalProperties": true
+            }
+          ]
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/requirement"
+          }
+        },
+        "success": {
+          "type": "string",
+          "minLength": 10
+        },
+        "failure": {
+          "type": "string"
+        },
+        "successEffects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          }
+        },
+        "failureEffects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          }
+        },
+        "rareSuccessEffects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "storylet": {
+      "type": "object",
+      "required": [
+        "title",
+        "text",
+        "ambition_id",
+        "requires_progress",
+        "choices"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 6
+        },
+        "text": {
+          "type": "string",
+          "minLength": 40
+        },
+        "ambition_id": {
+          "type": "string"
+        },
+        "requires_progress": {
+          "type": "object",
+          "required": [
+            "id",
+            "value"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "value": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "choices": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/branch"
+          }
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/requirement"
+          }
+        },
+        "once": {
+          "type": "boolean"
+        },
+        "pattern": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}
