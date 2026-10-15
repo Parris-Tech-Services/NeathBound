@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { initialState } from "../src/game/state.js";
-import { items } from "../src/game/content.js";
+import { items, stories } from "../src/game/content.js";
 import { drawCard, equipItem, discard, resolveChoice } from "../src/game/engine.js";
 import { LocalGameService } from "../src/services/local-game-service.js";
 import { createGameService } from "../src/services/index.js";
@@ -46,6 +46,14 @@ test("non-die checks cannot spend momentum on a fictitious dice total", () => {
   s.locationId = "lantern-quay";
   s.momentum = 2;
   // Mechanics must not turn null into zero for broad/narrow odds.
-  const outcome = resolveChoice(s, "tea-for-the-tide", "drink", () => 0);
-  assert.equal(outcome.state.momentum, 2);
+  const choice = stories["tea-for-the-tide"].choices.find(c => c.id === "drink");
+  const original = choice.challenge;
+  try {
+    choice.challenge = { ...original, mode: "broad" };
+    const outcome = resolveChoice(s, "tea-for-the-tide", "drink", () => 0.99);
+    assert.equal(outcome.success, false);
+    assert.equal(outcome.state.momentum, 2);
+  } finally {
+    choice.challenge = original;
+  }
 });

@@ -20,7 +20,7 @@ export class SupabaseGameService {
     return this.#call(
       "POST",
       `storylets/${encodeURIComponent(storyId)}/branches/${encodeURIComponent(choiceId)}/choose`,
-      { expectedRevision }
+      { expectedRevision, useLesson }
     );
   }
 

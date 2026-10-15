@@ -266,8 +266,8 @@ export function setRefuge(state, refugeId) {
 
 export function discard(state, cardId) {
   const next = cloneState(state);
+  if (!next.hand?.includes(cardId)) return { state: next, error: "That card is not in your hand." };
   removeCardFromHand(next, cardId);
-  next.flags = next.flags || {};
-  next.flags.__revision = (next.flags.__revision ?? 0) + 1;
+  bumpRevision(next);
   return { state: next };
 }

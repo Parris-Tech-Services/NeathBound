@@ -58,6 +58,7 @@ export class LocalGameService {
       return { error: "This save changed in another tab.", state: this.state };
     }
     const outcome = equipItem(this.state, slot, itemId);
+    if (outcome.error) return outcome;
     this.state = outcome.state;
     saveState(this.state, this.storage);
     return outcome;

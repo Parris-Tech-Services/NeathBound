@@ -66,6 +66,7 @@ export async function handle({ method, path, userId, body = {} }, { repo, random
     const slot = equipMatch[1];
     const itemId = body?.itemId ?? null;
     const outcome = equipItem(await loadOrCreate(), slot, itemId);
+    if (outcome.error) return conflict(outcome);
     await repo.savePlayer(userId, outcome.state);
     return ok(outcome);
   }
@@ -80,6 +81,7 @@ export async function handle({ method, path, userId, body = {} }, { repo, random
   if (method === "POST" && discardMatch) {
     const cardId = discardMatch[1];
     const outcome = discard(await loadOrCreate(), cardId);
+    if (outcome.error) return conflict(outcome);
     await repo.savePlayer(userId, outcome.state);
     return ok(outcome);
   }
