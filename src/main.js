@@ -242,6 +242,9 @@ async function draw(state) {
   }, lastOutcome);
 
   finishBoot();
+  if (service.mode === "offline") {
+    showNotice("Playing offline: progress is saved on this device only. Online saving is currently unavailable. Your existing local progress is preserved.");
+  }
 }
 
 function finishBoot() {
