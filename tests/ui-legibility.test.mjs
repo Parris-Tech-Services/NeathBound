@@ -10,7 +10,7 @@ const section = css.slice(css.indexOf(marker));
 function declaration(selector, property) {
   const position = section.indexOf(selector + " {");
   assert.ok(position >= 0, "Missing selector: " + selector);
-  const block = section.slice(position, section.indexOf("}", position) + 1);
+  const block = section.slice(position + selector.length + 2, section.indexOf("}", position));
   const propertyLine = block.split(";").map(line => line.trim())
     .find(line => line.startsWith(property + ":"));
   assert.ok(propertyLine, "Missing " + property + " in " + selector);
