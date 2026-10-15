@@ -21,6 +21,7 @@
         min-height: 78vh;
         display: grid;
         place-items: center;
+        grid-template-columns: minmax(0, 1fr);
         overflow: hidden;
         padding: 64px 22px;
         isolation: isolate;
@@ -49,6 +50,7 @@
       }
       .landing-card {
         width: min(760px,100%);
+        min-width: 0;
         text-align: center;
       }
       .landing-mark {
@@ -67,7 +69,7 @@
       .landing-title {
         margin: 0;
         color: #d8cd47;
-        font-size: clamp(2.6rem,10vw,5.4rem);
+        font-size: clamp(1.5rem,8vw,5.4rem);
         letter-spacing: .06em;
         line-height: .95;
         text-shadow: 0 3px 8px #000;
@@ -90,7 +92,8 @@
       }
       .landing-enter,
       .landing-about {
-        min-width: 180px;
+        min-width: min(180px,100%);
+        max-width: 100%;
         padding: 12px 20px;
         border: 1px solid #9d8548;
         font: 700 .82rem Arial,sans-serif;
