@@ -9,7 +9,13 @@ not from any protected setting, names, writing, art, or code.
 
 **Playtest the game:** https://parris-tech-services.github.io/NeathBound/?api=local
 
-This link uses your browser's local save. It works without an account or a running Supabase backend. Data is stored on the device and browser where you play, so clearing site data will erase the local save. The online Supabase project is currently inactive (restoring it is blocked by the two-active-free-project limit), so the linked local mode is the supported playtest route. Normal site entry also starts locally; `?api=supabase` explicitly tries the old online project and falls back to local if unavailable.
+The link above intentionally uses a browser-only local save, useful for private
+playtesting even when an online backend is unavailable. Normal site entry
+(without `?api=local`) now attempts the Cloudflare Workers + D1 backend,
+falling back to local storage if its first connection fails. Saves in the two
+modes are distinct; don't assume device-to-device synchronisation or silently
+replace an established save. The legacy Supabase project remains inactive.
+
 
 ```bash
 npm test
@@ -27,22 +33,23 @@ the browser when the backend is unreachable (or with `?api=local`).
 NeathBound uses an independent quality-based narrative architecture inspired by public design discussions
 (see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)):
 
-| Fallen London | NeathBound |
+| Publicly known quality-based narrative principles | NeathBound implementation |
 |---|---|
-| Browser-based narrative UI (exact private frontend stack not established here) | Static client hosted on GitHub Pages |
-| Server-authoritative actions (exact current API implementation not verified here) | Optional Supabase Edge Function `api`, presently inactive |
-| Persistent qualities and story progression (private production schema not verified) | Supabase Postgres schema when backend operates; localStorage for current play |
-| Player identity and saves | Local-only by default; optional Supabase anonymous login |
-| Quality-based narrative design | Original, testable `src/game/` rules engine |
+| Browser storylets and map | Static original client, hosted on GitHub Pages |
+| Server-authoritative state transitions as a design requirement | Cloudflare Worker API backed by D1 for online mode |
+| Persistent story qualities and journal | LocalStorage in offline mode, D1 in online mode |
+| Player identity | Anonymous 256-bit local session token for Cloudflare mode |
+| Story authoring and testing | Original `src/game/` engine, automated content and browser tests |
 
-The *optional* Supabase API resolves choices on the server when it is online;
-the default game currently runs locally and saves in the browser. It cannot
-claim server-authoritative anti-cheat or cross-device saves in local mode.
-Changes to `src/game/` are mirrored into the Supabase function; deploying the
-function currently remains blocked by the inactive project and credential issues.
+Cloudflare's online backend is a **separate implementation from Failbetter's
+private code**. The browser can choose `?api=local` for isolated offline saves
+or `?api=supabase` for the legacy inactive Supabase experiment. The original
+Supabase function mirror remains under `supabase/`, but Supabase deployment is
+not the default path. `server/` contains optional legacy local API code.
 
-`server/` is an optional local Node + SQLite API from the earlier migration
-plan. The game does not use it; the Supabase function is the online backend.
+See [application of the Fallen London engineering research](docs/QBN-RESEARCH-APPLICATION.md)
+for which mechanics have been strengthened and which remain incomplete.
+
 
 ## Story and exploration
 
