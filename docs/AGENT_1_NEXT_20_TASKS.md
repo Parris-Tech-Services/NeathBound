@@ -1,6 +1,6 @@
 # Agent 1 — next 20 QA, integration and release tasks
 
-**Status:** planned; every checkbox intentionally unchecked. **Prepared:** 15 October 2026.  
+**Status:** A1-01 complete (read-only baseline recorded); A1-02 to A1-20 remain unchecked. **Prepared:** 15 October 2026.  
 **Role:** Agent 1, release coordinator for [NeathBound](https://github.com/Parris-Tech-Services/NeathBound) and [The Undercity](https://github.com/joshualparris/theUndercity).  
 **Parent task:** [NeathBound issue #40](https://github.com/Parris-Tech-Services/NeathBound/issues/40).  
 **Coordination:** [Seven-agent production plan](SEVEN_AGENT_PRODUCTION.md). Both repositories hold the same task register so agents can cross-reference it.
@@ -9,7 +9,7 @@
 
 ## Work queue: next 20 tasks, in recommended execution order
 
-### 01. [ ] Freeze a verifiable release baseline — A1-01 · BOTH
+### 01. [x] Freeze a verifiable release baseline — A1-01 · BOTH
 
 **Player value:** Prevent stale or conflicting agent work from being mistaken for a deployed change.
 
@@ -249,7 +249,7 @@
 
 **Safety/ownership:** Only Agent 1 approves production deployment; never roll back or mutate live saves merely to demonstrate a procedure.
 
-## Release handoff template (mandatory on each task PR)
+**Evidence for A1-01:** [Read-only baseline report](qa/BASELINE-2026-10-15.md). This marks only the documented snapshot as complete, not live smoke testing.\n\n## Release handoff template (mandatory on each task PR)
 
 ```text
 Task ID / game:
