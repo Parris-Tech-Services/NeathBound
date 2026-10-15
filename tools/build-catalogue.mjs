@@ -20,7 +20,7 @@ for(const [id,def] of Object.entries(locations))rows.push(["location",id,def.nam
 for(const [id,def] of Object.entries(ambitions))rows.push(["ambition",id,def.name,"", "", "", def.total??0,def.description??""]);
 for(const [id,def] of Object.entries(destinies))rows.push(["destiny",id,def.name,"", "", "", "", JSON.stringify(def.stat_bonus??{})]);
 for(const [id,def] of Object.entries(festivals))rows.push(["festival",id,def.name,"", "", "", "", JSON.stringify({start:def.start,end:def.end})]);
-const qualityIds=new Set(["nerve","insight","poise","shadow","dread","wounds","suspicion","scandal"]);
+const qualityIds=new Set(["nerve","insight","poise","shadow","dread","wounds","suspicion","scandal","gloomwing_hunt_progress"]);
 for(const story of [...Object.values(stories),...Object.values(cards)]){
   for(const req of story.requirements??[])if(req.type==="quality"||req.type==="menace")qualityIds.add(req.id);
   for(const c of story.choices??[]){
