@@ -2,6 +2,7 @@ import { availableChoices, availableStories, currentLocation, effectiveChallenge
 import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions, ambitions, destinies } from "../game/content.js?v=20261015-10";
 import { CITY_ROUTES, getQuestGuide } from "./narrative-guide.js?v=20261015-10";
 import { loadPreferences } from "./preferences.js?v=20261015-10";
+import { cmsPublishedStories } from "../game/cms-published.js?v=20261015-cms";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
 
@@ -981,6 +982,15 @@ const STORY_ART = {
   "gloomwing_hunt_28": ["◈","gloomwing hunt","#293638","#b0a77f"],
   "gloomwing_hunt_29": ["◇","gloomwing hunt","#332c41","#b8a5c8"],
 };
+
+// Studio storylets use deterministic title-specific artwork until individual art is commissioned.
+for (const [storyId,story] of Object.entries(cmsPublishedStories)) {
+  const title=(story.kicker||story.title||storyId).slice(0,40);
+  const hash=[...storyId].reduce((n,ch)=>(n*31+ch.charCodeAt(0))>>>0,17);
+  const palettes=[["#292f3a","#a4adc4"],["#3c2e34","#c1a6af"],["#283b36","#a3c6b3"],["#44382d","#d0b488"]];
+  const [dark,light]=palettes[hash%palettes.length];
+  STORY_ART[storyId] ??= ["✒",title,dark,light];
+}
 
 const LOCATION_ART = {
   "ashrail-station": ["⌛","⚙","Ashrail Station","#252d32","#a18b70"],
