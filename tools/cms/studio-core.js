@@ -27,6 +27,7 @@ export function audit(s,ctx,{strict=false,allowExisting=false}={}){
  if(!/^[a-z][a-z0-9-]{2,80}$/.test(s.id||""))fail("id","Use a unique kebab-case ID.");
  if(!allowExisting&&(ctx.knownIds||[]).includes(s.id))fail("id","ID exists in the game; clone as a new storylet.");
  if(!filled(s.title))fail("title","Write a title.");
+ if(!filled(s.pitch))fail("pitch","Missing story pitch. Use Autofill & Fix All to create it before advancing.");
  if(!(ctx.locations||[]).includes(s.location))fail("location","Select an existing district.");
  if(!filled(s.description)||s.description.length<40)fail("description","Write at least 40 characters of original scene prose.");
  if(!Array.isArray(s.choices)||s.choices.length<2||s.choices.length>5)fail("choices","Require 2–5 choices.");
@@ -98,7 +99,7 @@ export function audit(s,ctx,{strict=false,allowExisting=false}={}){
 export function advance(s,target,ctx){
  const from=PHASES.indexOf(s.status),to=PHASES.indexOf(target);
  if(to!==from+1)return {ok:false,reason:"Advance one stage at a time."};
- if(to>=1&&!filled(s.pitch))return {ok:false,reason:"Write and approve a pitch first."};
+ if(to>=1&&!filled(s.pitch))return {ok:false,reason:"Your story pitch is empty. Use Autofill & Fix All, or enter a pitch, before advancing."};
  if(to>=2&&s.choices.length<2)return {ok:false,reason:"Complete the structure first."};
  if(to>=3&&(!filled(s.description)||s.choices.some(c=>!filled(c.success.text)||!filled(c.failure.text))))
   return {ok:false,reason:"Finish the prose before QA."};
