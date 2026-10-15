@@ -42,7 +42,8 @@ export function requirementsMet(state, requirements = [], context = {}) {
   return (requirements ?? []).every((requirement) => requirementMet(state, requirement, context));
 }
 
-export function applyEffect(state, effect) {
+export function applyEffect(state, effect, qualityDefs) {
+  if (effect?.quality !== undefined) return applyQualityEffect(state, effect, qualityDefs ?? {});
   switch (effect.type) {
     case "quality":
       state.qualities[effect.id] = Math.max(0, (state.qualities[effect.id] ?? 0) + Number(effect.amount ?? 0));
@@ -170,16 +171,19 @@ const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
 export function challengeChance(state, challenge) {
   if (!challenge) return 1;
   const level = effectiveStat(state, challenge.quality);
-  const difficulty = Math.max(1, Number(challenge.difficulty ?? 1));
-  switch (challenge.mode ?? "classic") {
+  const difficulty = Number(challenge.difficulty ?? 1);
+  switch (challenge.mode ?? "broad") {
     case "broad":
-      return clamp(Math.floor(Number(challenge.scaler ?? 0.60) * level / difficulty * 100) / 100, 0.1, 1);
+      return broadChance(level, difficulty, Number(challenge.scaler ?? DEFAULT_SCALER)) / 100;
     case "narrow":
-      return clamp(0.5 + 0.1 * (level - difficulty), 0.1, 1);
     case "luck":
-      return clamp(Number(challenge.chance ?? 0.5), 0, 1);
-    default:
+      // A narrow challenge is a fixed chance, not a stat comparison.
+      return clamp(Number(challenge.narrow ?? (Number(challenge.chance ?? 0.5) * 100)), 0, 100) / 100;
+    case "classic":
+      // Opt-in compatibility for explicitly authored legacy d10 storylets.
       return clamp((11 + level - difficulty) / 10, 0, 1);
+    default:
+      throw new Error("Unknown challenge mode: " + challenge.mode);
   }
 }
 
@@ -203,21 +207,28 @@ export function describeChallenge(state, challenge) {
   if (!challenge) return null;
   const chance = challengeChance(state, challenge);
   const band = challengeBand(chance);
-  return { ...challenge, mode: challenge.mode ?? "classic", chance, percent: band.percent, label: band.label };
+  return { ...challenge, mode: challenge.mode ?? "broad", chance, percent: band.percent, label: band.label };
 }
 
 export function resolveChallenge(state, challenge, random = Math.random) {
-  if (!challenge) return { success: true, roll: null, total: null, quality: null, chance: 1 };
+  // Standalone rules API: resolveChallenge({ difficulty, scaler, narrow }, qualityLevel)
+  if (typeof challenge === "number") return resolveQualityChallenge(state, challenge, random);
+  if (!challenge) return { success: true, outcome: "success", roll: null, total: null, quality: null, chance: 1, cpAwarded: 0, rare: false };
   const chance = challengeChance(state, challenge);
   const band = challengeBand(chance);
   const quality = effectiveStat(state, challenge.quality);
-  if ((challenge.mode ?? "classic") === "classic") {
-    const die = Math.floor(random() * 10) + 1;
-    const total = die + quality;
-    return { success: total >= challenge.difficulty, roll: die, total, quality, chance, percent: band.percent, label: band.label, band };
-  }
-  const roll = random();
-  return { success: roll < chance, roll, total: null, quality, chance, percent: band.percent, label: band.label, band };
+  const classic = (challenge.mode ?? "broad") === "classic";
+  const die = classic ? Math.floor(random() * 10) + 1 : null;
+  const total = classic ? die + quality : null;
+  const drawn = classic ? null : random();
+  const success = classic ? total >= Number(challenge.difficulty) : drawn < chance;
+  // Rare results replace normal success effects, not add to them.
+  const rare = success && random() < clamp(Number(challenge.rareChance ?? DEFAULT_RARE_SUCCESS_CHANCE), 0, 1);
+  return {
+    success, rare, outcome: success ? (rare ? "rare_success" : "success") : "failure",
+    roll: classic ? die : drawn, total, quality, chance, percent: band.percent,
+    label: band.label, band, cpAwarded: cpAward(band.percent, success)
+  };
 }
 
 // The four primary attributes require triangular CP to level 70, then 70 per level.
@@ -257,17 +268,185 @@ export function quirkTitle(id, level) {
 export function awardProgress(state, qualityId, points) {
   state.qualities ??= {};
   state.progress ??= {};
-  let level = Number(state.qualities[qualityId] ?? 0);
-  let progress = Number(state.progress[qualityId] ?? 0) + Math.max(0, Number(points) || 0);
-  let levelsGained = 0;
-  while (progress >= levelCost(level + 1)) {
-    progress -= levelCost(level + 1);
-    level += 1;
-    levelsGained += 1;
-  }
-  state.qualities[qualityId] = level;
-  state.progress[qualityId] = progress;
   state.progress_total ??= {};
-  state.progress_total[qualityId] = levelToCp(level) + progress;
-  return { qualityId, points, levelsGained, level, progress, nextLevelCost: levelCost(level + 1) };
+  const level = Math.max(0, Number(state.qualities[qualityId] ?? 0));
+  const previousTotal = levelToTotalCp(level) + Number(state.progress[qualityId] ?? 0);
+  const awarded = Math.max(0, Math.floor(Number(points) || 0));
+  const updated = addCp({ id: qualityId, cp: previousTotal, level }, awarded);
+  state.qualities[qualityId] = updated.level;
+  state.progress[qualityId] = updated.cp - levelToTotalCp(updated.level);
+  state.progress_total[qualityId] = updated.cp;
+  return {
+    qualityId, points: awarded, levelsGained: updated.level - level,
+    level: updated.level, progress: state.progress[qualityId],
+    nextLevelCost: levelCost(updated.level + 1)
+  };
 }
+
+
+// ============================================================================
+// QBN QUALITY TAXONOMY AND MATHEMATICS (independent of the legacy save shape)
+// ============================================================================
+
+export const QualityType = Object.freeze({
+  PRIMARY_STAT: "primary_stat", MENACE: "menace", QUIRK: "quirk",
+  CONNECTION: "connection", DREAM: "dream", STORY: "story", ITEM: "item",
+  STATUS: "status", CIRCUMSTANCE: "circumstance",
+  ACCOMPLISHMENT: "accomplishment", ROUTE: "route",
+  LIVING_STORY: "living_story", METALQUALITY: "metaquality",
+  UNLOCKED_BY_FATE: "unlocked_by_fate"
+});
+const PYRAMIDAL_TYPES = new Set([
+  QualityType.PRIMARY_STAT, QualityType.MENACE, QualityType.QUIRK,
+  QualityType.CONNECTION, QualityType.DREAM
+]);
+export const isPyramidal = (type) => PYRAMIDAL_TYPES.has(type);
+
+export const LEVEL_THRESHOLD = 70;
+export const CP_PER_LEVEL_AFTER_THRESHOLD = 70;
+export const levelToTotalCp = (level, threshold = LEVEL_THRESHOLD) => levelToCp(level, threshold);
+export function cpToNextLevel(cp, threshold = LEVEL_THRESHOLD) {
+  const value = Math.max(0, Math.floor(Number(cp) || 0));
+  return levelToTotalCp(cpToLevel(value, threshold) + 1, threshold) - value;
+}
+export function addCp(state, amount, maxLevel = Infinity, threshold = LEVEL_THRESHOLD) {
+  const current = Math.max(0, Math.floor(Number(state.cp) || 0));
+  const requested = Math.max(0, current + Math.floor(Number(amount) || 0));
+  const maxCp = Number.isFinite(maxLevel) ? levelToTotalCp(maxLevel, threshold) : Infinity;
+  const cp = Math.min(requested, maxCp);
+  return { ...state, cp, level: cpToLevel(cp, threshold) };
+}
+
+export const DEFAULT_SCALER = 0.60;
+export const MIN_BROAD_CHANCE = 10;
+export const DEFAULT_RARE_SUCCESS_CHANCE = 0.04;
+export function broadChance(qualityLevel, difficultyLevel, scaler = DEFAULT_SCALER) {
+  // Equal stat and difficulty yields 60%, NOT 100%.
+  if (difficultyLevel <= 0) return 100;
+  const value = Math.floor(100 * Number(scaler) * Math.max(0, Number(qualityLevel)) / difficultyLevel);
+  return clamp(value, MIN_BROAD_CHANCE, 100);
+}
+export function roll(chancePercent, random = Math.random) {
+  return random() * 100 < clamp(chancePercent, 0, 100);
+}
+export function cpAward(chance, success) {
+  return !success || chance >= 80 ? 1 : 2;
+}
+function resolveQualityChallenge(challenge, qualityLevel, random = Math.random) {
+  const chance = challenge.narrow !== undefined
+    ? clamp(Number(challenge.narrow), 0, 100)
+    : broadChance(qualityLevel, Number(challenge.difficulty), challenge.scaler ?? DEFAULT_SCALER);
+  const success = roll(chance, random);
+  const rare = success && roll((challenge.rareChance ?? DEFAULT_RARE_SUCCESS_CHANCE) * 100, random);
+  return { outcome: success ? (rare ? "rare_success" : "success") : "failure",
+    success, rare, chance, cpAwarded: cpAward(chance, success) };
+}
+
+export const EquipmentSlot = Object.freeze({
+  HAT:"hat", CLOTHING:"clothing", ADORNMENT:"adornment", GLOVES:"gloves",
+  WEAPON:"weapon", BOOTS:"boots", LUGGAGE:"luggage", COMPANION:"companion",
+  TREASURE:"treasure", DESTINY:"destiny", TOOLS:"tools", AFFILIATION:"affiliation",
+  TRANSPORT:"transport", HOME:"home_comfort", SHIP:"ship", CREW:"crew",
+  AIRSHIP:"airship", SPOUSE:"spouse", CLUB:"club", BOON:"boon"
+});
+export function getEffectiveStat(player, statId, qualityDefs = {}) {
+  const raw = player.qualities?.[statId] ?? 0;
+  let value = Number(typeof raw === "object" ? raw.level : raw);
+  const equipped = player.equipped ?? player.equipment ?? {};
+  for (const itemId of Object.values(equipped)) {
+    if (!itemId || player.inventory?.[itemId] === 0 || player.items?.[itemId] === 0) continue;
+    const def = qualityDefs[itemId] ?? items[itemId];
+    value += Number(def?.stat_bonuses?.[statId] ?? def?.stats?.[statId] ?? 0);
+  }
+  return value;
+}
+
+// Structured quality effects coexist with the existing typed storylet effects.
+// State: { qualities: { id: { id, cp, level } } }, definitions keyed by id.
+function applyQualityEffect(player, effect, qualityDefs) {
+  const def = qualityDefs[effect.quality];
+  if (!def) { console.warn("Unknown quality in effect: " + effect.quality); return player; }
+  player.qualities ??= {};
+  const id = effect.quality;
+  if (effect.remove) { delete player.qualities[id]; return player; }
+  const current = player.qualities[id] ?? { id, cp: 0, level: 0 };
+  if (effect.set !== undefined) {
+    const level = clamp(Math.floor(Number(effect.set)), 0, def.max ?? Infinity);
+    player.qualities[id] = { id, level, cp: isPyramidal(def.type) ? levelToTotalCp(level) : level };
+    return player;
+  }
+  if (effect.cp === undefined) return player;
+  if (isPyramidal(def.type)) {
+    player.qualities[id] = addCp(current, effect.cp, def.max ?? Infinity);
+    if (def.type === QualityType.QUIRK && effect.cp > 0) {
+      const opposites = Array.isArray(def.opposite) ? def.opposite : (def.opposite ? [def.opposite] : []);
+      for (const opp of opposites) {
+        if (!qualityDefs[opp]) continue;
+        player.qualities[opp] = addCp(player.qualities[opp] ?? {id:opp,cp:0,level:0},
+          -Math.abs(effect.cp), qualityDefs[opp].max ?? Infinity);
+      }
+    }
+  } else {
+    const level = clamp(Number(current.level ?? 0) + Number(effect.cp), 0, def.max ?? Infinity);
+    player.qualities[id] = { id, cp: level, level };
+  }
+  return player;
+}
+
+export const MENACE_THRESHOLD = 8;
+export const MENACE_PENALTY_LOCATIONS = Object.freeze({
+  dread:"the-pale-rooms", suspicion:"the-holding-vaults",
+  wounds:"the-stitchery", scandal:"the-whisper-court"
+});
+export function checkMenaceThreshold(player) {
+  for (const [menace, location] of Object.entries(MENACE_PENALTY_LOCATIONS)) {
+    const raw = player.menaces?.[menace] ?? player.qualities?.[menace];
+    const level = Number(typeof raw === "object" ? raw?.level : raw ?? 0);
+    if (level >= MENACE_THRESHOLD) return location;
+  }
+  return null;
+}
+export function sendToPenaltyLocation(player, menace) {
+  const location = MENACE_PENALTY_LOCATIONS[menace];
+  if (!location) return player;
+  player.locationId = location;
+  player.current_location = location; // compatibility with structured player model
+  if (menace === "suspicion") {
+    if (typeof player.criminal_record === "number") player.criminal_record = Math.min(7, player.criminal_record + 1);
+    else player.qualities.criminal_record = addCp(player.qualities.criminal_record ?? {
+      id:"criminal_record",cp:0,level:0
+    }, 1, 7);
+  }
+  return player;
+}
+
+// Action economy is available for future optional game modes. NeathBound's
+// current published experience intentionally has unlimited actions.
+export const ACTION_REGEN_MS = 600_000;
+export function regenerateActions(player, now = Date.now()) {
+  if (!Number.isFinite(player.last_action_tick) || !Number.isFinite(player.max_actions)) return player;
+  if (player.actions >= player.max_actions) { player.last_action_tick = now; return player; }
+  const added = Math.max(0, Math.floor((now - player.last_action_tick) / ACTION_REGEN_MS));
+  if (added) {
+    player.actions = Math.min(player.max_actions, player.actions + added);
+    player.last_action_tick = player.actions >= player.max_actions
+      ? now : player.last_action_tick + added * ACTION_REGEN_MS;
+  }
+  return player;
+}
+export function spendActions(player, cost) {
+  if (!Number.isSafeInteger(cost) || cost < 0) return false;
+  if (player.actions < cost) return false;
+  player.actions -= cost;
+  return true;
+}
+
+export default {
+  QualityType, isPyramidal, LEVEL_THRESHOLD, CP_PER_LEVEL_AFTER_THRESHOLD,
+  levelToTotalCp, cpToLevel, cpToNextLevel, addCp,
+  DEFAULT_SCALER, MIN_BROAD_CHANCE, DEFAULT_RARE_SUCCESS_CHANCE,
+  broadChance, roll, resolveChallenge, cpAward,
+  EquipmentSlot, getEffectiveStat, applyEffect,
+  MENACE_THRESHOLD, MENACE_PENALTY_LOCATIONS, checkMenaceThreshold,
+  sendToPenaltyLocation, ACTION_REGEN_MS, regenerateActions, spendActions
+};
