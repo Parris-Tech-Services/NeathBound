@@ -1,4 +1,4 @@
-import { expansionLocations, expansionStories } from "./expansion.js?v=20260930-22";
+import { expansionLocations, expansionStories } from "./expansion.js?v=20261015-02";
 
 
 

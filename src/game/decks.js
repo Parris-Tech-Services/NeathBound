@@ -1,4 +1,4 @@
-import { requirementsMet } from "./rules.js?v=20260930-22";
+import { requirementsMet } from "./rules.js?v=20261015-02";
 
 export function eligibleCards(state, deck, cards, context = {}) {
   return (deck.cardIds ?? [])

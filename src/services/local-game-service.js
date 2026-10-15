@@ -1,5 +1,5 @@
-import { resolveChoice, resetState, travelBlockedReason, drawCard, discard, setRefuge, equipItem } from "../game/engine.js?v=20260930-22";
-import { loadState, saveState } from "../game/state.js?v=20260930-22";
+import { resolveChoice, resetState, travelBlockedReason, drawCard, discard, setRefuge, equipItem } from "../game/engine.js?v=20261015-02";
+import { loadState, saveState } from "../game/state.js?v=20261015-02";
 
 export class LocalGameService {
   constructor(storage = globalThis.localStorage) {
