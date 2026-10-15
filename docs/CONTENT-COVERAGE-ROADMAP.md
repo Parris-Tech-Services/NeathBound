@@ -4,7 +4,7 @@
 
 ## Actual content inventory
 
-Run `npm run catalogue:build` to refresh [all-content.csv](../content/catalogue/all-content.csv). The inventory at this checkpoint contains **234 storylets, 22 cards, 61 items, 16 locations, and 16 explicitly enumerated quality IDs**, plus ambitions, destinies, festivals, and quirks (380 catalogue records total). A subset are short or procedural narratives; quantity is **not** a quality claim.
+Run `npm run catalogue:build` to refresh [all-content.csv](../content/catalogue/all-content.csv). The inventory at this checkpoint contains **234 storylets, 22 cards, 61 items, 16 locations, and 17 explicitly enumerated quality IDs**, plus ambitions, destinies, festivals, and quirks (381 catalogue records total). A subset are short or procedural narratives; quantity is **not** a quality claim.
 
 - **The Missing Name** has a 30-stage progression but needs substantive middle- and late-game editorial review.
 - **The Hunt for the Gloomwing** adds 30 distinct original stages (`gloomwing_hunt_00`–`29`), 90 branches, three regional locations, a delivered letter, quirk-gated alternatives, and three permanent ending treasures. JSON source: [gloomwing.v1.json](../content/ambitions/gloomwing.v1.json).
