@@ -284,7 +284,18 @@ test("mobile Gloomwing chapter 3 GO visibly responds, and no-action attempts say
   await go.waitFor({ state: "visible" });
   await go.click();
   const result = page.locator(".outcome-screen-overlay .outcome-panel[role=dialog]");
-  await result.waitFor({ state: "visible" });
+  try { await result.waitFor({ state: "visible", timeout: 4500 }); }
+  catch (error) {
+    const diagnostic = await page.evaluate((key) => ({
+      save:JSON.parse(localStorage.getItem(key)||"{}"),
+      alerts:[...document.querySelectorAll(".runtime-error,.runtime-notice")].map(n=>n.textContent),
+      results:[...document.querySelectorAll(".outcome-screen-overlay")].map(n=>n.textContent.slice(0,300)),
+      activeButtons:[...document.querySelectorAll('[data-story="gloomwing_hunt_02"]')].map(n=>({text:n.textContent,disabled:n.disabled})),
+      scrollY:window.scrollY
+    }), SAVE_KEY);
+    console.error("GLOOMWING CHAPTER THREE DIAGNOSTIC",JSON.stringify({diagnostic,problems}).slice(0,3800));
+    throw error;
+  }
   assert.equal(await page.locator('[data-action="onwards"]').isVisible(), true);
   const bounds = await result.boundingBox(), viewport = page.viewportSize();
   assert.ok(bounds.y < viewport.height && bounds.y + bounds.height > 0, "outcome must be in the mobile viewport");
