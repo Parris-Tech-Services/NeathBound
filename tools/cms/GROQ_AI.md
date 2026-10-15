@@ -34,6 +34,23 @@ Choose **Deep writer (120B)** for richer responses or **Fast assistant (20B)** f
 
 The assistant receives the active draft, game-specific references and, when checked, limited excerpts from the world documents. These are sent to Groq for inference. The browser does **not** send your Groq API keys; the Worker authenticates to Groq using private server-side bindings.
 
+## One-click autofill and repair
+
+The largest button in the editor is **✦ Autofill & Fix All**. It automatically:
+
+1. Audits the current draft, repairs recognizable invalid effect objects, numeric strings, blank effect placeholders, missing branch IDs, missing action costs and ambition-step increments.
+2. Supplies the complete draft and exact remaining QA error paths to Groq using the private gateway and the selected model. Groq fills unwritten copy, scene and outcome prose, missing branch content and valid typed effects.
+3. Re-runs the real game's schema QA after every proposal and performs up to **three** iterations without accepting a proposal that increases the number of blocking errors.
+4. Saves a pre-edit backup (up to five in browser-local storage) and **applies the safe edits automatically**, so you do not have to review and click Apply after each generation.
+5. Shows the remaining issue count. If the result cannot be validated, the unresolved issues remain visible rather than pretending they were fixed.
+6. Clears the content/design/mechanical/continuity/peer approvals. Humans must still perform real sign-offs; Groq never approves its own writing.
+
+The **Quality gates → ✦ Fix all QA issues with Groq** shortcut calls the same function directly from the error panel. **Fix schema issues offline** repairs safe structural mistakes without calling Groq. **Undo autofix** restores your previous draft if the resulting writing isn't what you want.
+
+The first Groq call needs a Studio access code. The gateway will not make paid calls without it. If you have not entered the access code, the button can still fix the safe local errors; it cannot invent finished prose offline.
+
+A zero-error report means **mechanical/structural validation succeeded**, not that writing quality, canon continuity or editorial approval have been independently established.
+
 ## Safe editorial workflow
 
 1. Open or create a draft in Narrative Studio.
