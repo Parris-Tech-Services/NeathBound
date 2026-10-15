@@ -8,6 +8,17 @@ import {fileURLToPath,pathToFileURL} from "node:url";
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const GAME=JSON.parse(fs.readFileSync(path.join(ROOT,"package.json"),"utf8")).name==="neathbound"?"neathbound":"undercity";
 const DIR=path.join(ROOT,"content/storylet-generator");
+// Read the current approved editorial materials before each AI call.
+export function loadEditorialContext({includeSecrets=true}={}){
+ const folder=path.join(ROOT,"docs/narrative-studio");
+ const names=["bible.md","style.md",...(includeSecrets?["secrets.md"]:[])];
+ return names.map(name=>{
+  const file=path.join(folder,name);
+  if(!fs.existsSync(file))throw Error("Missing Narrative Studio source: "+name);
+  return "### "+name+"\n"+fs.readFileSync(file,"utf8");
+ }).join("\n\n");
+}
+
 const STATS=GAME==="neathbound"?["nerve","insight","poise","shadow"]:["observation","guile","persuasion","resolve"];
 const MENACES=GAME==="neathbound"?["suspicion","dread","wounds","scandal"]:["suspicion","notoriety"];
 const RESOURCES=GAME==="neathbound"?["obols"]:["coin","clues","health","sanity"];
@@ -153,8 +164,10 @@ async function generate(){
  if(fs.existsSync(draftFile))die("Draft already exists: "+id);
  const model=opt("model",process.env.GROQ_MODEL||"llama-3.3-70b-versatile");
  const rounds=Math.max(1,Math.min(3,Number(opt("rounds","2"))||2));
+ const editorial=loadEditorialContext({includeSecrets:!flag("omit-secrets")});
  const system=[
   "You write original dark, melancholy, wry, specific second-person narrative game scenes with clear concrete stakes, NPC motivations, meaningful choices and distinct consequences. Not a copy of another game. No generic filler.",
+  "EDITORIAL SOURCE DOCUMENTS: Proposed ledger hypotheses are NOT automatically canon. A completed passage cannot reveal a secret deeper than its permitted depth.\n"+editorial,
   "Produce ONLY a JSON object: {id,title,location,rarity,description,options:[{id,text,action_cost:1,challenge?:{stat,difficulty},success:{text,effects:[{type,id,delta} or {type:'flag',id,set:true}]},failure?:{text,effects:[]}}]}. No markdown.",
   "ID "+id+"; location "+location+"; rarity "+kind+". 2–4 branches. Description 45–165 words. Every outcome at least 17–125 words. Make branches mechanically and narratively different.",
   "Stats "+ctx.stats.join(",")+". Menaces "+ctx.menaces.join(",")+". Resources "+ctx.resources.join(",")+".",
@@ -170,7 +183,7 @@ async function generate(){
   const obj=await groq([{role:"system",content:system},{role:"user",content:prompt}],model);
   s=obj.storylet||obj.story||obj;check=validate(s,ctx);
   review=check.ok?await groq([
-   {role:"system",content:"Be a strict developmental editor. JSON only: {scores:{voice:0-10,originality:0-10,clarity:0-10,continuity:0-10,agency:0-10,consequences:0-10},issues:[specific problems],recommendation:'revise'|'review'}. Never automatically approve. Scrutinise repetitive prose, hollow choices and lore contradictions."},
+   {role:"system",content:"Be a strict developmental editor. JSON only: {scores:{voice:0-10,originality:0-10,clarity:0-10,continuity:0-10,agency:0-10,consequences:0-10},issues:[specific problems],recommendation:'revise'|'review'}. Never automatically approve. Scrutinise repetitive prose, hollow choices and lore contradictions. Compare against this editorial source context:\\n"+editorial+""},
    {role:"user",content:JSON.stringify({brief,storylet:s})}
   ],model):{issues:check.errors,recommendation:"revise"};
   history.push({round:n+1,mechanical:check,editor:review});
@@ -222,7 +235,7 @@ function publish(){
  if(flag("check")){if(!fs.existsSync(full)||fs.readFileSync(full,"utf8")!==code)die("Approved bundle stale: run publish");console.log("Bundle current ("+entries.length+" approved): "+target)}
  else{fs.writeFileSync(full,code);console.log("Compiled "+entries.length+" HUMAN-APPROVED storylets into "+target+"; run full tests before commit");}
 }
-function help(){console.log("Storylet Foundry for "+GAME+"\nGROQ_API_KEY=... node tools/storylet-generator.mjs generate --id original_id --location PLACE --brief 'story beats' [--kind story|card]\nnode tools/storylet-generator.mjs validate --id original_id\nnode tools/storylet-generator.mjs approve --id original_id --reviewer 'Editor' --notes 'I checked every choice and its consequences carefully.' --confirm\nnode tools/storylet-generator.mjs publish [--check]\nnode tools/storylet-generator.mjs locations\nKey never goes in repo or browser; nothing is published without human approval.");}
+function help(){console.log("Storylet Foundry for "+GAME+"\nGROQ_API_KEY=... node tools/storylet-generator.mjs generate --id original_id --location PLACE --brief 'story beats' [--kind story|card]\nnode tools/storylet-generator.mjs validate --id original_id\nnode tools/storylet-generator.mjs approve --id original_id --reviewer 'Editor' --notes 'I checked every choice and its consequences carefully.' --confirm\nnode tools/storylet-generator.mjs publish [--check]\nnode tools/storylet-generator.mjs locations\nEditorial context: bible + style + proposed secrets ledger are loaded for Groq calls by default. Use --omit-secrets only to withhold the ledger; continuity review then remains incomplete.\nKey never goes in repo or browser; nothing is published without human approval.");}
 export async function main(){
  if(command==="generate")await generate();
  else if(command==="validate")validateCmd();
