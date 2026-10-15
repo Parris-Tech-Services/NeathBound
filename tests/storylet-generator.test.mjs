@@ -42,3 +42,29 @@ test("duplicate outcome prose is blocked",()=>{
  const s=example();s.options[0].failure.text=success;
  assert.match(validate(s,ctx).errors.join(" "),/identical|Duplicated/);
 });
+
+test("rare successes compile as replacement outcomes using each real engine schema",()=>{
+ const s=example();
+ s.options[0].challenge.rareChance=0.04;
+ s.options[0].rare_success={
+  text:"The ledger opens to a hidden register of names, each written in the clerk's own careful hand. She gives you the duplicate and accepts the risk of official inquiry. This is a rare discovery, not an additional reward layered upon the ordinary success.",
+  effects:[{type:"currency",id:ctx.resources[0],delta:3}]
+ };
+ const result=validate(s,ctx);
+ assert.deepEqual(result.errors,[]);
+ const compiled=adapt(s).story.choices[0];
+ if(ctx.game==="neathbound"){
+  assert.equal(compiled.challenge.rareChance,0.04);
+  assert.match(compiled.rare_success,/hidden register/);
+  assert.equal(compiled.rareSuccessEffects[0].type,"obols");
+ }else{
+  assert.equal(compiled.rare_success_chance,0.04);
+  assert.match(compiled.rare_success,/hidden register/);
+  assert.equal(compiled.rare.coin,3);
+ }
+});
+test("rare outcome cannot exist without a challenge",()=>{
+ const s=example();
+ s.options[1].rare_success={text:failure,effects:[]};
+ assert.match(validate(s,ctx).errors.join(" "),/rare success requires a challenge/);
+});
