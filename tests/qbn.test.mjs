@@ -61,7 +61,7 @@ test("quirks reduce opposites and free destiny bonuses affect effective stats",(
  const s=initialState();
  s.quirks.forceful=4;
  applyEffects(s,[{type:"quirk",id:"subtle",amount:2}]);
- assert.equal(s.quirks.forceful,2);
+ assert.equal(s.quirks.forceful,3); // -2 CP changes level 4 to level 3
  applyEffects(s,[{type:"destiny",id:"steady-lantern"}]);
  assert.equal(effectiveStat(s,"nerve"),7);
  assert.deepEqual(s.destinies,["steady-lantern"]);
