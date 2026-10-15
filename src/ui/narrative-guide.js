@@ -9,6 +9,9 @@ export const CITY_ROUTES = [
   { id: "glass-observatory", hint: "Recover your own Archive entry and follow The Margin Note." },
   { id: "ashrail-station", hint: "From Lantern Quay, choose Three Roads Out of Lantern Quay and ride the north line." },
   { id: "cinder-ward", hint: "From Lantern Quay, choose Three Roads Out of Lantern Quay and climb the east stair." },
+  { id: "duskwater", hint: "Accept the Gloomwing commission at Lantern Quay and follow its first lead." },
+  { id: "black-spire", hint: "Follow the Gloomwing hunt through Duskwater to the old outer door." },
+  { id: "bureau-hall", hint: "Continue the Gloomwing hunt through Black Spire to reach the central Bureau." },
   { id: "registry-of-hours", hint: "At Ashrail Station, investigate The Cancelled Platform to unlock the Registry." }
 ];
 
