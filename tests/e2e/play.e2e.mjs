@@ -250,6 +250,36 @@ test("Travel opens on demand and never covers the story after choices", async ()
   await context.close();
 });
 
+test("mobile district has concise single-open storylets and a folded evidence registry", async () => {
+  const { context, page, problems } = await openGame({ completeTutorial: true });
+  await page.setViewportSize({ width: 390, height: 740 });
+
+  const previews=page.locator(".storylet-disclosure");
+  assert.ok(await previews.count() >= 6, "Lantern Quay must still list its available encounters");
+  assert.equal(await page.locator('.storylet-disclosure[open]').count(), 1, "only one district story opens initially");
+  assert.equal(await page.locator('[data-storylet-id="bell-under-water"]').getAttribute("open"), "", "main objective opens first");
+  assert.ok(await page.locator('[data-story="bell-under-water"][data-choice="descend"]').isVisible());
+
+  const registry=page.locator(".storylet-archive");
+  await registry.waitFor();
+  assert.equal(await registry.getAttribute("open"), null, "the four registry volumes are hidden until requested");
+  assert.equal(await page.locator(".storylet-archive .storylet-disclosure").count(), 4);
+  const collapsedHeight=await registry.evaluate(el=>el.getBoundingClientRect().height);
+  assert.ok(collapsedHeight < 135, "evidence registry must occupy only one row when folded");
+
+  // Open any other story, check the featured story closes and its GO choices are hidden.
+  await page.locator('[data-storylet-id="cartographer-at-dusk"] > summary').click();
+  assert.equal(await page.locator(".storylet-disclosure[open]").count(), 1);
+  assert.equal(await page.locator('[data-story="bell-under-water"][data-choice="descend"]').isVisible(), false);
+  assert.ok(await page.locator('[data-story="cartographer-at-dusk"] [data-choice]').first().isVisible());
+  // Returning to the main lead requires one tap, not scrolling over a wall of choices.
+  await page.locator('[data-storylet-id="bell-under-water"] > summary').click();
+  assert.equal(await page.locator(".storylet-disclosure[open]").count(), 1);
+  assert.ok(await page.locator('[data-story="bell-under-water"][data-choice="descend"]').isVisible());
+  assert.deepEqual(problems, []);
+  await context.close();
+});
+
 test("mobile Gloomwing chapter 3 GO visibly responds, and no-action attempts say WAIT", async () => {
   const { context, page, problems } = await openGame({ completeTutorial: true });
   await page.setViewportSize({ width: 390, height: 740 });
