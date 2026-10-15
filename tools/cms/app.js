@@ -105,6 +105,7 @@ function openStory(id,ref=false){
  $("editor-title").textContent=s.title||"Untitled storylet";$("editor-subtitle").textContent=(ref?"Published reference · read-only":"Local draft · "+s.status)+" · "+s.id;
  $("delete-story").disabled=ref;$("save-story").disabled=ref;$("add-choice").disabled=ref;$("export-story").disabled=ref;$("go-next").disabled=ref;
  $("copy-prompt").disabled=ref;
+ $("download-publish").disabled=ref||s.status!=="approved";
  if(ref){
   $("fields").innerHTML='<div class="panel"><h3>'+esc(s.title)+'</h3><p>'+esc(s.text||"")+'</p><p class="muted">This is an existing script-authored story. Duplicate it to start new content without overwriting source.</p></div>';
   $("branches").innerHTML=(s.choices||[]).slice(0,8).map(c=>'<div class="panel"><strong>'+esc(c.label||"Choice")+'</strong><p>'+esc(c.success||"")+'</p></div>').join("");
@@ -182,6 +183,7 @@ function download(name,data){
 }
 $("download-all").onclick=()=>download(project.game+"-studio-drafts.json",exportBundle(drafts,project.game));
 $("export-story").onclick=()=>{const s=active();if(s&&!reference)download(s.id+".studio.json",exportBundle([s],project.game))};
+$("download-publish").onclick=()=>{const s=active();if(!s||reference)return;const result=audit(s,context(),{strict:true});if(!result.ok){toast("Cannot publish: "+result.errors[0].message);renderQA();return}download(s.id+".json",s);toast("Approved storylet exported. Add this single JSON file under content/storylets/cms/ and build.");};
 $("import-button").onclick=()=>$("file-upload").click();
 $("file-upload").onchange=async ev=>{
  const file=ev.target.files?.[0];if(!file)return;
