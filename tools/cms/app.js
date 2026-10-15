@@ -163,6 +163,9 @@ $("go-next").onclick=()=>{
  const s=active();if(!s||reference)return;
  const stage=PHASES[PHASES.indexOf(s.status)+1];
  if(!stage){toast("Already approved. Export and submit for review.");return}
+ if(stage==="approved"&&(!s.qa?.peer||!String(s.reviewer||"").trim())){
+  approveSolo({fromAutofill:true});return;
+ }
  // A fully described scene should not be trapped in Pitch merely because the
  // author used Autofill and the separate pitch field was left empty.
  if(stage==="midflight"&&!String(s.pitch||"").trim()&&String(s.description||"").trim().length>=40){
