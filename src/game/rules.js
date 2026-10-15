@@ -15,6 +15,8 @@ export function valueForRequirement(state, requirement, context = {}) {
       return state.qualities?.[requirement.id] ?? 0;
     case "menace":
       return state.menaces?.[requirement.id] ?? 0;
+    case "quirk":
+      return state.quirks?.[requirement.id] ?? 0;
     case "item":
       return state.items?.[requirement.id] ?? 0;
     case "flag":
@@ -53,11 +55,19 @@ export function applyEffect(state, effect, qualityDefs) {
       break;
     case "quirk": {
       state.quirks ??= {};
-      const change = Number(effect.amount ?? 0);
-      state.quirks[effect.id] = clamp((state.quirks[effect.id] ?? 0) + change, 0, 15);
-      if (change > 0) for (const opposite of QUIRK_OPPOSITES[effect.id] ?? []) {
-        state.quirks[opposite] = clamp((state.quirks[opposite] ?? 0) - change, 0, 15);
-      }
+      state.quirk_cp ??= {};
+      const amount = Math.floor(Number(effect.amount ?? 0));
+      const applyQuirkCp = (id, change) => {
+        const currentLevel = Math.max(0,Number(state.quirks[id]??0));
+        const cp = Number.isFinite(state.quirk_cp[id])
+          ? state.quirk_cp[id] : levelToTotalCp(currentLevel);
+        const next = addCp({id,cp,level:currentLevel},change,15);
+        state.quirks[id] = next.level;
+        state.quirk_cp[id] = next.cp;
+      };
+      applyQuirkCp(effect.id,amount);
+      if(amount>0)for(const opposite of QUIRK_OPPOSITES[effect.id]??[])
+        applyQuirkCp(opposite,-amount);
       break;
     }
     case "ambition":
@@ -89,7 +99,7 @@ export function applyEffect(state, effect, qualityDefs) {
     case "living-story":
       state.living_stories ??= [];
       if (!state.living_stories.some(entry => entry.storylet_id === effect.id && !entry.fired)) {
-        state.living_stories.push({ storylet_id: effect.id, trigger_time: Date.now(), delay_hours: Math.max(0, Number(effect.delay_hours ?? 1)), fired: false });
+        state.living_stories.push({ storylet_id: effect.id, trigger_time: Date.now(), delay_hours: Math.max(0, Number(effect.delay_hours ?? 1)), title: effect.title ?? "A delayed letter arrives", text: effect.message ?? `The city has answered an earlier decision: ${effect.id}`, on_arrival: effect.on_arrival ?? [], fired: false });
       }
       break;
     case "progress":
@@ -257,8 +267,17 @@ export const QUIRK_OPPOSITES = {
   honest: ["devious"], devious: ["honest"]
 };
 export const QUIRK_TITLES = {
-  austere: [[2,"Restrained"],[4,"Temperate"],[9,"Disciplined"],[15,"Ascetic"]],
-  daring: [[2,"Bold"],[4,"Dashing"],[9,"Intrepid"],[15,"Fearless"]]
+  "austere": [[2,"Restrained"],[4,"Temperate"],[9,"Disciplined"],[15,"Ascetic"]],
+  "hedonist": [[2,"Curious"],[4,"Indulgent"],[9,"Unrestrained"],[15,"Devoted to Pleasure"]],
+  "daring": [[2,"Bold"],[4,"Dashing"],[9,"Intrepid"],[15,"Fearless"]],
+  "subtle": [[2,"Tactful"],[4,"Careful"],[9,"Elusive"],[15,"Unfathomable"]],
+  "forceful": [[2,"Resolute"],[4,"Assertive"],[9,"Unyielding"],[15,"Implacable"]],
+  "magnanimous": [[2,"Kind"],[4,"Generous"],[9,"Merciful"],[15,"Open-Handed"]],
+  "ruthless": [[2,"Hard"],[4,"Relentless"],[9,"Pitiless"],[15,"Iron-Hearted"]],
+  "steadfast": [[2,"Reliable"],[4,"Loyal"],[9,"Unshakeable"],[15,"True"]],
+  "fickle": [[2,"Restless"],[4,"Changeable"],[9,"Whimsical"],[15,"Inconstant"]],
+  "honest": [[2,"Frank"],[4,"Truthful"],[9,"Principled"],[15,"Incorruptible"]],
+  "devious": [[2,"Clever"],[4,"Sly"],[9,"Conniving"],[15,"Master of Masks"]]
 };
 export function quirkTitle(id, level) {
   return (QUIRK_TITLES[id] ?? []).find(([max]) => level <= max)?.[1] ?? id.replace(/(^|-)./g, match => match.toUpperCase());
