@@ -1,7 +1,7 @@
 import {project} from "./game-config.js";
 import {mountGroqAssistant} from "./ai-assistant.js";
 import {repairDraft} from "./auto-repair.js";
-import {PHASES,STAGE_NAMES,EFFECTS,REQUIREMENTS,OPERATORS,slug,copy,freshStory,freshChoice,freshEffect,freshRequirement,audit,advance,exportBundle,importBundle} from "./studio-core.js";
+import {PHASES,STAGE_NAMES,EFFECTS,REQUIREMENTS,OPERATORS,slug,copy,freshStory,freshChoice,freshEffect,freshRequirement,audit,advance,creatorApprove,exportBundle,importBundle} from "./studio-core.js";
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 const storeKey="qbn.studio."+project.game+".v1";
@@ -91,8 +91,8 @@ function renderQA(){
  report.warnings.map(x=>'<div class="qa-warning">'+esc(x.path+": "+x.message)+'</div>').join("")+
  (!report.errors.length?'<div class="notice">Validation checks structure and references. It cannot replace a human prose or continuity review.</div>':'');
  const labels={content:"Content · copy, tone and spelling",design:"Design · economy and difficulty",mechanical:"Mechanical · progress and references",continuity:"Continuity · bible and secrets",peer:"Independent peer review"};
- $("qa-signoffs").innerHTML='<h3>Human sign-off</h3>'+Object.entries(labels).map(([k,v])=>'<label class="check"><input type="checkbox" data-qa="'+k+'" '+(s.qa?.[k]?"checked":"")+'>'+esc(v)+'</label>').join("")+
- '<p class="muted">These are recorded declarations, not automated AI approvals. Always export the reviewed file before publication.</p>';
+ $("qa-signoffs").innerHTML='<h3>Human sign-off (optional for solo creator approval)</h3>'+Object.entries(labels).map(([k,v])=>'<label class="check"><input type="checkbox" data-qa="'+k+'" '+(s.qa?.[k]?"checked":"")+'>'+esc(v)+'</label>').join("")+
+ '<p class="muted">Only check work actually reviewed by a person. Solo creator approval is an alternative to an independent peer reviewer, and will be labelled in your export.</p>';
 }
 function renderList(){
  const search=$("story-search").value.toLowerCase().trim(),filter=$("story-filter").value;
@@ -101,6 +101,28 @@ function renderList(){
  const all=[...own,...pub].filter(s=>(s.id+" "+s.title).toLowerCase().includes(search)).slice(0,350);
  $("story-list").innerHTML=all.map(s=>'<button type="button" class="story-entry '+(s._reference?"reference ":"")+(s.id===selected&&reference===s._reference?"active":"")+'" data-open="'+esc(s.id)+'" data-ref="'+(s._reference?1:0)+'"><b>'+esc(s.title||s.id)+'</b><small>'+esc(s.id)+' · '+(s._reference?"Published reference":esc(s.status))+'</small></button>').join("")||'<p class="muted">No matching storylets.</p>';
 }
+const soloButton=document.createElement("button");
+soloButton.id="solo-approve";soloButton.type="button";
+soloButton.textContent="Approve as solo creator";
+$("go-next").insertAdjacentElement("afterend",soloButton);
+/** Solo creator approval is explicitly requested, not silently attributed to a peer. */
+function approveSolo({fromAutofill=false,aiReview="none"}={}){
+ const story=active();
+ if(!story||reference)return false;
+ if(!fromAutofill&&story.status!=="review"){
+  toast("Use solo approval at Peer review, or Autofill & advance all stages.");return false;
+ }
+ const checked=audit(story,context());
+ if(!checked.ok){toast("Resolve "+checked.errors.length+" issue(s): "+checked.errors[0].path);renderQA();return false}
+ if(!confirm("Approve this as SOLO CREATOR? Validation passed, but no independent human has reviewed it. Your export will record this honestly."))return false;
+ const result=creatorApprove(story,context(),{creatorConfirmed:true,aiReview:aiReview==="groq"?{kind:"groq"}:null});
+ if(!result.ok){toast("Cannot approve: "+result.reason);renderQA();return false}
+ const i=drafts.findIndex(x=>x===story||x.id===story.id);if(i<0)return false;
+ drafts[i]=result.story;save();openStory(result.story.id,false);
+ toast("Creator approved. No independent peer reviewer claimed. Export JSON when ready.");
+ return true;
+}
+soloButton.addEventListener("click",()=>approveSolo());
 function openStory(id,ref=false){
  selected=id;reference=ref;const s=active();if(!s)return;
  $("editor").hidden=false;$("welcome").hidden=true;
@@ -108,6 +130,7 @@ function openStory(id,ref=false){
  $("delete-story").disabled=ref;$("save-story").disabled=ref;$("add-choice").disabled=ref;$("export-story").disabled=ref;$("go-next").disabled=ref;
  $("copy-prompt").disabled=ref;
  $("download-publish").disabled=ref||s.status!=="approved";
+ soloButton.hidden=ref||s.status!=="review";
  if(ref){
   $("fields").innerHTML='<div class="panel"><h3>'+esc(s.title)+'</h3><p>'+esc(s.text||"")+'</p><p class="muted">This is an existing script-authored story. Duplicate it to start new content without overwriting source.</p></div>';
   $("branches").innerHTML=(s.choices||[]).slice(0,8).map(c=>'<div class="panel"><strong>'+esc(c.label||"Choice")+'</strong><p>'+esc(c.success||"")+'</p></div>').join("");
@@ -245,5 +268,6 @@ mountGroqAssistant({project,getStory:active,isReference:()=>reference,getContext
   }
   drafts[i]=updated;save();openStory(updated.id,false);renderQA();
  },
+ approveCreator:({aiReview="none"}={})=>approveSolo({fromAutofill:true,aiReview}),
  notify:toast});
 renderList();renderQA();
