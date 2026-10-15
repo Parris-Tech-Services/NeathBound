@@ -73,6 +73,39 @@ for(const [choiceIndex,trophy] of [
   });
 }
 
+test("chapter 3: mapping the false landings consumes an action and advances with Insight",()=>{
+  const state=start();
+  state.locationId="duskwater";
+  state.unlockedLocations.push("duskwater");
+  state.ambition_progress["gloomwing-hunt"]=2;
+  state.qualities.gloomwing_hunt_progress=2;
+  state.qualities.insight=12;
+  state.actions=7;
+  const before=state.revision;
+  assert.equal(storyAvailable(state,id(2)),true);
+  const result=resolveChoice(state,id(2),"investigate",()=>0.5);
+  assert.equal(result.error,undefined);
+  assert.equal(result.success,true);
+  assert.equal(result.state.ambition_progress["gloomwing-hunt"],3);
+  assert.equal(result.state.actions,6);
+  assert.equal(result.state.revision,before+1);
+  assert.match(result.result,/stair was built to lead something out/);
+  assert.equal(storyAvailable(result.state,id(2)),false);
+  assert.equal(storyAvailable(result.state,id(3)),true);
+});
+
+test("chapter 3: without actions the engine returns a clear reason and preserves progress",()=>{
+  const state=start();
+  state.locationId="duskwater";
+  state.unlockedLocations.push("duskwater");
+  state.ambition_progress["gloomwing-hunt"]=2;
+  state.actions=0;
+  state.last_action_tick=Date.now();
+  const result=resolveChoice(state,id(2),"investigate",()=>0.5);
+  assert.match(result.error,/Not enough actions/);
+  assert.equal(result.state.ambition_progress["gloomwing-hunt"],2);
+});
+
 test("old ambitions and opening mystery remain available",()=>{
   assert.ok(ambitions["missing-name"]);
   assert.ok(stories["qbn-missing-name-1"]);
