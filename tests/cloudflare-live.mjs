@@ -1,0 +1,38 @@
+import assert from "node:assert/strict";
+import { randomBytes } from "node:crypto";
+const api = "https://neathbound-api.parris-neathaustralia.workers.dev";
+const token = randomBytes(32).toString("hex");
+async function call(path,method="GET",body) {
+  const res = await fetch(api+path,{method,headers:{Authorization:"Bearer "+token,"Content-Type":"application/json",Origin:"https://parris-tech-services.github.io"},body:method==="POST"?JSON.stringify(body??{}):undefined,signal:AbortSignal.timeout(15000)});
+  let json=await res.json();
+  return {status:res.status,body:json,headers:res.headers};
+}
+const health = await fetch(api+"/health",{signal:AbortSignal.timeout(15000)});
+assert.equal(health.status,200);
+assert.equal((await health.json()).storage,"D1");
+const unauth=await fetch(api+"/api/player",{signal:AbortSignal.timeout(15000)});
+assert.equal(unauth.status,401);
+const first=await call("/api/player");
+assert.equal(first.status,200);
+assert.equal(first.body.locationId,"the-lair");
+assert.equal(first.body.revision,0);
+assert.equal(first.headers.get("access-control-allow-origin"),"https://parris-tech-services.github.io");
+const chosen=await call("/api/storylets/lair-escape/branches/force/choose","POST",{expectedRevision:0});
+assert.equal(chosen.status,200,JSON.stringify(chosen.body));
+assert.equal(chosen.body.state.locationId,"lantern-quay");
+assert.equal(chosen.body.state.items["brass-key"],1);
+const persisted=await call("/api/player");
+assert.equal(persisted.body.locationId,"lantern-quay");
+assert.equal(persisted.body.revision,chosen.body.state.revision);
+const stale=await call("/api/storylets/bell-under-water/branches/listen/choose","POST",{expectedRevision:0});
+assert.equal(stale.status,409);
+const locked=await call("/api/travel/glass-observatory","POST",{expectedRevision:persisted.body.revision});
+assert.equal(locked.status,409);
+const valid=await call("/api/storylets/bell-under-water/branches/listen/choose","POST",{expectedRevision:persisted.body.revision});
+assert.equal(valid.status,200,JSON.stringify(valid.body));
+assert.equal(valid.body.state.locationId,"hollow-archive");
+const restored=await call("/api/player");
+assert.equal(restored.body.locationId,"hollow-archive");
+const accidentalImport=await call("/api/import","POST",{state:{locationId:"the-lair",unlockedLocations:["the-lair"],revision:0}});
+assert.equal(accidentalImport.status,409,"Import must not overwrite developed online character");
+console.log("PASS: health, auth, CORS, initial save, choice, persistence, concurrency, locked travel, story progression, import protection");

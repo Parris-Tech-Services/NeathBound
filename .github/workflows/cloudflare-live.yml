@@ -1,0 +1,21 @@
+name: Cloudflare live save tests
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "cloudflare/**"
+      - "src/services/cloudflare-game-service.js"
+      - ".github/workflows/cloudflare-live.yml"
+permissions:
+  contents: read
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify deployed Cloudflare Worker and D1
+        run: node tests/cloudflare-live.mjs
