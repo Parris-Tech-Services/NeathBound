@@ -104,3 +104,10 @@ MIT. All game writing and code in this repository are original contributions.
 There are nine ordinary map locations, including **Ashrail Station**, **Cinder Ward**, and the **Registry of Hours**. From Lantern Quay, the story **Three Roads Out of Lantern Quay** leads to the new districts; their routes remain on your map afterwards. Follow the on-screen **Your Journey** guide for the main mystery across Chapters One and Two, or explore independent encounters in any order. The new prologue supports all four attributes: Nerve, Insight, Poise, and Shadow. The Chapter Two finale has two distinct permanent outcomes in each saved life.
 
 The game currently starts with 10 actions, regenerating one every ten minutes; actions can be raised to a cap of 20. No paid action refills are offered. Local saves are separate from any previous online account.
+
+
+## Narrative CMS · QBN Studio
+
+Write new NeathBound storylets without hand-editing JavaScript at [QBN Studio](https://parris-tech-services.github.io/NeathBound/tools/cms/). The editor saves browser-local drafts, offers drop-downs for native Nerve/Insight/Poise/Shadow challenges, supports separate outcomes and effects, and follows pitch → structure → prose → content/design/mechanical/continuity QA → independent peer review → approval.
+
+Read the [full studio workflow](tools/cms/WORKFLOW.md), [world bible](tools/cms/bible.md), [forty-entry proposed secrets ledger](tools/cms/secrets.md) and [style guide](tools/cms/style.md). Final approved raw JSON goes into `content/storylets/cms/<story-id>.json`; run `npm run cms:build && npm run release:check`. The browser editor never publishes directly to GitHub or stores provider API secrets, and the proposed secrets are in a **public** repository.
