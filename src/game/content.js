@@ -1,6 +1,6 @@
-import { ambitions, destinies, festivals, qbnStories, qbnCards } from "./qbn-expansion.js?v=20261015-04";
+import { ambitions, destinies, festivals, qbnStories, qbnCards } from "./qbn-expansion.js?v=20261015-06";
 export { ambitions, destinies, festivals };
-import { expansionLocations, expansionStories } from "./expansion.js?v=20261015-03";
+import { expansionLocations, expansionStories } from "./expansion.js?v=20261015-06";
 
 
 
