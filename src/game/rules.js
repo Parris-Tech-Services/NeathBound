@@ -1,4 +1,4 @@
-import { items, equipmentSlots, locations } from "./content.js?v=20261015-03";
+import { items, equipmentSlots, locations, destinies } from "./content.js?v=20261015-04";
 
 const operators = {
   "==": (actual, expected) => actual === expected,
@@ -59,6 +59,32 @@ export function applyEffect(state, effect) {
       }
       break;
     }
+    case "ambition":
+      if (!state.ambition) {
+        state.ambition=effect.id;
+        state.ambition_progress ??= {};
+        state.ambition_progress[effect.id]=0;
+      }
+      break;
+    case "ambition-progress":
+      if(state.ambition===effect.id) {
+        state.ambition_progress ??= {};
+        state.ambition_progress[effect.id]=Math.max(0,(state.ambition_progress[effect.id]??0)+Number(effect.amount??1));
+      }
+      break;
+    case "destiny":
+      if(!state.destinies?.length && destinies[effect.id] && !destinies[effect.id].fate_locked) {
+        state.destinies=[effect.id];
+        state.flags["destiny-chosen"]=true;
+        state.destiny_bonus={...destinies[effect.id].stat_bonus};
+      }
+      break;
+    case "equip-treasure":
+      if(Number(state.items?.[effect.id]??0)>=1 && items[effect.id]?.slot==="treasure"){
+        state.equipment??={};
+        state.equipment.treasure=effect.id;
+      }
+      break;
     case "living-story":
       state.living_stories ??= [];
       if (!state.living_stories.some(entry => entry.storylet_id === effect.id && !entry.fired)) {
@@ -170,7 +196,7 @@ export function effectiveStat(state, stat) {
       value += items[itemId].stats[stat];
     }
   }
-  return value;
+  return value + Number(state.destiny_bonus?.[stat] ?? 0);
 }
 
 export function describeChallenge(state, challenge) {
