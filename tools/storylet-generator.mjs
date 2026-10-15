@@ -77,7 +77,11 @@ export function validate(s,ctx=context()){
   if(b.action_cost!==undefined&&b.action_cost!==1)err(at+"only 1-cost actions supported; this engine cannot faithfully import free branches");
   if(b.challenge&&(!ctx.stats.includes(b.challenge.stat)||!Number.isFinite(b.challenge.difficulty)||b.challenge.difficulty<=0))err(at+"invalid challenge stat/difficulty: "+ctx.stats.join(", "));
   if(b.challenge&&!isObj(b.failure))err(at+"challenge must have a failure");
-  for(const key of ["success",...(b.challenge?["failure"]:[])]){
+  if(b.rare_success){
+   if(!b.challenge)err(at+"rare success requires a challenge");
+   if(b.challenge?.rareChance!==undefined&&(!Number.isFinite(b.challenge.rareChance)||b.challenge.rareChance<0||b.challenge.rareChance>1))err(at+"rare chance must be 0–1");
+  }
+  for(const key of ["success",...(b.challenge?["failure"]:[]),...(b.rare_success?["rare_success"]:[])]){
    const result=b[key];
    if(!isObj(result)||words(result.text)<17||words(result.text)>125)err(at+key+" prose must be 17–125 words");
    else outcomes.push(result.text.trim().toLowerCase());
@@ -128,7 +132,8 @@ export function adapt(s){
   title:s.title,text:s.description,once:true,pattern:"decoupled",kicker:"A story in "+s.location,
   choices:s.options.map(b=>{
    const x={id:b.id,label:b.text,success:b.success.text,successEffects:effects(b.success.effects),failureEffects:effects(b.failure?.effects||[])};
-   if(b.challenge){x.challenge={quality:b.challenge.stat,difficulty:b.challenge.difficulty,mode:"broad",scaler:0.6};x.failure=b.failure.text;}
+   if(b.challenge){x.challenge={quality:b.challenge.stat,difficulty:b.challenge.difficulty,mode:"broad",scaler:0.6,rareChance:b.challenge.rareChance??0.04};x.failure=b.failure.text;}
+   if(b.rare_success){x.rare_success=b.rare_success.text;x.rareSuccessEffects=effects(b.rare_success.effects);}
    else x.challenge=false;
    return x;
   })
@@ -138,6 +143,7 @@ export function adapt(s){
   choices:s.options.map(b=>{
    const x={label:b.text,success:b.success.text,effects:effects(b.success.effects)};
    if(b.challenge){x.stat=b.challenge.stat;x.difficulty=b.challenge.difficulty;x.failure=b.failure.text;x.fail=effects(b.failure.effects);}
+   if(b.rare_success){x.rare_success=b.rare_success.text;x.rare=effects(b.rare_success.effects);x.rare_success_chance=b.challenge.rareChance??0.04;}
    else x.cost=1;
    return x;
   })
@@ -168,11 +174,14 @@ async function generate(){
  const system=[
   "You write original dark, melancholy, wry, specific second-person narrative game scenes with clear concrete stakes, NPC motivations, meaningful choices and distinct consequences. Not a copy of another game. No generic filler.",
   "EDITORIAL SOURCE DOCUMENTS: Proposed ledger hypotheses are NOT automatically canon. A completed passage cannot reveal a secret deeper than its permitted depth.\n"+editorial,
-  "Produce ONLY a JSON object: {id,title,location,rarity,description,options:[{id,text,action_cost:1,challenge?:{stat,difficulty},success:{text,effects:[{type,id,delta} or {type:'flag',id,set:true}]},failure?:{text,effects:[]}}]}. No markdown.",
+  "Produce ONLY JSON: {id,title,location,rarity,description,options:[{id,text,action_cost:1,challenge?:{stat,difficulty,rareChance?:0.04},success:{text,effects:[{type,id,delta} or {type:'flag',id,set:true}]},failure?:{text,effects:[]},rare_success?:{text,effects:[]}}]}. No markdown.",
   "ID "+id+"; location "+location+"; rarity "+kind+". 2–4 branches. Description 45–165 words. Every outcome at least 17–125 words. Make branches mechanically and narratively different.",
   "Stats "+ctx.stats.join(",")+". Menaces "+ctx.menaces.join(",")+". Resources "+ctx.resources.join(",")+".",
   "Allowed effects: stat, menace, currency, flag. Never invent item IDs or quality types. Flags must start generated:"+id+"-. Only one flag per outcome.",
   "Challenge difficulty 2–15; success and failure are distinct. Default action_cost 1. No auto-publish, no existing ambition progression edits.",
+  "Narrative tone: second-person present tense, gothic melancholy and dry absurdist humour; one precise striking image rather than three vague ones; dialogue must reveal character motives. No puns, slapstick, winking at reader or unearned triumph.",
+  "The city is physical: cave-roof, lamps, fungus, iron, chalk, paper. The surface is hearsay; treat the Spire as an unresolved wound/lock rather than explaining it all. Do not contradict existing characters.",
+  "Optional rare_success replaces normal success after a successful challenge. Its prose and effect list must be distinct and valid. Challenges use the existing engine's math, never model-calculated rolls.",
   "Original-world context: "+(GAME==="neathbound"?"Lantern Quay, Hollow Archive, labour, memory and civic mysteries":"Lantern Court, Inkward, district politics, light and debts"),
   "REQUEST: "+brief
  ].join("\n");
@@ -190,7 +199,7 @@ async function generate(){
   const nums=Object.values(review.scores||{});
   if(check.ok&&nums.length===6&&nums.every(x=>Number.isFinite(x)&&x>=8)&&review.recommendation==="review")break;
  }
- save(draftFile,{storylet:s,report:{game:GAME,id,model,brief,createdAt:new Date().toISOString(),iterations:history}});
+ save(draftFile,{storylet:s,report:{game:GAME,id,model,brief,createdAt:new Date().toISOString(),finalChecksum:checksum(s),iterations:history}});
  console.log("Saved draft "+path.relative(ROOT,draftFile)+"; mechanical QA "+(check.ok?"PASS":"FAIL")+". Human review required.");
  if(!check.ok)process.exitCode=2;
 }
@@ -199,8 +208,25 @@ function validateCmd(){
  const p=opt("file")?path.resolve(ROOT,opt("file")):draftPath(),s=(json(p).storylet||json(p));
  const results=validate(s);console.log(JSON.stringify(results,null,2));if(!results.ok)process.exitCode=1;
 }
+async function review(){
+ const p=draftPath(),draft=json(p),story=draft.storylet,check=validate(story);
+ if(!check.ok)die("Mechanical QA failed: "+check.errors.join("; "));
+ const model=opt("model",process.env.GROQ_MODEL||"llama-3.3-70b-versatile");
+ const assessment=await groq([
+  {role:"system",content:"Independent critical editor. Output JSON only: {scores:{voice:0-10,originality:0-10,clarity:0-10,continuity:0-10,agency:0-10,consequences:0-10},issues:[specific actionable faults],recommendation:'revise'|'review'}. Challenge boilerplate, weak NPC motivation, overexplanation and broken story logic; never mark human approval."},
+  {role:"user",content:JSON.stringify({game:GAME,storylet:story,brief:draft.report?.brief})}
+ ],model);
+ draft.report??={};
+ draft.report.iterations??=[];
+ draft.report.iterations.push({round:"human-edited-rereview",mechanical:check,editor:assessment});
+ draft.report.finalChecksum=checksum(story);
+ save(p,draft);
+ console.log("Reviewed "+story.id+" with Groq; open the QA report and seek human sign-off.");
+}
+
 function approve(){
  const draft=json(draftPath()),s=draft.storylet,result=validate(s);
+ if(checksum(s)!==draft.report?.finalChecksum)die("Story changed since its AI review. Run review --id before approval.");
  if(!result.ok)die("Mechanical checks failed: "+result.errors.join("; "));
  const scores=draft.report?.iterations?.at(-1)?.editor?.scores||{};
  const keys=["voice","originality","clarity","continuity","agency","consequences"];
@@ -235,10 +261,12 @@ function publish(){
  if(flag("check")){if(!fs.existsSync(full)||fs.readFileSync(full,"utf8")!==code)die("Approved bundle stale: run publish");console.log("Bundle current ("+entries.length+" approved): "+target)}
  else{fs.writeFileSync(full,code);console.log("Compiled "+entries.length+" HUMAN-APPROVED storylets into "+target+"; run full tests before commit");}
 }
-function help(){console.log("Storylet Foundry for "+GAME+"\nGROQ_API_KEY=... node tools/storylet-generator.mjs generate --id original_id --location PLACE --brief 'story beats' [--kind story|card]\nnode tools/storylet-generator.mjs validate --id original_id\nnode tools/storylet-generator.mjs approve --id original_id --reviewer 'Editor' --notes 'I checked every choice and its consequences carefully.' --confirm\nnode tools/storylet-generator.mjs publish [--check]\nnode tools/storylet-generator.mjs locations\nEditorial context: bible + style + proposed secrets ledger are loaded for Groq calls by default. Use --omit-secrets only to withhold the ledger; continuity review then remains incomplete.\nKey never goes in repo or browser; nothing is published without human approval.");}
+function help(){console.log("Storylet Foundry for "+GAME+"\nGROQ_API_KEY=... node tools/storylet-generator.mjs generate --id original_id --location PLACE --brief 'story beats' [--kind story|card]\nnode tools/storylet-generator.mjs validate --id original_id\nnode tools/storylet-generator.mjs review --id original_id
+node tools/storylet-generator.mjs approve --id original_id --reviewer 'Editor' --notes 'I checked every choice and its consequences carefully.' --confirm\nnode tools/storylet-generator.mjs publish [--check]\nnode tools/storylet-generator.mjs locations\nEditorial context: bible + style + proposed secrets ledger are loaded for Groq calls by default. Use --omit-secrets only to withhold the ledger; continuity review then remains incomplete.\nKey never goes in repo or browser; nothing is published without human approval.");}
 export async function main(){
  if(command==="generate")await generate();
  else if(command==="validate")validateCmd();
+ else if(command==="review")await review();
  else if(command==="approve")approve();
  else if(command==="publish")publish();
  else if(command==="locations")console.log(context().locations.join("\n"));
