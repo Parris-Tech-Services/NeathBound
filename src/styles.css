@@ -1371,3 +1371,5 @@ button, select { font: inherit; }
 .city-banner{background:linear-gradient(0deg,#07141655,#07141610),url("../assets/art/neath-hero.webp") center/cover}
 .city-banner > div{display:none}
 .city-banner::after{background:linear-gradient(0deg,#101b1e55,transparent 50%)}
+
+.story-back{margin:0 18px 18px;padding:10px 14px;min-height:44px;background:#f3e7cf;color:#30291e;border:1px solid #746342;border-radius:4px;font:700 .85rem system-ui;cursor:pointer}.story-back:focus-visible{outline:3px solid #315d68;outline-offset:3px}

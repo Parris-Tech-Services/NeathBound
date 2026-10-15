@@ -367,3 +367,22 @@ test("accessibility audit (axe-core)", async (t) => {
 function escapeRegExp(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
+
+
+test("browsing and backing out are free, and bookmarking preserves the open story", async () => {
+ const {context,page,problems}=await openGame({completeTutorial:true});
+ const preview=page.locator('.storylet-disclosure').last();
+ const id=await preview.getAttribute('data-storylet-id');
+ const story=page.locator('details[data-storylet-id="'+id+'"]');
+ if(!await story.evaluate(el=>el.open))await story.locator('summary').click();
+ const before=await readSave(page);
+ await story.locator('[data-action="close-story"]').click();
+ assert.equal(await story.evaluate(el=>el.open),false);
+ assert.equal(await readSave(page).then(s=>s.actions),before.actions,"backing out spends no action");
+ assert.equal(await story.locator('summary').evaluate(el=>el===document.activeElement),true);
+ await story.locator('summary').click();
+ await story.locator('[data-action="bookmark"]').click();
+ await page.locator('details[data-storylet-id="'+id+'"][open]').waitFor();
+ assert.equal(await readSave(page).then(s=>s.actions),before.actions,"bookmarking is free");
+ assert.deepEqual(problems,[]);await context.close();
+});
