@@ -113,7 +113,8 @@
             "quality",
             "item",
             "flag",
-            "menace"
+            "menace",
+            "quirk"
           ]
         },
         "id": {
@@ -152,7 +153,8 @@
             "unlock-location",
             "location",
             "living-story",
-            "equip-treasure"
+            "equip-treasure",
+            "quirk"
           ]
         },
         "id": {
@@ -165,6 +167,12 @@
         "delay_hours": {
           "type": "number",
           "minimum": 0
+        },
+        "title": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
         }
       },
       "additionalProperties": true
