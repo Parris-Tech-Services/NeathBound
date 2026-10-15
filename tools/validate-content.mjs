@@ -1,6 +1,6 @@
-import { locations, stories } from "../src/game/content.js";
+import { locations, stories, cards, decks, items, equipmentSlots, ambitions, destinies } from "../src/game/content.js";
 
-const effectTypes = new Set(["quality", "set-quality", "obols", "item", "flag", "location", "menace", "unlock-location", "momentum", "global-flag", "acquaintance", "set-time-flag"]);
+const effectTypes = new Set(["quality", "set-quality", "obols", "item", "flag", "location", "menace", "unlock-location", "momentum", "global-flag", "acquaintance", "set-time-flag", "quirk", "living-story", "progress", "ambition", "ambition-progress", "destiny", "equip-treasure"]);
 const requirementTypes = new Set(["quality", "item", "flag", "obols", "location", "world-quality", "menace", "time-since-flag"]);
 const errors = [];
 function requirements(value) {
@@ -27,6 +27,8 @@ for (const [storyId, story] of Object.entries(stories)) {
     if (!requirementTypes.has(requirement.type)) errors.push(`Story ${storyId} has unknown requirement type ${requirement.type}`);
   }
 
+  if(story.ambition_id&&!ambitions[story.ambition_id])errors.push("Unknown ambition in "+storyId);
+  if(story.pattern&&!["chain","pyramid","decoupled"].includes(story.pattern))errors.push("Unknown pattern in "+storyId);
   const choiceIds = new Set();
   for (const choice of story.choices ?? []) {
     if (choiceIds.has(choice.id)) errors.push(`Story ${storyId} repeats choice id ${choice.id}`);
@@ -38,6 +40,8 @@ for (const [storyId, story] of Object.entries(stories)) {
 
     for (const effect of [...(choice.successEffects ?? []), ...(choice.failureEffects ?? [])]) {
       if (!effectTypes.has(effect.type)) errors.push(`Choice ${storyId}/${choice.id} has unknown effect type ${effect.type}`);
+      if ((effect.type==="item"||effect.type==="equip-treasure")&&!items[effect.id])errors.push(`Unknown item ${effect.id} in ${storyId}`);
+      if (effect.type==="destiny"&&!destinies[effect.id])errors.push(`Unknown destiny ${effect.id} in ${storyId}`);
       if ((effect.type === "location" || effect.type === "unlock-location") && !locations[effect.id]) {
         errors.push(`Choice ${storyId}/${choice.id} targets missing location ${effect.id}`);
       }
@@ -45,6 +49,13 @@ for (const [storyId, story] of Object.entries(stories)) {
   }
 }
 
+for(const [deckId,deck] of Object.entries(decks))for(const id of deck.cardIds){
+ if(!cards[id])errors.push(`Deck ${deckId} references missing card ${id}`);
+}
+for(const [cardId,card] of Object.entries(cards)){
+ if(!card.title||!card.choices?.length)errors.push(`Invalid card ${cardId}`);
+}
+if(new Set(equipmentSlots).size!==20)errors.push("All 20 named equipment slots must be unique");
 if (errors.length) {
   console.error(errors.join("\n"));
   process.exitCode = 1;
