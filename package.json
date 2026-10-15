@@ -10,7 +10,7 @@
     "smoke": "node tests/smoke.mjs",
     "api": "node server/index.mjs",
     "api:test": "node --test server/tests/*.test.mjs",
-    "validate:content": "node tools/build-gloomwing.mjs --check && node tools/build-catalogue.mjs --check && node tools/validate-content.mjs",
+    "validate:content": "node tools/build-gloomwing.mjs --check && node tools/build-catalogue.mjs --check && node tools/validate-content.mjs && npm run cms:check",
     "sync:engine": "node scripts/sync-engine.mjs",
     "release:check": "npm test && npm run api:test && npm run validate:content && npm run smoke && npm run storylets:check && npm run studio:validate",
     "test:e2e": "node --test tests/e2e/play.e2e.mjs",
@@ -22,6 +22,8 @@
     "storylets:publish": "node tools/storylet-generator.mjs publish",
     "storylets:check": "node tools/storylet-generator.mjs publish --check",
     "studio:validate": "node tools/narrative-studio/validate.mjs",
-    "studio:report": "node tools/narrative-studio/validate.mjs report"
+    "studio:report": "node tools/narrative-studio/validate.mjs report",
+    "cms:build": "node tools/cms/build.mjs",
+    "cms:check": "node tools/cms/build.mjs --check"
   }
 }
