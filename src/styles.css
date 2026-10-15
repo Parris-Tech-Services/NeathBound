@@ -1299,3 +1299,111 @@ button, select { font: inherit; }
 .city-banner{background:linear-gradient(0deg,#07141655,#07141610),url("../assets/art/neath-hero.webp") center/cover}
 .city-banner > div{display:none}
 .city-banner::after{background:linear-gradient(0deg,#101b1e55,transparent 50%)}
+
+
+/* Story-reading contrast and mobile legibility (Agent 7)
+   Original parchment art is retained; every colour below is an opaque
+   foreground/background pairing rather than low-opacity text. */
+.storylet .story-body { color: #211e1a; }
+.storylet .story-body h3 {
+  font-size: 1.24rem;
+  line-height: 1.28;
+  color: #211e1a;
+}
+.storylet .story-body > p:not(.story-role) {
+  font-size: .97rem;
+  line-height: 1.55;
+  color: #29251f;
+}
+/* The inherited pale teal (#9fcdcb) belonged to the DARK quest panel.
+   It was almost invisible on these LIGHT storylet cards. */
+.storylet .story-body > .story-role {
+  display: inline-block;
+  max-width: calc(100% - 35px);
+  margin: 1px 35px 9px 0;
+  padding: 5px 8px;
+  color: #173c39;
+  background: #dce5dc;
+  border-left: 3px solid #22676b;
+  border-radius: 2px;
+  font: 700 .83rem/1.4 Arial, sans-serif;
+  letter-spacing: .04em;
+}
+.storylet .choice-copy > strong {
+  font-size: 1.02rem;
+  line-height: 1.4;
+  color: #241f1b;
+}
+.storylet .challenge-line {
+  color: #34312c;
+  font-size: .88rem;
+  line-height: 1.4;
+}
+.storylet .challenge-line small {
+  color: #34312c;
+  font-size: .84rem;
+  line-height: 1.4;
+}
+.storylet .go-button {
+  min-height: 44px;
+  color: #fff;
+  background: linear-gradient(#22676b, #1d5659);
+  border-color: #123f42;
+  font: 700 .95rem/1.2 Arial, sans-serif;
+}
+.storylet .go-button:disabled {
+  opacity: 1;
+  background: #d7d2c6;
+  color: #453f36;
+  border-color: #80786b;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.storylet .choice-row.is-locked {
+  opacity: 1; /* Dim the disabled BUTTON, not the explanation of why. */
+}
+.storylet .go-button:focus-visible,
+.storylet .bookmark:focus-visible {
+  outline: 3px solid #955716;
+  outline-offset: 3px;
+}
+.storylet ::selection {
+  color: #fff;
+  background: #1d5659;
+}
+@media (max-width: 700px) {
+  /* Put art above prose: the old 64px side-column stole scarce line width. */
+  .storylet {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: 10px;
+  }
+  .storylet .story-art {
+    height: 100px;
+    min-height: 100px;
+    max-height: 100px;
+    margin-bottom: 11px;
+  }
+  .storylet .story-body { padding: 2px 3px 5px; }
+  .storylet .story-body h3 {
+    font-size: 1.34rem;
+    line-height: 1.28;
+  }
+  .storylet .story-body > p:not(.story-role) {
+    font-size: 1.04rem;
+    line-height: 1.6;
+  }
+  .storylet .story-body > .story-role {
+    font-size: .86rem;
+    letter-spacing: .03em;
+  }
+  .storylet .choice-copy > strong { font-size: 1.1rem; }
+  .storylet .challenge-line,
+  .storylet .challenge-line small { font-size: .94rem; }
+  .storylet .choice-row { padding: 13px 0 7px; }
+  .storylet .go-button {
+    min-height: 48px;
+    width: 100%;
+    font-size: 1rem;
+  }
+}
