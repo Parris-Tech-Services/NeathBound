@@ -19,6 +19,7 @@ export function chooseAmbition(state,id){
  if(next.ambition||!ambitions[id]||next.locationId==="the-lair")
    return {state:next,error:"Choose one ambition after leaving the opening chamber."};
  next.ambition=id;next.ambition_progress??={};next.ambition_progress[id]=0;
+ if(id==="gloomwing-hunt")next.qualities.gloomwing_hunt_progress=0;
  next.flags["qbn-ambition-chosen"]=true;bumpRevision(next);
  return {state:next};
 }
