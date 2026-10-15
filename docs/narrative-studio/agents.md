@@ -50,11 +50,9 @@ Each AI call receives *bible.md*, *secrets.md*, *style.md*, the relevant product
 
 **Inputs:** approved packet, bible, ledger, style guide, known story/item/quality IDs. **Output:** targeted draft or report with evidence and exact field paths. Record the result and reviewer in the packet before proceeding.
 
-## Role 9: Batch Writer
+## Role 9: Small-batch writer
 
-**System task:** Only after at least fifty individually reviewed storylets and reliable QA metrics: produce ten one-step links with three distinct stats, rare outcomes and one timed event, then individually validate every entry.
-
-**Inputs:** approved packet, bible, ledger, style guide, known story/item/quality IDs. **Output:** targeted draft or report with evidence and exact field paths. Record the result and reviewer in the packet before proceeding.
+Use [writer-prompt.md](writer-prompt.md) with a brief, actual schema and two or three explicitly selected exemplars. Produce **one to five pitches**, then stop for Josh's approval. Do not generate prose merely to meet a volume target. After approved structure and prose, use the separate-context [critic-prompt.md](critic-prompt.md). No self-grading or invented peer approvals. Each story still receives the existing independent mechanical/continuity checks and an explicit human editorial decision.
 
 ## Role 10: Economy Balancer
 

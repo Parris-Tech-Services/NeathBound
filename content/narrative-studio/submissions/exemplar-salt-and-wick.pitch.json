@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "game": "NeathBound",
+  "id": "draft-exemplar-salt-and-wick",
+  "stage": "pitch",
+  "title": "Salt and Wick",
+  "location": "duskwater",
+  "pitch": "A lamp-trimmer’s cottage contains an interrupted meal and a ledger dated beyond the present. With no dialogue, choose between preserving the evidence, taking useful tools, or accepting the abandoned hospitality; the future date and missing resident should recur at the Spire.",
+  "secret_ids": [],
+  "reveal_depth": 1,
+  "description": "[PROSE PENDING: user-supplied reference archived separately; no pitch approval recorded]",
+  "branches": [],
+  "qa": {
+    "content": "pending",
+    "design": "pending",
+    "mechanical": "pending",
+    "continuity": "pending"
+  },
+  "human_approved": false,
+  "runtime_integration": "pending",
+  "source": "User-supplied Gloomwing exemplar, 16 October 2026; reference prose is not ratified canon.",
+  "new_proposals": [
+    "Odile Vane",
+    "vane_ledger_future",
+    "ate_vanes_supper",
+    "vane_trimmers_key",
+    "vane_cottage_seen"
+  ],
+  "open_questions": [
+    "The supplied line about hands stopping shaking assumes the player’s state; revise only after pitch approval.",
+    "Confirm safe retry or exit for the trapped-door failure.",
+    "The future ledger is proposed evidence, not proof that the city consumes calendars."
+  ],
+  "approval": {
+    "pitch": "pending",
+    "structure": "pending"
+  },
+  "reference_file": "docs/narrative-studio/exemplars/gloomwing-user-references.md"
+}

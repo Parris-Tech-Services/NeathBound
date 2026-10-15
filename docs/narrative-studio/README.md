@@ -23,7 +23,7 @@ Keep the current `src/game/` engine, `tools/cms/` browser editor and `content/sc
 Keep the ledger current after every approved revelation, including liar/unreliable-narrator context. Once weekly: compare every recently changed storylet, report contradictions and tone drift, inspect plot locks and their critical paths. Reviewers must inspect evidence; a language model cannot prove the absence of contradictions.
 
 ## Phase 4 — controlled scale and monthly balance
-Run individual-review loops at least **fifty times** before allowing ten-at-once generation. Every batch story still receives independent QA and human sign-off. Monthly: table item sources/sinks/net flows, menace costs, currency inflation and inaccessible items, followed by change proposals only. No invisible live-economy changes.
+New writing uses batches of **one to five** pitches under the exemplar-led workflow. This supersedes the historical ten-at-once threshold; every story still receives independent QA and human sign-off. Monthly: table item sources/sinks/net flows, menace costs, currency inflation and inaccessible items, followed by change proposals only. No invisible live-economy changes.
 
 ## Commands and gates
 - `node tools/narrative-studio/validate.mjs` checks the editorial packets, 40 ledger IDs, stat whitelist, secret-depth references, required texts, branch counts and QA sign-off.
@@ -37,3 +37,7 @@ The [no-code QBN Studio editor](../../tools/cms/index.html) has dropdowns for br
 
 ## Grounded Groq context
 The [Storylet Foundry](../../tools/storylet-generator.mjs) now loads **this game's latest Project Bible, Style Guide and proposed 40-secret ledger** into the generator prompt and its separate reviewer. This reduces fresh-session amnesia; it does **not** make unratified lore true or remove the human approvals. You may use `--omit-secrets` when you do not want to send the spoiler ledger to the configured third-party API, but that draft must then receive a later human continuity review. No API key is sent to GitHub or stored in the repository.
+
+## Default small-batch prompts
+
+Use the [exemplar-led workflow](SMALL_BATCH_WORKFLOW.md), [writer prompt](writer-prompt.md) and [separate-context critic](critic-prompt.md) for new batches of no more than five. These add the user's lean editorial approach without replacing the existing CMS, approval flow or runtime validators.
