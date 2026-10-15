@@ -691,6 +691,8 @@ const STORY_ART = {
   "borrowed-face": ["◐", "silken mask", "#4b253f", "#c79bb7"],
   "red-thread": ["∞", "red thread", "#4d2227", "#c35c62"],
   "index-of-lost-things": ["▤", "remembering index", "#343128", "#b8aa7d"],
+  "archive-paper-trail": ["▤", "a missing registry page", "#34332d", "#b6a685"],
+  "a-name-sold": ["◑", "the masked broker", "#3b2a37", "#b58f9e"],
   "the-quiet-librarian": ["⌑", "silent librarian", "#29352f", "#9aa88f"],
   "tea-for-the-tide": ["♨", "tide tea", "#1e4148", "#c9b48a"],
   "market-gossip": ["◌", "whispering stalls", "#432d3e", "#b58b9f"],
