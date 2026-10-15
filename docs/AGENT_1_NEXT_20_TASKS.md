@@ -1,6 +1,6 @@
 # Agent 1 — next 20 QA, integration and release tasks
 
-**Status:** A1-01 complete (read-only baseline recorded); A1-02 to A1-20 remain unchecked. **Prepared:** 15 October 2026.  
+**Status:** A1-01 and A1-02 complete (read-only baseline and public asset checks recorded); A1-03 to A1-20 remain unchecked. **Prepared:** 15 October 2026.  
 **Role:** Agent 1, release coordinator for [NeathBound](https://github.com/Parris-Tech-Services/NeathBound) and [The Undercity](https://github.com/joshualparris/theUndercity).  
 **Parent task:** [NeathBound issue #40](https://github.com/Parris-Tech-Services/NeathBound/issues/40).  
 **Coordination:** [Seven-agent production plan](SEVEN_AGENT_PRODUCTION.md). Both repositories hold the same task register so agents can cross-reference it.
@@ -21,7 +21,7 @@
 
 **Safety/ownership:** None to saves; do not expose tokens, anonymous player IDs, or private data.
 
-### 02. [ ] Prove the live entrypoints load real game assets — A1-02 · BOTH
+### 02. [x] Prove the live entrypoints load real game assets — A1-02 · BOTH
 
 **Player value:** A successful GitHub commit is not proof the public game updated.
 
@@ -249,7 +249,7 @@
 
 **Safety/ownership:** Only Agent 1 approves production deployment; never roll back or mutate live saves merely to demonstrate a procedure.
 
-**Evidence for A1-01:** [Read-only baseline report](qa/BASELINE-2026-10-15.md). This marks only the documented snapshot as complete, not live smoke testing.\n\n## Release handoff template (mandatory on each task PR)
+**Evidence for A1-01:** [Read-only baseline report](qa/BASELINE-2026-10-15.md). **Evidence for A1-02:** [Live entrypoints and asset verification](qa/LIVE-ASSETS-2026-10-15.md), with outstanding third-party media failures and deployment drift recorded. These mark only the named milestone checks as complete, not full browser/save QA.\n\n## Release handoff template (mandatory on each task PR)
 
 ```text
 Task ID / game:
