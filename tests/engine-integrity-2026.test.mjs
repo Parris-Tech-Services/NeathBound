@@ -50,6 +50,7 @@ test("non-die checks cannot spend momentum on a fictitious dice total", () => {
   const original = choice.challenge;
   try {
     choice.challenge = { ...original, mode: "broad" };
+    s.qualities[choice.challenge.quality] = 0; // Guaranteed failure tests momentum eligibility, not odds.
     const outcome = resolveChoice(s, "tea-for-the-tide", "drink", () => 0.99);
     assert.equal(outcome.success, false);
     assert.equal(outcome.state.momentum, 2);

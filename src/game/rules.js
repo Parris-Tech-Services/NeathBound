@@ -39,7 +39,7 @@ export function requirementMet(state, requirement, context = {}) {
 }
 
 export function requirementsMet(state, requirements = [], context = {}) {
-  return requirements.every((requirement) => requirementMet(state, requirement, context));
+  return (requirements ?? []).every((requirement) => requirementMet(state, requirement, context));
 }
 
 export function applyEffect(state, effect) {
