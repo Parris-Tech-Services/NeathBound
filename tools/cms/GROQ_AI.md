@@ -40,7 +40,7 @@ The editor requires a narrative **Pitch (beat, mechanics, scope and stakes)** be
 
 The pitch is now a regular, visible QA issue. **Autofill & Fix All** or **Fix schema issues offline** can derive a grounded first pitch from an already-authored scene, choices and setbacks. Groq can further polish this pitch when connected. If the story has no meaningful scene content yet, the editor preserves the empty field and reports it rather than inventing a premise.
 
-The **Advance stage** button now explains what field is missing and how to fix it. Pitch advancement is not an AI peer review or a human sign-off for publishing.
+The **Advance stage** button also builds the missing first-draft pitch from a sufficiently complete existing scene when clicked, and advances to Structure in the same step. If the draft has no meaningful source scene yet, it explains what field is missing instead. Pitch advancement is not AI peer review or a human sign-off for publishing.
 
 ## One-click autofill and repair
 
