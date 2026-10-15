@@ -92,7 +92,7 @@ export function repairDraft(input,ctx,{ensureProgress=true}={}){
  // Construct a grounded first draft from the user's existing scene and choices.
  // Do not fabricate a premise when the original contains no useful story content.
  if(!text(s.pitch)&&text(s.description).length>=40){
-  const premise=text(s.description).replace(/\\s+/g," ").slice(0,400);
+  const premise=text(s.description).replace(/\s+/g," ").slice(0,400);
   const approaches=s.choices.map(c=>text(c.label)).filter(Boolean).slice(0,3);
   const setbacks=s.choices.map(c=>text(c.failure?.text)).filter(Boolean).slice(0,2);
   s.pitch="Premise: "+premise+
