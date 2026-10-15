@@ -683,6 +683,17 @@ function locationArtMarkup(locationId) {
 }
 
 const STORY_ART = {
+  "quay-roads": ["⚓", "three roads from the quay", "#20343b", "#a7a173"],
+  "ashrail-cancelled-platform": ["⌛", "the cancelled platform", "#333036", "#a69a83"],
+  "ashrail-last-train": ["🚂", "midnight freight train", "#262a30", "#a99472"],
+  "ashrail-ticket-office": ["✉", "a ticket for nowhere", "#363431", "#aca087"],
+  "cinder-communal-stove": ["♨", "supper in cinder ward", "#3f2e29", "#b89976"],
+  "cinder-choir": ["♫", "choir of missing names", "#3e2d32", "#a98c9c"],
+  "cinder-blue-door": ["▣", "the blue door", "#213947", "#83a5ad"],
+  "registry-counter": ["▤", "the corrections counter", "#34313c", "#a7a3a0"],
+  "registry-thirteenth-correction": ["◷", "the thirteenth hour", "#302e42", "#ad9cad"],
+  "registry-last-decision": ["⚖", "whose names survive", "#36302c", "#bbb09c"],
+  "registry-afterword": ["✒", "the clerk's last note", "#292e34", "#a1a69f"],
   "lair-escape": ["⚿", "the sealed iron door", "#171b1d", "#6f6049"],
   "lair-inspect-door": ["⌘", "rusted hinges and old scratches", "#202427", "#867154"],
   "lair-listen": ["◖", "a black tunnel beyond the wall", "#11171b", "#52626a"],
@@ -743,6 +754,9 @@ const STORY_ART = {
 };
 
 const LOCATION_ART = {
+  "ashrail-station": ["⌛","⚙","Ashrail Station","#252d32","#a18b70"],
+  "cinder-ward": ["♨","♫","Cinder Ward","#3c2d2b","#ae8778"],
+  "registry-of-hours": ["◷","▤","Registry of Hours","#2c3242","#9ca3ab"],
   "the-lair": ["▣", "⚿", "The Lair", "#14191c", "#75664e"],
   "lantern-quay": ["⚓", "♢", "Lantern Quay", "#143740", "#6d8f91"],
   "velvet-market": ["◐", "✦", "Velvet Market", "#47293f", "#9d6f8f"],
