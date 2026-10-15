@@ -1,4 +1,4 @@
-import { locations, menaceAreas, stories, decks, cards, refuges, equipmentSlots, items } from "./content.js?v=20261015-03";
+import { locations, menaceAreas, stories, decks, cards, refuges, equipmentSlots, items, ambitions, festivals, destinies } from "./content.js?v=20261015-04";
 import { drawCardToHand, discardCard as removeCardFromHand } from "./decks.js?v=20261015-03";
 import { cloneState, initialState } from "./state.js?v=20261015-03";
 import { applyEffects, awardProgress, describeChallenge, requirementsMet, resolveChallenge } from "./rules.js?v=20261015-03";
@@ -7,6 +7,40 @@ import { effectiveStat } from "./rules.js?v=20261015-03";
 export { describeChallenge, effectiveStat };
 
 export const MENACE_WARNING_LEVEL = 5;
+export const menace_penalty_locations=menaceAreas;
+export function festivalActive(festival,now=new Date()){
+ if(!festival)return false;
+ const current=(now.getMonth()+1)*100+now.getDate();
+ const start=festival.start[0]*100+festival.start[1],end=festival.end[0]*100+festival.end[1];
+ return start<=end?(current>=start&&current<=end):(current>=start||current<=end);
+}
+export function chooseAmbition(state,id){
+ const next=cloneState(state);
+ if(next.ambition||!ambitions[id]||next.locationId==="the-lair")
+   return {state:next,error:"Choose one ambition after leaving the opening chamber."};
+ next.ambition=id;next.ambition_progress??={};next.ambition_progress[id]=0;
+ next.flags["qbn-ambition-chosen"]=true;bumpRevision(next);
+ return {state:next};
+}
+export function chooseDestiny(state,id,now=new Date()){
+ const next=cloneState(state);
+ if(next.destinies?.length||!destinies[id]||destinies[id].fate_locked||!Object.values(festivals).some(f=>festivalActive(f,now)))
+   return {state:next,error:"This destiny is unavailable outside a festival, or one was already chosen."};
+ next.destinies=[id];next.flags["destiny-chosen"]=true;next.destiny_bonus={...destinies[id].stat_bonus};
+ bumpRevision(next);return {state:next};
+}
+export function tickLivingStories(state,now=Date.now()){
+ const next=cloneState(state);
+ let fired=0;next.messages??=[];next.living_stories??=[];
+ for(const event of next.living_stories){
+   if(event.fired||now<Number(event.trigger_time)+Number(event.delay_hours)*3600000)continue;
+   event.fired=true;fired++;
+   next.messages.unshift({id:event.storylet_id,at:new Date(now).toISOString(),title:"A delayed letter arrives",
+      text:"The city has answered your earlier decision: "+event.storylet_id});
+ }
+ if(fired)bumpRevision(next);
+ return {state:next,fired};
+}
 export const MENACE_CONSEQUENCE_LEVEL = 8;
 
 function bumpRevision(state) {
@@ -41,7 +75,7 @@ export function effectiveChallenge(story, choice) {
 // While in a menace consequence area the only way out is its storylets.
 export function travelBlockedReason(state) {
   const here = locations[state.locationId];
-  return here?.consequenceOf ? `You cannot simply leave ${here.name}. Find a way out through its stories.` : null;
+  return here?.consequenceOf && Number(state.menaces?.[here.consequenceOf] ?? 0) >= MENACE_CONSEQUENCE_LEVEL ? `You cannot leave ${here.name} until ${here.consequenceOf} is below 8.` : null;
 }
 
 export function storyAvailable(state, storyId, context = {}) {
@@ -49,6 +83,8 @@ export function storyAvailable(state, storyId, context = {}) {
   if (!story) return false;
   if (!currentLocation(state).stories.includes(storyId) && !state.hand?.includes(storyId)) return false;
   if (story.once && state.flags[`story-complete:${storyId}`]) return false;
+  if(story.ambition_id && (state.ambition!==story.ambition_id || Number(state.ambition_progress?.[story.ambition_id]??0)!==Number(story.requires_progress?.value??0)))return false;
+  if(story.festival_id && !festivalActive(festivals[story.festival_id]))return false;
   return requirementsMet(state, requirementsFor(story), context);
 }
 
@@ -113,11 +149,12 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     check.success = success = true;
     usedMomentum = true;
   }
-  const resultText = success
-    ? choice.success
-    : (choice.failure ?? "The city refuses to explain itself.");
-
-  applyEffects(next, success ? (choice.successEffects ?? []) : (choice.failureEffects ?? []));
+  const rare=Boolean(success && (choice.rareSuccessEffects || choice.rare_success) &&
+    random()<Math.max(0,Math.min(1,Number(choice.rare_success_chance??0.04))));
+  const resultText=rare?(choice.rare_success??"An extraordinary success changes the outcome."):
+    success?choice.success:(choice.failure??"The city refuses to explain itself.");
+  // Only rare effects fire on a rare success (not ordinary success + rare).
+  applyEffects(next,rare?(choice.rareSuccessEffects??[]):success?(choice.successEffects??[]):(choice.failureEffects??[]));
 
   // Progress on success AND failure, by difficulty band (progress pyramid).
   const progress = challenge
@@ -132,6 +169,10 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     if (to >= MENACE_CONSEQUENCE_LEVEL && from < MENACE_CONSEQUENCE_LEVEL && locations[areaId]) {
       next.locationId = areaId;
       next.flags[`menace-consequence:${menace}`] = true;
+      next.flags[`qbn-arrived-${menace}`] = true;
+      if(menace==="suspicion")next.criminal_record=Math.min(7,Number(next.criminal_record??0)+1);
+      next.messages??=[];
+      next.messages.unshift({id:"arrival-"+menace,at:new Date().toISOString(),title:"Taken to "+locations[areaId].name,text:"Your "+menace+" reached 8. Recover before you can leave."});
       menaceNotes.push({ type: "menace-consequence", id: menace, message: `Your ${title(menace)} has reached ${to}. You have been taken to ${locations[areaId].name}.` });
     } else if (to >= MENACE_WARNING_LEVEL && from < MENACE_WARNING_LEVEL) {
       menaceNotes.push({ type: "menace-warning", id: menace, message: `Take care: your ${title(menace)} is ${to}. At ${MENACE_CONSEQUENCE_LEVEL} there will be consequences.` });
@@ -185,6 +226,7 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     title: story.title,
     result: resultText,
     success,
+    rare,
     roll: check.roll,
     total: check.total,
     challenge,
@@ -235,7 +277,7 @@ export function drawCard(state, deckId = "whispers", random = Math.random) {
   const next = cloneState(state);
   const deck = decks[deckId];
   if (!deck) return { state: next, error: "Deck not found." };
-  const maxHand = refuges[next.refuge ?? "camp-on-the-docks"]?.handSize ?? 3;
+  const maxHand = 6; // Fixed six-card ceiling
   if ((next.hand?.length ?? 0) >= maxHand) return { state: next, error: "Your hand is full." };
   
   const card = drawCardToHand(next, deck, cards, random);
