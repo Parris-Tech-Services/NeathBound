@@ -1,7 +1,7 @@
-import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20261015-08";
-import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions, ambitions, destinies } from "../game/content.js?v=20261015-08";
-import { CITY_ROUTES, getQuestGuide } from "./narrative-guide.js?v=20261015-08";
-import { loadPreferences } from "./preferences.js?v=20261015-08";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20261015-09";
+import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions, ambitions, destinies } from "../game/content.js?v=20261015-09";
+import { CITY_ROUTES, getQuestGuide } from "./narrative-guide.js?v=20261015-09";
+import { loadPreferences } from "./preferences.js?v=20261015-09";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
 
@@ -409,12 +409,12 @@ const inventoryHtml = inventory.length
           state.flags['tutorial.myself'] ? [
             '<section class="candle-block">',
               '<div class="candle"><span class="wick"></span><span class="wax-line w1"></span><span class="wax-line w2"></span><span class="wax-line w3"></span><span class="wax-line w4"></span></div>',
-              '<div class="action-copy"><strong>Actions</strong><div>∞</div><small>Unlimited</small></div>',
+              '<div class="action-copy"><strong>Actions</strong><div>',actionCount,' / ',actionCap,'</div><small>',nextActionIn===null?'Full':'Next in '+nextActionIn+' min','</small></div>',
             '</section>',
 
             '<section class="side-section">',
               '<div class="side-icon fate-icon">◇</div>',
-              '<div><strong>Fate</strong><div>0</div><small>No waiting or payment gates.</small></div>',
+              '<div><strong>Fate</strong><div>0</div><small>No payments or paid refills.</small></div>',
             '</section>',
 
             '<section class="side-section obols-section">',
@@ -627,14 +627,6 @@ possessionCardsHtml,
   app.querySelectorAll("[data-action=draw-card]").forEach((button) => {
     button.dataset.originallyDisabled = String(button.disabled);
     button.addEventListener("click", () => handlers.drawCard(button.dataset.deck));
-  });
-  app.querySelectorAll("[data-action=equip-item]").forEach((button) => {
-    button.dataset.originallyDisabled = String(button.disabled);
-    button.addEventListener("click", () => handlers.equipItem(button.dataset.slot, button.dataset.item));
-  });
-  app.querySelectorAll("[data-action=unequip-item]").forEach((button) => {
-    button.dataset.originallyDisabled = String(button.disabled);
-    button.addEventListener("click", () => handlers.equipItem(button.dataset.slot, null));
   });
   app.querySelectorAll("[data-action=equip-item]").forEach((button) => {
     button.dataset.originallyDisabled = String(button.disabled);
@@ -1070,7 +1062,12 @@ function requirementSummary(state, requirements) {
     else if (requirement.type === "obols" || requirement.type === "echoes") { actual = state.obols ?? state.echoes ?? 0; label = "Obols"; }
     else if (requirement.type === "flag") actual = state.flags?.[requirement.id] ?? false;
     else if (requirement.type === "location") { actual = state.locationId; label = "Location"; }
-    if (requirement.type === "flag") return `${label} must be ${expected ? "true" : "false"}`;
+    if (requirement.type === "time-since-flag") {
+      const elapsed=Date.now()-Number(state.flags?.[requirement.id]??0);
+      const remaining=Math.max(0,Math.ceil((Number(expected)-elapsed)/3600000));
+      return `${label}: ${remaining ? "available in "+remaining+" hours" : "ready"}`;
+    }
+    if (requirement.type === "flag") return `${label} must be ${op === "!=" ? "not " : ""}${String(expected)}`;
     if (requirement.type === "location") return `${label} must be ${formatName(expected)}`;
     return `${label} ${op} ${expected} (you have ${actual})`;
   }).join(" · ");
