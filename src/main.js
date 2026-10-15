@@ -29,6 +29,14 @@ async function draw(state) {
       if (pending) return;
       pending = true;
       setPending(true);
+      // Mobile players often activate a branch far below the top of the page.
+      // Give immediate, in-place feedback before any network request starts.
+      app.querySelectorAll("[data-choice]").forEach((button) => {
+        if (button.dataset.story === storyId && button.dataset.choice === choiceId) {
+          button.textContent = "RESOLVING…";
+          button.setAttribute("aria-busy", "true");
+        }
+      });
       const before = currentState;
 
       try {
@@ -41,13 +49,15 @@ async function draw(state) {
           lastOutcome = null;
           const fresh = outcome.state ?? await service.getState();
           await draw(fresh);
-          showNotice(`${outcome.error} The page has been refreshed to your current position.`);
+          showNotice(`${outcome.error} The page has been refreshed to your current position.`, { action: true });
           return;
         }
 
         lastOutcome = outcome;
         await draw(outcome.state ?? outcome);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        // The result is now a viewport-level dialog; never require scrolling
+        // back past the entire mobile story stack to discover what happened.
+        app.querySelector(".outcome-panel[role=dialog]")?.focus({ preventScroll: true });
       } catch (error) {
         await draw(currentState).catch(() => {});
         showError(error);
@@ -267,11 +277,11 @@ function setPending(isPending) {
   });
 }
 
-function showNotice(message) {
+function showNotice(message, { action = false } = {}) {
   app.querySelector(".runtime-notice")?.remove();
   const notice = document.createElement("p");
-  notice.className = "runtime-notice";
-  notice.setAttribute("role", "status");
+  notice.className = action ? "runtime-notice action-notice" : "runtime-notice";
+  notice.setAttribute("role", action ? "alert" : "status");
   notice.textContent = message;
   app.prepend(notice);
 }
