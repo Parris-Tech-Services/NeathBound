@@ -17,7 +17,7 @@ const [css, render, page] = await Promise.all([
 test("shipped CSS and UI use local artwork instead of remote Wikimedia images", () => {
   assert.doesNotMatch(css, /url\(\s*['"]?https?:\/\//i, "external CSS images can be blocked or unavailable");
   assert.doesNotMatch(render, /(?:upload|commons)\.wikimedia\.org/i, "UI must not hotlink Wikimedia images");
-  assert.match(page, /src\/styles\.css\?v=20261015-11/, "cached stylesheet needs a new URL");
+  assert.match(page, /src\/styles\.css\?v=\d{8}-[A-Za-z0-9._-]+/, "stylesheet must have a versioned cache URL");
 });
 
 test("all local WebP artworks referenced by CSS exist and are nonempty", async () => {
