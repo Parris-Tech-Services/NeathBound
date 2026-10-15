@@ -42,6 +42,19 @@ The pitch is now a regular, visible QA issue. **Autofill & Fix All** or **Fix sc
 
 The **Advance stage** button also builds the missing first-draft pitch from a sufficiently complete existing scene when clicked, and advances to Structure in the same step. If the draft has no meaningful source scene yet, it explains what field is missing instead. Pitch advancement is not AI peer review or a human sign-off for publishing.
 
+## Finish everything as a solo creator
+
+**Your former blocker:** Stage 08 (Peer review) used to demand the name of a different human reviewer even after Autofill reported zero issues.
+
+You now have two routes, both supported in the Undercity and NeathBound CMS:
+
+- **Autofill & advance all stages (solo)** in the Groq panel: repairs structural issues, uses Groq to finish the story when an access code works, runs validation, then asks **one explicit confirmation** to mark the story as creator-approved. Without a Groq connection, the button still does safe local repairs and can approve a draft that already passes QA.
+- **Advance stage** at 08 (Peer review), or **Approve as solo creator** immediately beside it: once validation passes, you can finish without a peer reviewer. You explicitly confirm that this is creator approval, not an independent human review.
+
+The approved JSON includes `review_mode: "solo-creator"` and a `creator_approval` record showing the date, schema validation and whether Groq provided content assistance. All five human QA checkboxes stay **false**: the editor never fabricates an independent review. The strict content compiler accepts a creator-approved story only when these provenance fields and schema checks are valid.
+
+A creator-approved story is ready **to export and integrate**, not proof that a separate human played it or reviewed the narrative. Runtime integration still requires the game's normal build and playtesting checks.
+
 ## One-click autofill and repair
 
 The largest button in the editor is **✦ Autofill & Fix All**. It automatically:
