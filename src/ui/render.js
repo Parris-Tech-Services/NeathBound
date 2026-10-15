@@ -1,9 +1,9 @@
-import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20261015-play2";
-import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions, ambitions, destinies } from "../game/content.js?v=20261015-play2";
-import { CITY_ROUTES, getQuestGuide } from "./narrative-guide.js?v=20261015-play2";
-import { loadPreferences } from "./preferences.js?v=20261015-play2";
-import { cmsPublishedStories } from "../game/cms-published.js?v=20261015-play2";
-import { quirkTitle } from "../game/rules.js?v=20261015-play2";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20261016-reader1";
+import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions, ambitions, destinies } from "../game/content.js?v=20261016-reader1";
+import { CITY_ROUTES, getQuestGuide } from "./narrative-guide.js?v=20261016-reader1";
+import { loadPreferences } from "./preferences.js?v=20261016-reader1";
+import { cmsPublishedStories } from "../game/cms-published.js?v=20261016-reader1";
+import { quirkTitle } from "../game/rules.js?v=20261016-reader1";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
 
@@ -57,6 +57,7 @@ const ITEM_DETAILS = {
 };
 
 export function render(app, state, handlers, outcome = null) {
+  const previouslyOpen = app.querySelector(".storylet-disclosure[open]")?.dataset?.storyletId;
   const location = currentLocation(state);
   const quest = getQuestGuide(state);
   const stories = availableStories(state);
@@ -165,7 +166,7 @@ export function render(app, state, handlers, outcome = null) {
   // not an endless list of every available branch and locked requirement.
   // Native <details> preserves keyboard operation even without JavaScript.
   const currentAmbition = stories.find((story) => state.ambition && story.ambition_id === state.ambition);
-  const primaryId = questHere ? quest.storyId : (currentAmbition?.id ?? stories[0]?.id);
+  const primaryId = stories.some(story => story.id === previouslyOpen) ? previouslyOpen : (questHere ? quest.storyId : (currentAmbition?.id ?? stories[0]?.id));
   const makePreview = (story, open = false, isCard = false) => {
     const availableCount = availableChoices(state, story.id).length;
     const preview = (story.text ?? "").replace(/\s+/g, " ").trim();
@@ -182,6 +183,7 @@ export function render(app, state, handlers, outcome = null) {
           '<span class="storylet-headline-indicator" aria-hidden="true">', open ? '−' : '+', '</span>',
         '</summary>',
         renderStory(story, isCard),
+        '<button type="button" class="story-back" data-action="close-story">← Back to stories · Free</button>',
       '</details>'
     ].join("");
   };
@@ -679,6 +681,7 @@ possessionCardsHtml,
   // browsers; this also supports older browsers without that feature.
   app.querySelectorAll(".storylet-disclosure").forEach((section) => {
     section.addEventListener("toggle", () => {
+      section.querySelector(".storylet-headline-indicator").textContent = section.open ? "−" : "+";
       if (!section.open) return;
       app.querySelectorAll(".storylet-disclosure").forEach((other) => {
         if (other !== section && other.open) other.open = false;
@@ -688,6 +691,14 @@ possessionCardsHtml,
     section.querySelector("summary")?.addEventListener("click", () => {
       if (section.open) section.querySelector(".storylet-headline-indicator").textContent = "+";
       else section.querySelector(".storylet-headline-indicator").textContent = "−";
+    });
+  });
+  app.querySelectorAll('[data-action="close-story"]').forEach(button => {
+    button.addEventListener("click", () => {
+      const section = button.closest("details");
+      section.open = false;
+      section.querySelector(".storylet-headline-indicator").textContent = "+";
+      section.querySelector("summary")?.focus();
     });
   });
   app.querySelectorAll("[data-choice]").forEach((button) => {
