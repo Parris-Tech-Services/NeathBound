@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "document": "docs/MASTER_SYSTEMS_SPEC.md",
+  "game": "neathbound",
+  "repository": "Parris-Tech-Services/NeathBound",
+  "reviewed_at": "2026-10-16",
+  "status": "audited source, proposed future work",
+  "source_head_note": "Inspect current main before implementation; this audit is not a commit pin",
+  "primary_stats": [
+    "nerve",
+    "insight",
+    "poise",
+    "shadow"
+  ],
+  "menaces": [
+    "suspicion",
+    "dread",
+    "wounds",
+    "scandal"
+  ],
+  "currency": "obols",
+  "canonical_paths": [
+    "gloomwing-hunt",
+    "missing-name",
+    "last-light",
+    "river-debt",
+    "stolen-hour"
+  ],
+  "unresolved_decisions": [
+    "D-01",
+    "D-02",
+    "D-03",
+    "D-04",
+    "D-05",
+    "D-10"
+  ],
+  "parts": [
+    {
+      "id": "I",
+      "title": "CP pyramid",
+      "phase": "already implemented baseline",
+      "source": "src/game/rules.js; tests/qbn-math.test.mjs",
+      "gap": "Finite input/cap and old-save CP canonicalization acceptance"
+    },
+    {
+      "id": "II",
+      "title": "Challenges",
+      "phase": "implemented, conflicting profiles",
+      "source": "src/game/rules.js",
+      "gap": "Resolve D-01 equal-stat override; narrow/rare rules; seeded cross-game parity"
+    },
+    {
+      "id": "III",
+      "title": "14 qualities",
+      "phase": "registry implemented; migration incomplete",
+      "source": "src/game/rules.js; src/game/state.js",
+      "gap": "Typed canonical save migration and single authoritative quality effect applier"
+    },
+    {
+      "id": "IV",
+      "title": "Quirk opposition",
+      "phase": "implemented baseline",
+      "source": "src/game/rules.js; tests/quirk-living.test.mjs",
+      "gap": "Game-specific ID/title audit, migration and multi-opposite edge tests"
+    },
+    {
+      "id": "V",
+      "title": "Opportunity deck",
+      "phase": "implemented baseline with different weights",
+      "source": "src/game/decks.js; tests/decks.test.mjs",
+      "gap": "Proposed frequency constants require conversion analysis, paused timer checks"
+    },
+    {
+      "id": "VI",
+      "title": "Menace hubs",
+      "phase": "implemented baseline",
+      "source": "src/game/engine.js; src/game/content.js",
+      "gap": "Double-menace priority, idempotent arrival, full recovery choice playtest"
+    },
+    {
+      "id": "VII",
+      "title": "Living Stories",
+      "phase": "baseline timers/messages",
+      "source": "src/game/engine.js; src/game/state.js",
+      "gap": "Original 24h renewal not yet approved; exactly-once replay and multi-device timestamp tests"
+    },
+    {
+      "id": "VIII",
+      "title": "Professions",
+      "phase": "partial/full tier definitions; depth/balance partial",
+      "source": "src/game/content.js; src/game/expansion.js",
+      "gap": "Check all 4 tiers, item bonuses, 2–3 unique activities, wages and long-term balance"
+    },
+    {
+      "id": "IX",
+      "title": "Ambitions",
+      "phase": "numerical chapter targets achieved",
+      "source": "src/game/qbn-expansion.js; src/game/gloomwing-content.js",
+      "gap": "Ten-chapter deep narrative audit, callbacks, unique treasures, D-02 optional new Vows"
+    },
+    {
+      "id": "X",
+      "title": "Authoring pipeline",
+      "phase": "working CMS and validators; full migration incomplete",
+      "source": "src/types/storylet.ts; scripts/validate.mjs; tools/cms/",
+      "gap": "Full registry tracker JSON, complete cross-reference migration, controlled approvals"
+    }
+  ]
+}
