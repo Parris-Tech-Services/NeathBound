@@ -9,6 +9,8 @@ not from any protected setting, names, writing, art, or code.
 
 **Playtest the game:** https://parris-tech-services.github.io/NeathBound/?api=local
 
+**New ambition:** Once you leave the opening chamber, visit Lantern Quay and choose **The Hunt for the Gloomwing**. The 30-chapter arc moves through Duskwater, the Black Spire and the Bureau. It branches into three permanent Treasure-slot endings. The 24-hour Paper Court letter is delivered through the Messages screen.
+
 The link above intentionally uses a browser-only local save, useful for private
 playtesting even when an online backend is unavailable. Normal site entry
 (without `?api=local`) now attempts the Cloudflare Workers + D1 backend,
@@ -24,8 +26,7 @@ npm run dev
 
 Then open <http://localhost:4173>.
 
-Actions are deliberately unlimited. There are no energy timers, payment gates,
-or payments. Progress is saved to an anonymous online account, or locally in
+Actions use a 10-action starting pool and regenerate at one action per ten minutes. There are no payments or purchase gates. Progress is saved to an anonymous online account, or locally in
 the browser when the backend is unreachable (or with `?api=local`).
 
 ## Backend
@@ -96,4 +97,4 @@ MIT. All game writing and code in this repository are original contributions.
 
 There are nine ordinary map locations, including **Ashrail Station**, **Cinder Ward**, and the **Registry of Hours**. From Lantern Quay, the story **Three Roads Out of Lantern Quay** leads to the new districts; their routes remain on your map afterwards. Follow the on-screen **Your Journey** guide for the main mystery across Chapters One and Two, or explore independent encounters in any order. The new prologue supports all four attributes: Nerve, Insight, Poise, and Shadow. The Chapter Two finale has two distinct permanent outcomes in each saved life.
 
-The game intentionally has unlimited actions and no waiting or payment gates. Local saves are separate from any previous online account.
+The game currently starts with 10 actions, regenerating one every ten minutes; actions can be raised to a cap of 20. No paid action refills are offered. Local saves are separate from any previous online account.
