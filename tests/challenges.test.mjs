@@ -15,17 +15,17 @@ import { initialState as baseInitialState, normaliseState } from "../src/game/st
 const at = (qualities) => ({ qualities });
 
 test("classic challenges keep their original odds, now reported exactly", () => {
-  assert.equal(challengeChance(at({ nerve: 2 }), { quality: "nerve", difficulty: 5 }), 0.8);   // d10+2 >= 5
-  assert.equal(challengeChance(at({ nerve: 0 }), { quality: "nerve", difficulty: 12 }), 0);
-  assert.equal(challengeChance(at({ nerve: 9 }), { quality: "nerve", difficulty: 5 }), 1);
+  assert.equal(challengeChance(at({ nerve: 2 }), { quality: "nerve", difficulty: 5, mode: "classic" }), 0.8);   // d10+2 >= 5
+  assert.equal(challengeChance(at({ nerve: 0 }), { quality: "nerve", difficulty: 12, mode: "classic" }), 0);
+  assert.equal(challengeChance(at({ nerve: 9 }), { quality: "nerve", difficulty: 5, mode: "classic" }), 1);
 });
 
 test("broad, narrow and luck follow the Fallen London formulas", () => {
   assert.equal(challengeChance(at({ nerve: 50 }), { quality: "nerve", difficulty: 50, mode: "broad" }), 0.6);
   assert.equal(challengeChance(at({ nerve: 100 }), { quality: "nerve", difficulty: 50, mode: "broad" }), 1);
-  assert.equal(challengeChance(at({ nerve: 5 }), { quality: "nerve", difficulty: 5, mode: "narrow" }), 0.5);
-  assert.ok(Math.abs(challengeChance(at({ nerve: 7 }), { quality: "nerve", difficulty: 5, mode: "narrow" }) - 0.7) < 1e-9);
-  assert.equal(challengeChance(at({ nerve: 0 }), { quality: "nerve", difficulty: 9, mode: "narrow" }), 0.1);
+  assert.equal(challengeChance(at({ nerve: 5 }), { quality: "nerve", difficulty: 5, mode: "narrow", narrow:50 }), 0.5);
+  assert.ok(Math.abs(challengeChance(at({ nerve: 7 }), { quality: "nerve", difficulty: 5, mode: "narrow", narrow:70 }) - 0.7) < 1e-9);
+  assert.equal(challengeChance(at({ nerve: 0 }), { quality: "nerve", difficulty: 9, mode: "narrow", narrow:10 }), 0.1);
   assert.equal(challengeChance(at({}), { quality: "nerve", difficulty: 1, mode: "luck", chance: 0.3 }), 0.3);
 });
 
@@ -33,7 +33,7 @@ test("labels and progress rewards follow the bands", () => {
   assert.deepEqual([challengeBand(1).label, challengeBand(0.9).label, challengeBand(0.6).label, challengeBand(0.35).label, challengeBand(0.05).label],
     ["Straightforward", "Low-risk", "Chancy", "Tough", "Almost impossible"]);
   assert.deepEqual([challengeBand(0.35).success, challengeBand(0.35).failure], [4, 2]);
-  const info = describeChallenge(at({ nerve: 2 }), { quality: "nerve", difficulty: 5 });
+  const info = describeChallenge(at({ nerve: 2 }), { quality: "nerve", difficulty: 5, mode: "classic" });
   assert.equal(`${info.label} ${info.percent}`, "Very modest 80");
 });
 
@@ -53,7 +53,7 @@ test("a challenge pays progress on success and on failure", () => {
     assert.equal(result.label, "Very modest");
     assert.ok(result.changes.some((c) => c.type === "progress" && /Nerve is increasing/.test(c.message)));
   }
-  assert.equal(win.progress.points, 2);
+  assert.equal(win.progress.points, 1); // 80% or higher grants 1 CP
   assert.equal(lose.progress.points, 1);
 });
 
@@ -68,7 +68,7 @@ test("menace 5 warns; menace 8 sends you to its area, which you cannot travel ou
   const taken = play(7);                        // 7 -> 8
   assert.equal(taken.state.locationId, menaceAreas.suspicion);
   assert.ok(taken.changes.some((c) => c.type === "menace-consequence" && /The Holding Vaults/.test(c.message)));
-  assert.match(travelBlockedReason(taken.state), /cannot simply leave The Holding Vaults/);
+  assert.match(travelBlockedReason(taken.state), /cannot leave The Holding Vaults until suspicion is below 8/);
   assert.equal(travelBlockedReason(initialState()), null);
 });
 
