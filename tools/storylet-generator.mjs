@@ -78,6 +78,7 @@ export function validate(s,ctx=context()){
     if(e.type==="currency"&&!ctx.resources.includes(e.id))err(at+key+" unknown resource "+e.id);
     if(e.type==="item"&&!ctx.items.has(e.id))err(at+key+" unknown item "+e.id);
     if(e.type==="flag"&&!/^generated:[a-z0-9_-]+$/.test(e.id||""))err(at+key+" flag must begin generated:");
+    if(e.type==="flag"&&ctx.game==="undercity"&&e.set!==true)err(at+key+" Undercity flags can only be set true");
     if(e.type==="flag"?![true,false].includes(e.set):!Number.isInteger(e.delta))err(at+key+" invalid effect delta/set");
     if(e.type==="item"&&e.delta<0)err(at+key+" consumes item without proven prerequisite");
     if(e.type==="currency"&&Math.abs(e.delta)>20)warn(at+key+" high resource reward");
@@ -104,7 +105,7 @@ function effects(list){
    {type:"flag",id:e.id,value:e.set});
  const result={};
  for(const e of list){
-  if(e.type==="stat"){result.quality??={};result.quality[e.id]=(result.quality[e.id]||0)+e.delta}
+  if(e.type==="stat"){result.quirks??={};result.quirks[e.id]=(result.quirks[e.id]||0)+e.delta}
   else if(e.type==="item"){result.items??={};result.items[e.id]=(result.items[e.id]||0)+e.delta}
   else if(e.type==="flag")result.flag=e.id;
   else result[e.id]=(result[e.id]||0)+e.delta;
@@ -209,7 +210,7 @@ function publish(){
  const notice="// GENERATED FROM human-reviewed content/storylet-generator/approved/*.json. Do not edit.\n";
  if(GAME==="neathbound"){
   const stories=Object.fromEntries(entries.filter(x=>x.rarity==="story").map(x=>[x.id,x.story]));
-  const cards=Object.fromEntries(entries.filter(x=>x.rarity==="card").map(x=>[x.id,{id:x.id,...x.story}]));
+  const cards=Object.fromEntries(entries.filter(x=>x.rarity==="card").map(x=>[x.id,{id:x.id,...x.story,requirements:[{type:"location",id:"location",op:"==",value:x.location}]}]));
   const places=entries.filter(x=>x.rarity==="story").map(x=>({id:x.id,location:x.location}));
   code=notice+"export const approvedStories="+JSON.stringify(stories,null,2)+";\nexport const approvedCards="+JSON.stringify(cards,null,2)+";\nexport const approvedPlacements="+JSON.stringify(places,null,2)+";\n";
   target="src/game/approved-storylets.js";
