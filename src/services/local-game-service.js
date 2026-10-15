@@ -1,4 +1,4 @@
-import { resolveChoice, resetState, travelBlockedReason, drawCard, discard, setRefuge, equipItem } from "../game/engine.js?v=20261015-03";
+import { resolveChoice, resetState, travelBlockedReason, drawCard, discard, setRefuge, equipItem, tickLivingStories, chooseAmbition, chooseDestiny } from "../game/engine.js?v=20261015-04";
 import { loadState, saveState } from "../game/state.js?v=20261015-03";
 import { locations } from "../game/content.js?v=20261015-03";
 
@@ -9,7 +9,19 @@ export class LocalGameService {
   }
 
   async getState() {
+    const result=tickLivingStories(this.state);
+    if(result.fired){this.state=result.state;saveState(this.state,this.storage);}
     return this.state;
+  }
+  async chooseAmbition(id){
+    const result=chooseAmbition(this.state,id);
+    if(!result.error){this.state=result.state;saveState(this.state,this.storage);}
+    return result;
+  }
+  async chooseDestiny(id){
+    const result=chooseDestiny(this.state,id);
+    if(!result.error){this.state=result.state;saveState(this.state,this.storage);}
+    return result;
   }
 
   async choose(storyId, choiceId, { expectedRevision, useLesson } = {}) {
