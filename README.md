@@ -7,6 +7,10 @@ not from any protected setting, names, writing, art, or code.
 
 ## Play
 
+**Playtest the game:** https://parris-tech-services.github.io/NeathBound/?api=local
+
+This link uses your browser's local save. It works without an account or a running Supabase backend. Data is stored on the device and browser where you play, so clearing site data will erase the local save. The online Supabase project is currently inactive (restoring it is blocked by the two-active-free-project limit), so the linked local mode is the supported playtest route.
+
 ```bash
 npm test
 npm run dev
@@ -79,3 +83,9 @@ Canonical repository: https://github.com/Parris-Tech-Services/NeathBound
 ## License
 
 MIT. All game writing and code in this repository are original contributions.
+
+## Explore the expanded Undercity
+
+There are nine ordinary map locations, including **Ashrail Station**, **Cinder Ward**, and the **Registry of Hours**. From Lantern Quay, the story **Three Roads Out of Lantern Quay** leads to the new districts; their routes remain on your map afterwards. Follow the on-screen **Your Journey** guide for the main mystery across Chapters One and Two, or explore independent encounters in any order. The new prologue supports all four attributes: Nerve, Insight, Poise, and Shadow. The Chapter Two finale has two distinct permanent outcomes in each saved life.
+
+The game intentionally has unlimited actions and no waiting or payment gates. Local saves are separate from any previous online account.
