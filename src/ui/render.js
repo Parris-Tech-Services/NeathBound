@@ -171,7 +171,7 @@ export function render(app, state, handlers, outcome = null) {
     const preview = (story.text ?? "").replace(/\s+/g, " ").trim();
     return [
       '<details class="storylet-disclosure', open ? ' is-featured' : '', '" name="neathbound-story-focus" data-storylet-id="', escapeHtml(story.id), '"', open ? ' open' : '', '>',
-        '<summary class="storylet-headline" aria-label="', escapeHtml(story.title), ' — open or close story">',
+        '<summary class="storylet-headline">',
           '<span class="storylet-headline-glyph" aria-hidden="true">', storyArtMarkup(story.id, state.locationId), '</span>',
           '<span class="storylet-headline-copy">',
             '<strong>', escapeHtml(story.title), '</strong>',
