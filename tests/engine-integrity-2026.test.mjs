@@ -1,9 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { initialState } from "../src/game/state.js";
-import { items, stories } from "../src/game/content.js?v=20261015-02";
+import { items, stories } from "../src/game/content.js?v=20261015-03";
 import { drawCard, equipItem, discard, resolveChoice } from "../src/game/engine.js";
-import { LocalGameService } from "../src/services/local-game-service.js?v=20261015-02";
+import { LocalGameService } from "../src/services/local-game-service.js?v=20261015-03";
 import { createGameService } from "../src/services/index.js";
 
 function memory() {

@@ -145,7 +145,7 @@ export function challengeChance(state, challenge) {
   if (!challenge) return 1;
   const level = effectiveStat(state, challenge.quality);
   const difficulty = Math.max(1, Number(challenge.difficulty ?? 1));
-  switch (challenge.mode ?? "broad") {
+  switch (challenge.mode ?? "classic") {
     case "broad":
       return clamp(Math.floor(Number(challenge.scaler ?? 0.60) * level / difficulty * 100) / 100, 0.1, 1);
     case "narrow":
@@ -177,7 +177,7 @@ export function describeChallenge(state, challenge) {
   if (!challenge) return null;
   const chance = challengeChance(state, challenge);
   const band = challengeBand(chance);
-  return { ...challenge, mode: challenge.mode ?? "broad", chance, percent: band.percent, label: band.label };
+  return { ...challenge, mode: challenge.mode ?? "classic", chance, percent: band.percent, label: band.label };
 }
 
 export function resolveChallenge(state, challenge, random = Math.random) {
@@ -185,7 +185,7 @@ export function resolveChallenge(state, challenge, random = Math.random) {
   const chance = challengeChance(state, challenge);
   const band = challengeBand(chance);
   const quality = effectiveStat(state, challenge.quality);
-  if ((challenge.mode ?? "broad") === "classic") {
+  if ((challenge.mode ?? "classic") === "classic") {
     const die = Math.floor(random() * 10) + 1;
     const total = die + quality;
     return { success: total >= challenge.difficulty, roll: die, total, quality, chance, percent: band.percent, label: band.label, band };
