@@ -16,9 +16,11 @@ const ledger=JSON.parse(read("tools/cms/ledger.json"));
 async function getContext(){
  if(game==="neathbound"){
   const content=await import(pathToFileURL(path.join(root,"src/game/content.js")).href);
+  const previous=await import(pathToFileURL(path.join(root,"src/game/cms-published.js")).href);
+  const previouslyPublished=new Set(Object.keys(previous.cmsPublishedStories));
   return {game,stats:["nerve","insight","poise","shadow"],menaces:["dread","scandal","wounds","suspicion"],
    quirks:["austere","hedonist","daring","subtle","forceful","magnanimous","ruthless","steadfast","fickle","honest","devious"],
-   items:Object.keys(content.items),locations:Object.keys(content.locations),knownIds:Object.keys(content.stories),
+   items:Object.keys(content.items),locations:Object.keys(content.locations),knownIds:Object.keys(content.stories).filter(id=>!previouslyPublished.has(id)),
    forbidden:["Fallen London","Watchful","Shadowy","Dangerous","Persuasive"],secrets:ledger};
  }
  const c=vm.createContext({window:{},console});
