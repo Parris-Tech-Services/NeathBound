@@ -53,7 +53,7 @@ test("API exposes inherited challenge definitions instead of claiming no roll", 
   );
   const catalogue = response.body.find((story) => story.id === "catalogue-the-dark");
   const choice = catalogue.choices.find((candidate) => candidate.id === "catalogue");
-  assert.deepEqual(choice.challenge, { quality: "insight", difficulty: 7 });
+  assert.deepEqual(choice.challenge, { quality: "insight", difficulty: 7, mode: "classic" });
 });
 
 test("failing Catalogue the Dark never grants its success rewards", () => {
