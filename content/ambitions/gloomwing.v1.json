@@ -1288,7 +1288,7 @@
         "value": 9
       },
       "once": true,
-      "text": "The Gloomwing speaks without moving its beak. It says the bounty is a price placed on the last lock of the city.",
+      "text": "A Bureau bounty notice hangs beside an older invoice for maintaining the Spire's deepest lock. The Gloomwing has nailed them to the same door. \"One prices my death,\" it says, \"and one prices the lives beneath it. Which sum did they show you?\"",
       "requirements": [],
       "choices": [
         {
@@ -1301,8 +1301,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The creature proposes a bargain: discover who made the lock before deciding its fate. You set a fact down where another person may find it.",
-          "failure": "The evidence twists away before you can secure it. The hunt has not advanced; you can try another approach.",
+          "success": "You compare the seals. The same clerk signed both documents, but the older one calls the Gloomwing a custodian. It lets you copy the line. \"Evidence weighs less than trust. Carry that first.\"",
+          "failure": "You touch the invoice and the ink loosens, leaving the name unreadable. The Gloomwing draws it away. \"The Bureau sells certainty by the bottle.\" You need another way to prove its account.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -1349,7 +1349,8 @@
               "id": "gloomwing-rare-8",
               "value": true
             }
-          ]
+          ],
+          "rare_success": "Beneath the invoice you find a second impression sunk into the damp timber. The Gloomwing lets you take a rubbing. \"The office may deny the page,\" it says, \"but let us see them deny the nail.\""
         },
         {
           "id": "endure",
@@ -1361,8 +1362,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The creature proposes a bargain: discover who made the lock before deciding its fate. The cost is real, but you leave the chamber unbowed.",
-          "failure": "You endure the encounter, but not without a cost. The hunt has not advanced; you can try another approach.",
+          "success": "You set down your weapon and promise not to strike before hearing the lock's terms. The Gloomwing moves aside so you can examine a cracked retaining bolt. It grants access, not forgiveness.",
+          "failure": "You hesitate when asked who would carry the debt if the guardian died. Your hand returns to the weapon. \"Then we are not bargaining yet,\" the Gloomwing says, withdrawing the invoice.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -1393,8 +1394,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The creature proposes a bargain: discover who made the lock before deciding its fate. You gain a witness who will remember which way you chose.",
-          "failure": "Your proposal falls on ears still loyal to the Bureau. The hunt has not advanced; you can try another approach.",
+          "success": "You ask why the Bureau fears its survival. \"A surviving witness can present a bill,\" the Gloomwing replies, pointing to the names erased from the margin. \"Find out who crossed those out.\"",
+          "failure": "You repeat the Bureau's assurance of fair dealing. The Gloomwing turns the bounty notice around; your own name appears under expenses. \"They have priced you as well.\" It ends the conversation.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -2347,7 +2348,7 @@
         "value": 17
       },
       "once": true,
-      "text": "The sealed envelope now contains a name, a date, and one sentence written in a hand you recall from a dream.",
+      "text": "The Paper Court's promised day has passed. The sealed envelope now bears tomorrow's date and a signature from the Bureau's earliest accounts. Its witness identifies the founder as the Spire's first debtor, then supplies an address where the claim may be tested.",
       "requirements": [
         {
           "type": "flag",
@@ -2367,8 +2368,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The reply identifies the Bureau's founder as the first debtor to the Spire. You set a fact down where another person may find it.",
-          "failure": "The evidence twists away before you can secure it. The hunt has not advanced; you can try another approach.",
+          "success": "You place the reply beside the original commission. Both use the same misprinted crest; the debt was entered against the Bureau itself. The messenger asks you to quote the page, not the witness's name. You keep the returned letter as evidence.",
+          "failure": "Three dead clerks used that signature. You cannot yet tell which one wrote the reply. The messenger offers to wait. \"A claim is not evidence until someone can answer it.\"",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -2404,8 +2405,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The reply identifies the Bureau's founder as the first debtor to the Spire. The cost is real, but you leave the chamber unbowed.",
-          "failure": "You endure the encounter, but not without a cost. The hunt has not advanced; you can try another approach.",
+          "success": "You burn the forged duplicate while the real witness waits behind an iron screen. The smoke sends searching Bureau clerks down the wrong stair. \"You have protected a person,\" the messenger says, \"not settled the account.\"",
+          "failure": "The damp forgery smokes instead of burning and attracts the guard. You and the messenger stamp out the embers before the door opens. The original letter survives, but the ruse needs better timing.",
           "successEffects": [
             {
               "type": "ambition-progress",
@@ -2436,8 +2437,8 @@
             "mode": "broad",
             "rareChance": 0.04
           },
-          "success": "The reply identifies the Bureau's founder as the first debtor to the Spire. You gain a witness who will remember which way you chose.",
-          "failure": "Your proposal falls on ears still loyal to the Bureau. The hunt has not advanced; you can try another approach.",
+          "success": "You bring the letter to the last clerk willing to acknowledge the original accounts. They deny the seal until you recite the founder's first unpaid entry. \"I can confirm the ledger,\" they whisper. \"Keep my family out of the register.\"",
+          "failure": "The clerk sees the Paper Court seal and closes the hatch. A slip appears beneath the door: \"Return without an audience.\" The potential witness is not lost.",
           "successEffects": [
             {
               "type": "ambition-progress",
