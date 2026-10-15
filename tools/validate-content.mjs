@@ -59,7 +59,7 @@ for(const [cardId,card] of Object.entries(cards)){
 if(new Set(equipmentSlots).size!==20)errors.push("All 20 named equipment slots must be unique");
 
 /** Strict checks for the standalone Gloomwing narrative pack. */
-const gloomwing = Object.entries(stories).filter(([id]) => /^gloomwing_hunt_\\d{2}$/.test(id));
+const gloomwing = Object.entries(stories).filter(([id]) => /^gloomwing_hunt_[0-9]{2}$/.test(id));
 if (gloomwing.length !== 30) errors.push("Gloomwing must have exactly 30 authored chapters.");
 for (let n=0;n<30;n++){
   const id="gloomwing_hunt_"+String(n).padStart(2,"0");
