@@ -286,6 +286,10 @@ test("mobile Gloomwing chapter 3 GO visibly responds, and no-action attempts say
   const result = page.locator(".outcome-screen-overlay .outcome-panel[role=dialog]");
   await result.waitFor({ state: "visible" });
   assert.equal(await page.locator('[data-action="onwards"]').isVisible(), true);
+  await page.keyboard.press("Tab");
+  assert.equal(await page.locator('[data-action="onwards"]').evaluate(el => el === document.activeElement), true);
+  await page.keyboard.press("Shift+Tab");
+  assert.equal(await page.locator('[data-action="onwards"]').evaluate(el => el === document.activeElement), true, "reverse Tab cannot escape result dialog");
   const bounds = await result.boundingBox(), viewport = page.viewportSize();
   assert.ok(bounds.y < viewport.height && bounds.y + bounds.height > 0, "outcome must be in the mobile viewport");
   const saved = await readSave(page);
@@ -293,6 +297,7 @@ test("mobile Gloomwing chapter 3 GO visibly responds, and no-action attempts say
   assert.equal(saved.actions, 9);
   await page.locator('[data-action="onwards"]').click();
   assert.equal(await page.locator(".outcome-screen-overlay").count(), 0);
+  assert.equal(await page.locator('.main-storylet h3').evaluate(el => el === document.activeElement), true, "Onwards restores focus to the next main lead");
   assert.deepEqual(problems, []);
   await context.close();
 });
