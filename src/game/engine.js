@@ -1,9 +1,9 @@
 import { locations, menaceAreas, stories, decks, cards, refuges, equipmentSlots, items, ambitions, festivals, destinies } from "./content.js?v=20261015-04";
-import { drawCardToHand, discardCard as removeCardFromHand } from "./decks.js?v=20261015-04";
+import { drawCardToHand, discardCard as removeCardFromHand } from "./decks.js?v=20261015-05";
 import { cloneState, initialState } from "./state.js?v=20261015-04";
-import { applyEffects, awardProgress, cpAward, describeChallenge, requirementsMet, resolveChallenge } from "./rules.js?v=20261015-04";
+import { applyEffects, awardProgress, cpAward, describeChallenge, requirementsMet, resolveChallenge } from "./rules.js?v=20261015-05";
 
-import { effectiveStat } from "./rules.js?v=20261015-04";
+import { effectiveStat } from "./rules.js?v=20261015-05";
 export { describeChallenge, effectiveStat };
 
 export const MENACE_WARNING_LEVEL = 5;
