@@ -23,7 +23,9 @@ export function drawWeightedCard(state, deck, cards, random = Math.random, conte
   const eligible = eligibleCards(state, deck, cards, context);
   if (!eligible.length) return null;
   const urgent = eligible.filter(card => card.urgency === "high" || card.high_urgency);
-  const pool = urgent.length ? urgent : eligible;
+  // Urgent legal cards must draw even when authored with weight zero.
+  if (urgent.length) return urgent[Math.min(urgent.length - 1, Math.floor(random() * urgent.length))];
+  const pool = eligible;
   const totalWeight = pool.reduce((sum, card) => sum + cardWeight(card), 0);
   if (totalWeight <= 0) return null;
   let cursor = random() * totalWeight;
