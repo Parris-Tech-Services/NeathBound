@@ -362,6 +362,8 @@ const inventoryHtml = inventory.length
   const actionCount=Math.max(0,Number(state.actions??10));
   const actionCap=Math.max(10,Number(state.max_actions??10));
   const nextActionIn=actionCount>=actionCap?null:Math.max(0,Math.ceil((600000-(Date.now()-Number(state.last_action_tick??Date.now())))/60000));
+  const quirkHtml = Object.entries(state.quirks??{}).filter(([,level])=>Number(level)>0)
+    .map(([id,level])=>'<span class="character-chip"><strong>'+escapeHtml(formatName(id))+'</strong> · '+escapeHtml(quirkTitle(id,Number(level)))+' (Level '+Number(level)+')</span>').join("");
   const ambitionName=ambitions[state.ambition]?.name??"Not yet chosen";
   const ambitionStage=state.ambition_progress?.[state.ambition]??0;
   app.innerHTML = [
@@ -530,6 +532,8 @@ possessionCardsHtml,
               '<div class="myself-section-heading"><div><p class="myself-kicker">Capabilities</p><h3>Qualities</h3></div><p>What the city has learned you can do.</p></div>',
               '<div class="character-stat-grid">', qualityCardsHtml, '</div>',
             '</section>',
+
+            (quirkHtml ? '<section class="myself-section"><div class="myself-section-heading"><div><p class="myself-kicker">Character</p><h3>Quirks</h3></div><p>Your choices may strengthen one trait at the expense of its opposite.</p></div><div class="character-chips">'+quirkHtml+'</div></section>' : ''),
 
             (circlesHtml ? '<section class="myself-section"><div class="myself-section-heading"><div><p class="myself-kicker">Society</p><h3>Circles</h3></div><p>Standing and obligations.</p></div><div class="circles-grid">' + circlesHtml + '</div></section>' : ''),
 
