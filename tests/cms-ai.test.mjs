@@ -13,7 +13,7 @@ test("shared AI helper is a valid ES module with a protected gateway",async()=>{
  assert.match(source,/https:\/\/qbn-studio-ai\./);
  assert.match(source,/sessionStorage/);
  assert.match(source,/export AI-ready handoff|Export AI-ready handoff/);
- assert.match(source,/next\\.qa=\\{content:false/);
+ assert.ok(source.includes("next.qa={content:false"));
  assert.doesNotMatch(source,/gsk_[A-Za-z0-9]{12}/,"API keys must not be bundled");
 });
 test("gateway requires correct allowed origin and secret access header",async()=>{
