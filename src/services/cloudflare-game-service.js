@@ -1,6 +1,6 @@
 // Cloudflare Workers + D1 player save service. The private random session key
 // never goes in URLs; only its SHA-256 hash is stored by the backend.
-import { loadState, saveState } from "../game/state.js?v=20261015-06";
+import { loadState, saveState } from "../game/state.js?v=20261015-07";
 const SESSION_KEY="neathbound.cloudflare.session.v1";
 export class CloudflareGameService {
   mode="online";
