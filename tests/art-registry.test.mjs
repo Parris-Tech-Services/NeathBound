@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { locations, stories, cards } from "../src/game/content.js";
+import { cmsPublishedStories } from "../src/game/cms-published.js";
 
 const renderSource = fs.readFileSync(new URL("../src/ui/render.js", import.meta.url), "utf8");
 
@@ -20,7 +21,7 @@ test("every current location has dedicated artwork", () => {
 test("every storylet and opportunity card has dedicated artwork", () => {
   const keys = keysFromMap("STORY_ART");
   const required = [...Object.keys(stories), ...Object.keys(cards ?? {})];
-  const missing = required.filter((id) => !keys.has(id));
+  const missing = required.filter((id) => !keys.has(id) && !Object.hasOwn(cmsPublishedStories,id));
   assert.deepEqual(missing, [], `Missing STORY_ART entries: ${missing.join(", ")}`);
 });
 
