@@ -114,14 +114,14 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     usedMomentum = true;
   }
   const resultText = success
-    ? choice.success
+    ? (check.rare ? (choice.rareSuccess ?? choice.success) : choice.success)
     : (choice.failure ?? "The city refuses to explain itself.");
 
-  applyEffects(next, success ? (choice.successEffects ?? []) : (choice.failureEffects ?? []));
+  applyEffects(next, success ? (check.rare ? (choice.rareSuccessEffects ?? choice.successEffects ?? []) : (choice.successEffects ?? [])) : (choice.failureEffects ?? []));
 
   // Progress on success AND failure, by difficulty band (progress pyramid).
-  const progress = challenge
-    ? awardProgress(next, challenge.quality, success ? check.band.success : check.band.failure)
+  const progress = challenge?.quality
+    ? awardProgress(next, challenge.quality, check.cpAwarded)
     : null;
 
   // Menaces: a warning at 5; at 8 the player is taken to that menace's area.
@@ -173,7 +173,7 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     storyId,
     choiceId,
     title: story.title,
-    outcome: success ? "success" : "failure",
+    outcome: check.rare ? "rare_success" : (success ? "success" : "failure"),
     text: resultText,
     changes
   }, ...(next.events ?? [])].slice(0, 250);
@@ -185,6 +185,8 @@ export function resolveChoice(state, storyId, choiceId, random = Math.random, co
     title: story.title,
     result: resultText,
     success,
+    rare: Boolean(check.rare),
+    outcome: check.outcome,
     roll: check.roll,
     total: check.total,
     challenge,
