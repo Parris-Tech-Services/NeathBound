@@ -18,7 +18,7 @@ export function freshStory(ctx){
   qa:{content:false,design:false,mechanical:false,continuity:false,peer:false},history:[]};
 }
 export const freshEffect=(type="currency",id="",amount=1)=>({type,id,amount});
-export const freshRequirement=(type="quality",id="",op:">=",value:1)=>({type,id,op,value});
+export const freshRequirement=(type="quality",id="",op:">=",value=1)=>({type,id,op,value});
 const filled=x=>typeof x==="string"&&x.trim().length>0;
 export function audit(s,ctx,{strict=false,allowExisting=false}={}){
  const errors=[],warnings=[],fail=(path,message)=>errors.push({path,message}),warn=(path,message)=>warnings.push({path,message});
