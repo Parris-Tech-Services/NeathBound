@@ -3,6 +3,7 @@ import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories
 import { CITY_ROUTES, getQuestGuide } from "./narrative-guide.js?v=20261015-art1";
 import { loadPreferences } from "./preferences.js?v=20261015-art1";
 import { cmsPublishedStories } from "../game/cms-published.js?v=20261015-art1";
+import { quirkTitle } from "../game/rules.js?v=20261015-art1";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
 
