@@ -1,9 +1,9 @@
-import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20261016-reader1";
-import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions, ambitions, destinies } from "../game/content.js?v=20261016-reader1";
-import { CITY_ROUTES, getQuestGuide } from "./narrative-guide.js?v=20261016-reader1";
-import { loadPreferences } from "./preferences.js?v=20261016-reader1";
-import { cmsPublishedStories } from "../game/cms-published.js?v=20261016-reader1";
-import { quirkTitle } from "../game/rules.js?v=20261016-reader1";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20261016-gloomwing2";
+import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions, ambitions, destinies } from "../game/content.js?v=20261016-gloomwing2";
+import { CITY_ROUTES, getQuestGuide } from "./narrative-guide.js?v=20261016-gloomwing2";
+import { loadPreferences } from "./preferences.js?v=20261016-gloomwing2";
+import { cmsPublishedStories } from "../game/cms-published.js?v=20261016-gloomwing2";
+import { quirkTitle } from "../game/rules.js?v=20261016-gloomwing2";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
 
@@ -783,6 +783,11 @@ possessionCardsHtml,
 
 
 const STORY_IMAGE_ART = {
+  "gloomwing-claims-desk": "./assets/art/archive.webp",
+  "gloomwing-salt-and-wick": "./assets/art/waterway.webp",
+  "gloomwing-price-of-a-claim": "./assets/art/chamber.webp",
+  "gloomwing-lamp-cupboard": "./assets/art/neath-hero.webp",
+  "gloomwing-bureau-counterfoil": "./assets/art/archive.webp",
   "bell-under-water": "./assets/art/waterway.webp",
   "cartographer-at-dusk": "./assets/art/market.webp",
   "tea-for-the-tide": "./assets/art/waterway.webp",
@@ -828,6 +833,11 @@ function locationArtMarkup(locationId) {
 }
 
 const STORY_ART = {
+  "gloomwing-claims-desk": ["✒","the claims desk","#182321","#ab9468"],
+  "gloomwing-salt-and-wick": ["♜","salt and wick","#132a2b","#c9b68a"],
+  "gloomwing-price-of-a-claim": ["◈","the price of a claim","#30212b","#bba47d"],
+  "gloomwing-lamp-cupboard": ["⚿","the lamp cupboard","#172129","#b5a071"],
+  "gloomwing-bureau-counterfoil": ["✉","the counterfoil","#2c2922","#b9ac87"],
   "gloomwing-registry-1": ["♢","evidence registry 1","#25323a","#9db6c0"],
   "gloomwing-registry-2": ["▤","evidence registry 2","#342c37","#c3a3b4"],
   "gloomwing-registry-3": ["♧","evidence registry 3","#2e382d","#b6c495"],

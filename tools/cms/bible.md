@@ -73,3 +73,7 @@ Obol — local coin; Unmoored — one deprived of civic identity; Bellmark — s
 
 ## Forbidden imports from reference works
 Do not lift proprietary names, named character designs, lore or familiar scenes from other narrative RPGs. In new original NeathBound prose specifically avoid the stat names **Watchful, Shadowy, Dangerous, Persuasive** and the phrase **Fallen London**. Rules may be inspired by the quality-based narrative format; prose must be independently authored.
+
+## Released-sidepack continuity reference
+
+The implemented Pell / Vane / Hesper / Mara scenes are documented in `docs/narrative-studio/bible.md`, section “Implemented Gloomwing side encounters”. Canonical mechanics and prose: `content/ambitions/gloomwing-encounters.v1.json`. The optional lamp cupboard is inside Black Spire; it does not replace its entrance or add ambition stages. An impossible-looking entry is contested evidence, not confirmed time travel. Reuse those actual voices and flags rather than the unadapted user reference prose.

@@ -8,7 +8,7 @@
   "pitch": "A dying Bureau tracker entrusts a pass to her daughter while the player needs it for the Spire. Returning it, keeping it, seeking a limited copy or risking a previous forgery should preserve competing obligations and generate identifiable later callbacks.",
   "secret_ids": [],
   "reveal_depth": 1,
-  "description": "[PROSE PENDING: user-supplied reference archived separately; no pitch approval recorded]",
+  "description": "Historical pitch retained. Completed native-schema prose and mechanics are in content/ambitions/gloomwing-encounters.v1.json#gloomwing-price-of-a-claim",
   "branches": [],
   "qa": {
     "content": "pending",
@@ -17,7 +17,7 @@
     "continuity": "pending"
   },
   "human_approved": false,
-  "runtime_integration": "pending",
+  "runtime_integration": "implemented",
   "source": "User-supplied Gloomwing exemplar, 16 October 2026; reference prose is not ratified canon.",
   "new_proposals": [
     "Hesper Quill",
@@ -28,15 +28,12 @@
     "forged_the_dying",
     "limited copy-token"
   ],
-  "open_questions": [
-    "A Lantern Quay infirmary is a proposed sublocation, not a registered travel destination.",
-    "A four-storylet-delayed Scandal consequence needs an actual progress consumer; do not substitute a real-time timer.",
-    "The copied token must be limited so the risky Poise branch does not erase the dilemma.",
-    "The two-action search penalty conflicts with normal 0/1 action authoring costs; resolve explicitly."
-  ],
+  "open_questions": [],
   "approval": {
-    "pitch": "pending",
-    "structure": "pending"
+    "pitch": "User expressly authorised completion and playable integration in the current task.",
+    "structure": "User authorised proceeding through skeleton, prose, testing and integration; not an exact-prose human review."
   },
-  "reference_file": "docs/narrative-studio/exemplars/gloomwing-user-references.md"
+  "reference_file": "docs/narrative-studio/exemplars/gloomwing-user-references.md",
+  "runtime_story_id": "gloomwing-price-of-a-claim",
+  "approval_scope": "Completion and deployment authorised by user; no claim of a human reading and signing off this exact final prose."
 }

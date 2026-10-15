@@ -1,6 +1,6 @@
-import { createGameService } from "./services/index.js?v=20261016-reader1";
-import { render } from "./ui/render.js?v=20261016-reader1";
-import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20261016-reader1";
+import { createGameService } from "./services/index.js?v=20261016-gloomwing2";
+import { render } from "./ui/render.js?v=20261016-gloomwing2";
+import { loadPreferences, savePreferences } from "./ui/preferences.js?v=20261016-gloomwing2";
 
 const app = document.querySelector("#app");
 const bootScreen = document.querySelector("#boot-screen");

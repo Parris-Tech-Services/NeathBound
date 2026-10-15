@@ -1,0 +1,1365 @@
+{
+  "schema_version": 1,
+  "id": "gloomwing-linked-encounters",
+  "items": {
+    "pell-date-copy": {
+      "name": "A Rejected Date",
+      "description": "A copied rejection from Pell’s street ledger. Compare it with a Spire oil carbon at Bureau Hall.",
+      "category": "curiosity",
+      "value": 0
+    },
+    "pell-seal-impression": {
+      "name": "Pell’s Seal Impression",
+      "description": "One inked impression on loose claim-paper. Can endorse one substitute claim-token; consumed only when the forgery succeeds.",
+      "category": "curiosity",
+      "value": 0
+    },
+    "vane-dated-copy": {
+      "name": "Vane’s Unfinished Entry",
+      "description": "A future-dated transcription, not proof of time travel. Compare it with a Spire oil carbon at Bureau Hall.",
+      "category": "curiosity",
+      "value": 0
+    },
+    "vane-service-diagram": {
+      "name": "A Supper-Stained Diagram",
+      "description": "The service catch of the Spire lamp cupboard, copied from beneath Vane’s bowl.",
+      "category": "curiosity",
+      "value": 0
+    },
+    "vane-trimmer-key": {
+      "name": "Vane’s Cupboard Key",
+      "description": "Fits the internal lamp cupboard at the Spire. Its soldered neck will survive one turn.",
+      "category": "curiosity",
+      "value": 0
+    },
+    "vane-trimmer-knife": {
+      "name": "Vane’s Trimming Knife",
+      "description": "A singed wick-knife. Lifts the Spire cupboard’s service catch beside its matching key.",
+      "category": "curiosity",
+      "value": 0
+    },
+    "quill-household-receipt": {
+      "name": "Mara’s Allowance Receipt",
+      "description": "The original token has been redeemed. Its serial number can identify an entry through the cupboard glass.",
+      "category": "curiosity",
+      "value": 0
+    },
+    "quill-claim-token": {
+      "name": "Hesper’s Claim-Token",
+      "description": "One use: the Spire’s internal lamp cupboard or Mara’s oil allowance. The ordinary Spire entrance needs no token.",
+      "category": "curiosity",
+      "value": 0
+    },
+    "quill-copy-permit": {
+      "name": "A Public Cupboard Permit",
+      "description": "A single-use internal Spire permit. Its public register names you and Odile Vane.",
+      "category": "curiosity",
+      "value": 0
+    },
+    "spire-oil-carbon": {
+      "name": "A Contradictory Oil Account",
+      "description": "A copy signing consignment Q17 as received and refused unopened at the same hour. Compare it with Pell’s or Vane’s dated evidence at Bureau Hall.",
+      "category": "curiosity",
+      "value": 0
+    }
+  },
+  "stories": {
+    "gloomwing-claims-desk": {
+      "title": "The Claims Desk",
+      "pattern": "decoupled",
+      "once": true,
+      "requirements": [
+        {
+          "type": "quality",
+          "id": "gloomwing_hunt_progress",
+          "op": ">=",
+          "value": 1
+        },
+        {
+          "type": "quality",
+          "id": "gloomwing_hunt_progress",
+          "op": "<=",
+          "value": 19
+        }
+      ],
+      "text": "The Bureau’s street counter has a box for everything except a successful claimant. It stands beside the Lantern Quay infirmary; the central Bureau Hall remains elsewhere. Above Mr Pell hangs a sign: CLAIMANTS MUST PRESENT A GLOOMWING. He raises his stamp, lowers it, and addresses the empty box. “Four million Lumens on the commission. Not money I can give you. I can give you paper.” Beneath his elbow, rejected claims lie open beside a strip of blank token-paper.",
+      "choices": [
+        {
+          "id": "ledger",
+          "label": "Read the rejected claims upside down",
+          "action_cost": 1,
+          "challenge": {
+            "quality": "insight",
+            "difficulty": 5,
+            "scaler": 0.6,
+            "mode": "broad",
+            "rareChance": 0
+          },
+          "success": "Every rejection corrects a date, never a beast. Pell raises the stamp. “Reading is a separate form.” You copy the disputed date and its delivery serial, Q17, before he covers the ledger. The next claimant named on the page is Odile Vane, a lamp-trimmer in Duskwater. A copied entry may be safer than a clerk’s confidence.",
+          "failure": "Pell turns the ledger face-down. “Reading is a separate form.” The lamp-trimmer’s address remains on its cover: Duskwater. You can try again.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "pell-date-copy",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "pell-ledger-read",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "pell-contact",
+              "value": true
+            }
+          ],
+          "failureEffects": [
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "confidence",
+          "label": "Ask what a claimant should know before going to Duskwater",
+          "action_cost": 1,
+          "challenge": {
+            "quality": "poise",
+            "difficulty": 5,
+            "scaler": 0.6,
+            "mode": "broad",
+            "rareChance": 0
+          },
+          "success": "Pell raises the stamp, then sets it on its side. “Odile Vane. Duskwater. I sent her rejection back undated. If anyone asks, you read that upside down.” He keeps the evidence; you keep his confidence. He will recognise your name when the accounts reach Bureau Hall.",
+          "failure": "Pell raises the stamp. “Advice is not a department.” He slides the queue marker one place behind you. There is still time to ask differently.",
+          "successEffects": [
+            {
+              "type": "flag",
+              "id": "pell-ally",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "pell-contact",
+              "value": true
+            }
+          ],
+          "failureEffects": [
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "impression",
+          "label": "Steal an impression on the loose token-paper",
+          "action_cost": 1,
+          "challenge": {
+            "quality": "shadow",
+            "difficulty": 6,
+            "scaler": 0.6,
+            "mode": "broad",
+            "rareChance": 0
+          },
+          "success": "The impression includes the small broken corner that distinguishes Pell’s seal. You fold the strip inside your sleeve. It can endorse one substitute claim-token; it is neither a claim nor a key. Beneath it, the paper bears Odile Vane’s Duskwater address. Pell raises his suddenly clean stamp. “That was ink.”",
+          "failure": "The paper catches on Pell’s cuff. He raises the stamp. “That is mine.” He takes the strip back; the loose sheets remain available for another attempt.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "pell-seal-impression",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "pell-seal-stolen",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "pell-contact",
+              "value": true
+            }
+          ],
+          "failureEffects": [
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "leave",
+          "label": "Take only the address and leave — free",
+          "action_cost": 0,
+          "challenge": false,
+          "success": "Pell raises the stamp over a scrap bearing Odile Vane’s address in Duskwater. “Addresses are complimentary. Finding the person is not.” You leave the rejected ledger closed and the seal untouched. You have a destination, but no evidence to take there.",
+          "failure": "Pell raises the stamp over a scrap bearing Odile Vane’s address in Duskwater. “Addresses are complimentary. Finding the person is not.” You leave the rejected ledger closed and the seal untouched. You have a destination, but no evidence to take there.",
+          "successEffects": [
+            {
+              "type": "flag",
+              "id": "pell-declined",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "pell-contact",
+              "value": true
+            }
+          ],
+          "failureEffects": []
+        }
+      ]
+    },
+    "gloomwing-salt-and-wick": {
+      "title": "Salt and Wick",
+      "pattern": "decoupled",
+      "once": true,
+      "requirements": [
+        {
+          "type": "quality",
+          "id": "gloomwing_hunt_progress",
+          "op": ">=",
+          "value": 1
+        },
+        {
+          "type": "flag",
+          "id": "pell-contact",
+          "op": "==",
+          "value": true
+        },
+        {
+          "type": "quality",
+          "id": "gloomwing_hunt_progress",
+          "op": "<=",
+          "value": 19
+        }
+      ],
+      "text": "One bowl is empty; the other still steams. Beyond the open cottage door in Duskwater, two places are laid at a narrow table. Odile Vane’s lamp-trimmer’s knife crosses a saucer. Beside it lies a brass key tagged SPIRE: LAMP CUPBOARD L4. Her wick-ledger stops mid-line on the sill. Four scratches score the stone above the lintel, too high for a standing visitor. There is no lamp-trimmer in the room.",
+      "choices": [
+        {
+          "id": "ledger",
+          "label": "Copy the dated evidence; risk Dread and leave the tools",
+          "action_cost": 1,
+          "challenge": {
+            "quality": "insight",
+            "difficulty": 5,
+            "scaler": 0.6,
+            "mode": "broad",
+            "rareChance": 0
+          },
+          "success": "The unfinished entry assigns delivery Q17 a date seven days ahead of the date on the Quay commission. The same cupboard number is cut into the key. A mistake, a schedule, or something worse: the page does not choose for you. You copy it. Beneath the ledger lies an infirmary notice: Hesper Quill, Lantern Quay. Visitors permitted.",
+          "failure": "Lamp smoke has filmed the window. Under its reflection, the wet figures refuse to separate. You step outside into clear air. The door remains open; the page can be examined again.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "vane-dated-copy",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "vane-ledger-copied",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "vane-cottage-seen",
+              "value": true
+            },
+            {
+              "type": "menace",
+              "id": "dread",
+              "amount": 1
+            }
+          ],
+          "failureEffects": [
+            {
+              "type": "menace",
+              "id": "dread",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "supper",
+          "label": "Eat the supper; heal one Wound and copy the service diagram",
+          "action_cost": 1,
+          "challenge": false,
+          "success": "The soup tastes of salt and barley. Under the bowl, a heat-stained diagram shows the Spire cupboard’s service catch: press inward before lifting. You copy it onto the reverse of an infirmary notice for Hesper Quill at Lantern Quay. The meal is gone; the knife, key and ledger remain where Vane left them.",
+          "failure": "The soup tastes of salt and barley. Under the bowl, a heat-stained diagram shows the Spire cupboard’s service catch: press inward before lifting. You copy it onto the reverse of an infirmary notice for Hesper Quill at Lantern Quay. The meal is gone; the knife, key and ledger remain where Vane left them.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "vane-service-diagram",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "vane-supper-eaten",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "vane-cottage-seen",
+              "value": true
+            },
+            {
+              "type": "menace",
+              "id": "wounds",
+              "amount": -1
+            }
+          ],
+          "failureEffects": []
+        },
+        {
+          "id": "tools",
+          "label": "Take both knife and key; disturb Vane’s place",
+          "action_cost": 1,
+          "challenge": {
+            "quality": "shadow",
+            "difficulty": 5,
+            "scaler": 0.6,
+            "mode": "broad",
+            "rareChance": 0
+          },
+          "success": "The key is cold; the knife smells of singed wick. Without their weight, the saucer tips and spills oil across the unfinished entry. You have the cupboard tools and have spoiled the best copy of its date. An infirmary notice beneath the saucer names Hesper Quill at Lantern Quay.",
+          "failure": "Your sleeve moves the door. Its latch drops against the unfastened strike-plate with a loud click. You lift it and step out empty-handed; nothing has locked. The tools remain on the saucer.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "vane-trimmer-key",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "id": "vane-trimmer-knife",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "vane-tools-taken",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "vane-cottage-seen",
+              "value": true
+            }
+          ],
+          "failureEffects": [
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "leave",
+          "label": "Close the door and take nothing — free",
+          "action_cost": 0,
+          "challenge": false,
+          "success": "The latch rests against its plate. On the outside, pinned beneath Vane’s name, is an infirmary visiting notice for Hesper Quill at Lantern Quay. You copy the address. Behind the door, the second bowl has stopped steaming.",
+          "failure": "The latch rests against its plate. On the outside, pinned beneath Vane’s name, is an infirmary visiting notice for Hesper Quill at Lantern Quay. You copy the address. Behind the door, the second bowl has stopped steaming.",
+          "successEffects": [
+            {
+              "type": "flag",
+              "id": "vane-left-undisturbed",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "vane-cottage-seen",
+              "value": true
+            }
+          ],
+          "failureEffects": []
+        }
+      ]
+    },
+    "gloomwing-price-of-a-claim": {
+      "title": "The Price of a Claim",
+      "pattern": "decoupled",
+      "once": true,
+      "requirements": [
+        {
+          "type": "quality",
+          "id": "gloomwing_hunt_progress",
+          "op": ">=",
+          "value": 1
+        },
+        {
+          "type": "flag",
+          "id": "vane-cottage-seen",
+          "op": "==",
+          "value": true
+        },
+        {
+          "type": "quality",
+          "id": "gloomwing_hunt_progress",
+          "op": "<=",
+          "value": 19
+        }
+      ],
+      "text": "Hesper Quill counts four breaths on three fingers, then starts again. At the Lantern Quay infirmary, the Bureau tracker has placed her remaining claim-token between two medicine bottles. It buys her daughter Mara a winter’s lamp-oil allowance; until redeemed, it also admits one bearer to the Spire’s internal lamp cupboard. The token is punched with a cupboard number, not the Spire’s outer seal. “Promise you’ll carry it to Mara. Or ask me for it. I’d rather you did one of them honestly.” Her fourth finger stays folded beneath the blanket.",
+      "choices": [
+        {
+          "id": "deliver",
+          "label": "Carry it to Mara now; surrender the cupboard pass",
+          "action_cost": 1,
+          "challenge": false,
+          "success": "Hesper counts three fingers against the blanket. “Tell her the winter is paid for. Nothing about next winter.” At the infirmary oil desk, Mara signs the allowance receipt with the nib held between both hands. “This winter, then. I’ll sign for that.” The token is punched and retained. She gives you the receipt: its delivery serial Q17 may still identify the cupboard record, but it will not open the lock.",
+          "failure": "Hesper counts three fingers against the blanket. “Tell her the winter is paid for. Nothing about next winter.” At the infirmary oil desk, Mara signs the allowance receipt with the nib held between both hands. “This winter, then. I’ll sign for that.” The token is punched and retained. She gives you the receipt: its delivery serial Q17 may still identify the cupboard record, but it will not open the lock.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "quill-household-receipt",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "quill-daughter-paid",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-resolution",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": true
+            }
+          ],
+          "failureEffects": []
+        },
+        {
+          "id": "borrow",
+          "label": "Ask to use it first; accept a debt of eight Obols",
+          "action_cost": 1,
+          "challenge": false,
+          "success": "Hesper counts three fingers, then lays the token on the fourth. “Eight Obols buys the same oil. Bring that to the Bureau cashier when you come back. Borrowing ought to have a return address.” You take the pass with her permission. The debt will be settled before the Bureau resumes your commission.",
+          "failure": "Hesper counts three fingers, then lays the token on the fourth. “Eight Obols buys the same oil. Bring that to the Bureau cashier when you come back. Borrowing ought to have a return address.” You take the pass with her permission. The debt will be settled before the Bureau resumes your commission.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "quill-honest-debt",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-resolution",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": true
+            }
+          ],
+          "failureEffects": []
+        },
+        {
+          "id": "copy",
+          "label": "Pay eight Obols for oil and request a public cupboard permit",
+          "action_cost": 1,
+          "challenge": {
+            "quality": "poise",
+            "difficulty": 7,
+            "scaler": 0.6,
+            "mode": "broad",
+            "rareChance": 0
+          },
+          "success": "Hesper counts three fingers, then pushes the original token toward the oil desk. “Both, then. Put your name on it.” Your eight Obols purchases the allowance outright. Mara receives it. The clerk keeps the unspent token as collateral and issues a single-use cupboard permit in your name. Its public register also names Vane as the cupboard’s custodian; you have bought access by making her a witness.",
+          "failure": "The clerk rejects the unsigned copy. Hesper counts three fingers and closes her hand over the original token. No fee has been taken and no token has changed hands. You can make a different arrangement.",
+          "successEffects": [
+            {
+              "type": "obols",
+              "amount": -8
+            },
+            {
+              "type": "item",
+              "id": "quill-copy-permit",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "quill-daughter-paid",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-vane-exposed",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-resolution",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": true
+            }
+          ],
+          "failureEffects": [
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 1
+            }
+          ],
+          "requirements": [
+            {
+              "type": "obols",
+              "id": "",
+              "op": ">=",
+              "value": 8
+            }
+          ]
+        },
+        {
+          "id": "forge",
+          "label": "Endorse a substitute using Pell’s stolen impression; risk a four-Obol validation fee and Scandal",
+          "action_cost": 1,
+          "challenge": {
+            "quality": "shadow",
+            "difficulty": 7,
+            "scaler": 0.6,
+            "mode": "broad",
+            "rareChance": 0
+          },
+          "success": "Hesper counts three fingers while you fold the endorsed substitute into her delivery envelope. At the oil desk it passes a hurried inspection. Mara receives the first issue of oil; you retain the real token. The broken corner in Pell’s seal will be visible at audit. You have borrowed his name without asking him. A disputed substitute costs four Obols to validate, and admitting it puts your name on the public roll.",
+          "failure": "The substitute’s edge curls before you seal the envelope. Hesper counts three fingers and waits. You have not delivered it. The impression and original remain available; your attempted forgery has drawn a porter’s attention.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "pell-seal-impression",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "quill-forged",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-resolution",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": true
+            }
+          ],
+          "failureEffects": [
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 1
+            }
+          ],
+          "requirements": [
+            {
+              "type": "item",
+              "id": "pell-seal-impression",
+              "op": ">=",
+              "value": 1
+            }
+          ]
+        }
+      ]
+    },
+    "gloomwing-lamp-cupboard": {
+      "title": "The Cupboard That Kept Its Date",
+      "pattern": "decoupled",
+      "once": true,
+      "requirements": [
+        {
+          "type": "quality",
+          "id": "gloomwing_hunt_progress",
+          "op": ">=",
+          "value": 1
+        },
+        {
+          "type": "flag",
+          "id": "quill-resolution",
+          "op": "==",
+          "value": true
+        }
+      ],
+      "text": "The Spire’s lamp cupboard has a visitors’ lock and, below it, a service catch. Someone has scraped Vane’s name off the door without removing the darker rectangle beneath it. Inside the wired glass, a delivery book rests on a shelf above a stopped lamp. Beyond it, the main stair continues toward the quarry.",
+      "choices": [
+        {
+          "id": "key",
+          "label": "Use Vane’s key and lift the catch with her knife",
+          "action_cost": 1,
+          "challenge": false,
+          "success": "The knife lifts the service catch without scoring it. The key turns once and snaps at its old soldered neck; the knife remains yours. You take a carbon sheet from the delivery book: consignment Q17 is signed as both received and refused unopened at the same hour. You leave the original in place. The Bureau cashier can compare the serial number with Hesper’s account.",
+          "failure": "The knife lifts the service catch without scoring it. The key turns once and snaps at its old soldered neck; the knife remains yours. You take a carbon sheet from the delivery book: consignment Q17 is signed as both received and refused unopened at the same hour. You leave the original in place. The Bureau cashier can compare the serial number with Hesper’s account.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "vane-trimmer-key",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "spire-cupboard-examined",
+              "value": true
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "item",
+              "id": "vane-trimmer-key",
+              "op": ">=",
+              "value": 1
+            },
+            {
+              "type": "item",
+              "id": "vane-trimmer-knife",
+              "op": ">=",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": "token",
+          "label": "Redeem Hesper’s real token; let the lock keep it",
+          "action_cost": 1,
+          "challenge": false,
+          "success": "The visitors’ lock swallows the token and turns. It does not give it back. You take a carbon sheet from the delivery book: consignment Q17 is signed as both received and refused unopened at the same hour. Hesper’s allowance can no longer be redeemed with that token. Her account can still be settled at the Bureau cashier.",
+          "failure": "The visitors’ lock swallows the token and turns. It does not give it back. You take a carbon sheet from the delivery book: consignment Q17 is signed as both received and refused unopened at the same hour. Hesper’s allowance can no longer be redeemed with that token. Her account can still be settled at the Bureau cashier.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "spire-cupboard-examined",
+              "value": true
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "op": ">=",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": "permit",
+          "label": "Spend the public permit; leave your name in the register",
+          "action_cost": 1,
+          "challenge": false,
+          "success": "The lock punches the permit and keeps it. Your name joins Vane’s on the visitor roll. You take a carbon sheet from the delivery book: consignment Q17 signed as both received and refused unopened at the same hour. A duplicate of your visit is already travelling to Bureau Hall. Paying for oil has spared Mara; it has not spared Vane an interview.",
+          "failure": "The lock punches the permit and keeps it. Your name joins Vane’s on the visitor roll. You take a carbon sheet from the delivery book: consignment Q17 signed as both received and refused unopened at the same hour. A duplicate of your visit is already travelling to Bureau Hall. Paying for oil has spared Mara; it has not spared Vane an interview.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "quill-copy-permit",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "spire-cupboard-examined",
+              "value": true
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "item",
+              "id": "quill-copy-permit",
+              "op": ">=",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": "diagram",
+          "label": "Use the service diagram from beneath Vane’s supper",
+          "action_cost": 1,
+          "challenge": false,
+          "success": "Inward, then upward. The service catch opens beneath your folded diagram. You copy the delivery entry without removing the book: consignment Q17 signed as both received and refused unopened at the same hour. You close the catch. Vane’s supper has bought you a quiet way in, but it cannot settle anyone’s allowance.",
+          "failure": "Inward, then upward. The service catch opens beneath your folded diagram. You copy the delivery entry without removing the book: consignment Q17 signed as both received and refused unopened at the same hour. You close the catch. Vane’s supper has bought you a quiet way in, but it cannot settle anyone’s allowance.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "spire-cupboard-examined",
+              "value": true
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "item",
+              "id": "vane-service-diagram",
+              "op": ">=",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": "receipt",
+          "label": "Match Mara’s receipt to the entry visible through the glass",
+          "action_cost": 1,
+          "challenge": {
+            "quality": "insight",
+            "difficulty": 6,
+            "scaler": 0.6,
+            "mode": "broad",
+            "rareChance": 0
+          },
+          "success": "The receipt serial is repeated beside the delivery date. Through the wired glass you can copy the adjacent line: consignment Q17 signed as both received and refused unopened at the same hour. No lock opens; no entry records your visit. You keep the receipt and your transcription. The cupboard has yielded an account without yielding its contents.",
+          "failure": "A wire in the glass divides the last figure. You keep the receipt and copy nothing uncertain. The book remains visible for another attempt.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "spire-cupboard-examined",
+              "value": true
+            }
+          ],
+          "failureEffects": [
+            {
+              "type": "menace",
+              "id": "dread",
+              "amount": 1
+            }
+          ],
+          "requirements": [
+            {
+              "type": "item",
+              "id": "quill-household-receipt",
+              "op": ">=",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": "leave",
+          "label": "Leave the cupboard untouched — free",
+          "action_cost": 0,
+          "challenge": false,
+          "success": "The visitors’ lock bears a warning: redeemed tokens will not be returned. You copy its cupboard number, L4, from the brass plate and leave the book behind the glass. The stair beyond remains open. The missing account will remain missing from your evidence.",
+          "failure": "The visitors’ lock bears a warning: redeemed tokens will not be returned. You copy its cupboard number, L4, from the brass plate and leave the book behind the glass. The stair beyond remains open. The missing account will remain missing from your evidence.",
+          "successEffects": [
+            {
+              "type": "flag",
+              "id": "spire-cupboard-declined",
+              "value": true
+            }
+          ],
+          "failureEffects": []
+        }
+      ]
+    },
+    "gloomwing-bureau-counterfoil": {
+      "title": "The Other Half of the Receipt",
+      "pattern": "decoupled",
+      "once": true,
+      "requirements": [
+        {
+          "type": "quality",
+          "id": "gloomwing_hunt_progress",
+          "op": ">=",
+          "value": 1
+        },
+        {
+          "type": "flag",
+          "id": "quill-account-review",
+          "op": "==",
+          "value": true
+        }
+      ],
+      "text": "Bureau Hall has received the half of the receipt that nobody carries home. Pell raises his stamp above Hesper Quill’s account. Beside it lie Mara’s allowance line and a request for Odile Vane’s whereabouts. “A receipt is an account with a witness,” he says. A borrowed pass leaves oil owed; a forged one has frozen its payment. A paid account may still be compared with the cupboard records. Any outstanding obligation must be answered before the commission continues.",
+      "choices": [
+        {
+          "id": "repay",
+          "label": "Pay the eight Obols owed for Mara’s oil",
+          "action_cost": 1,
+          "challenge": false,
+          "success": "Pell raises the stamp and cancels the debt. Mara’s allowance is paid; the cashier retains any unused real token so it cannot claim the same oil twice. The commission is released. The loan is closed. Pell files Hesper’s permission beside your payment.",
+          "failure": "Pell raises the stamp and cancels the debt. Mara’s allowance is paid; the cashier retains any unused real token so it cannot claim the same oil twice. The commission is released. The loan is closed. Pell files Hesper’s permission beside your payment.",
+          "successEffects": [
+            {
+              "type": "obols",
+              "amount": -8
+            },
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": -1
+            },
+            {
+              "type": "flag",
+              "id": "quill-daughter-paid",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-repaid",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "flag",
+              "id": "quill-vane-exposed",
+              "op": "!=",
+              "value": true
+            },
+            {
+              "type": "obols",
+              "id": "",
+              "op": ">=",
+              "value": 8
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "op": "==",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-forged",
+              "op": "!=",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "admit",
+          "label": "Admit the unpaid claim; accept a public debt — free",
+          "action_cost": 0,
+          "challenge": false,
+          "success": "Pell raises the stamp over your signed account. The cashier withdraws any unused real token and releases an emergency oil issue to Mara against your name. Her lamps will burn. Your name joins the public debt list; the commission resumes with the account recorded, rather than concealed.",
+          "failure": "Pell raises the stamp over your signed account. The cashier withdraws any unused real token and releases an emergency oil issue to Mara against your name. Her lamps will burn. Your name joins the public debt list; the commission resumes with the account recorded, rather than concealed.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": -1
+            },
+            {
+              "type": "flag",
+              "id": "quill-daughter-paid",
+              "value": true
+            },
+            {
+              "type": "menace",
+              "id": "scandal",
+              "amount": 2
+            },
+            {
+              "type": "flag",
+              "id": "quill-public-debt",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "flag",
+              "id": "quill-vane-exposed",
+              "op": "!=",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "op": "==",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "exposure",
+          "label": "Stand by the public permit; leave Vane named — free",
+          "action_cost": 0,
+          "challenge": false,
+          "success": "Pell raises the stamp. “Paid, yes. Private, no.” Mara’s allowance is safe. He sends the interview request to Vane’s cottage and releases your commission. The date has become evidence against its custodian. You retain access bought in public, and the record of whom it exposed.",
+          "failure": "Pell raises the stamp. “Paid, yes. Private, no.” Mara’s allowance is safe. He sends the interview request to Vane’s cottage and releases your commission. The date has become evidence against its custodian. You retain access bought in public, and the record of whom it exposed.",
+          "successEffects": [
+            {
+              "type": "flag",
+              "id": "vane-interview-ordered",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "flag",
+              "id": "quill-vane-exposed",
+              "op": "==",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "op": "==",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "withdraw",
+          "label": "Withdraw the permit and take responsibility for the entry — free",
+          "action_cost": 0,
+          "challenge": false,
+          "success": "Pell raises the stamp and strikes Vane’s name from the interview request. Your unused permit, if any, is cancelled; Mara’s paid oil remains hers. The Bureau records you as the source of the disputed entry instead. The inquiry follows your name, and the commission resumes.",
+          "failure": "Pell raises the stamp and strikes Vane’s name from the interview request. Your unused permit, if any, is cancelled; Mara’s paid oil remains hers. The Bureau records you as the source of the disputed entry instead. The inquiry follows your name, and the commission resumes.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "quill-copy-permit",
+              "amount": -1
+            },
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 2
+            },
+            {
+              "type": "flag",
+              "id": "vane-interview-withdrawn",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "flag",
+              "id": "quill-vane-exposed",
+              "op": "==",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "op": "==",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "date-copy",
+          "label": "Submit Pell’s copied rejection alongside the cupboard carbon — free",
+          "action_cost": 0,
+          "challenge": false,
+          "success": "Pell raises the stamp, then recognises the date you copied at his counter. The cupboard carbon pairs Q17 with Pell’s disputed date. “A duplicated date is evidence,” he says. “Not an explanation.” He sets the account aside for inquiry and verifies that Mara’s oil is funded, issuing emergency credit only if needed. The records inquiry carries your name. Any unused pass or permit is cancelled. Your commission has no outstanding allowance hold; neither calendar has been declared true.",
+          "failure": "Pell raises the stamp, then recognises the date you copied at his counter. The cupboard carbon pairs Q17 with Pell’s disputed date. “A duplicated date is evidence,” he says. “Not an explanation.” He sets the account aside for inquiry and verifies that Mara’s oil is funded, issuing emergency credit only if needed. The records inquiry carries your name. Any unused pass or permit is cancelled. Your commission has no outstanding allowance hold; neither calendar has been declared true.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "pell-date-copy",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "quill-copy-permit",
+              "amount": -1
+            },
+            {
+              "type": "flag",
+              "id": "quill-daughter-paid",
+              "value": true
+            },
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 2
+            },
+            {
+              "type": "flag",
+              "id": "pell-date-inquiry",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "item",
+              "id": "pell-date-copy",
+              "op": ">=",
+              "value": 1
+            },
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "op": ">=",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": "vane-copy",
+          "label": "Submit Vane’s dated page alongside the cupboard carbon — free",
+          "action_cost": 0,
+          "challenge": false,
+          "success": "Pell raises the stamp above the two incompatible entries. Vane’s unfinished page dates the cupboard a week ahead; the carbon signs Q17 as received and refused at the same hour. He sets the account aside for inquiry and verifies that Mara’s oil is funded, issuing emergency credit only if needed. The inquiry carries Vane’s name beside yours. Any unused pass or permit is cancelled. Your commission has no outstanding allowance hold. You have submitted two records, not proved that time moved.",
+          "failure": "Pell raises the stamp above the two incompatible entries. Vane’s unfinished page dates the cupboard a week ahead; the carbon signs Q17 as received and refused at the same hour. He sets the account aside for inquiry and verifies that Mara’s oil is funded, issuing emergency credit only if needed. The inquiry carries Vane’s name beside yours. Any unused pass or permit is cancelled. Your commission has no outstanding allowance hold. You have submitted two records, not proved that time moved.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "vane-dated-copy",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "quill-copy-permit",
+              "amount": -1
+            },
+            {
+              "type": "flag",
+              "id": "quill-daughter-paid",
+              "value": true
+            },
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "vane-interview-ordered",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "item",
+              "id": "vane-dated-copy",
+              "op": ">=",
+              "value": 1
+            },
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "op": ">=",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": "pell",
+          "label": "Ask Pell to witness your honest loan — free",
+          "action_cost": 0,
+          "challenge": false,
+          "success": "Pell raises the stamp, pauses over your name, and writes his own beside it. “A witness is not a benefactor.” The cashier cancels any unused token and releases Mara’s oil against both names. Your debt becomes public; Pell’s confidence becomes a signed guarantee. The commission resumes, and he turns his stamp away from you.",
+          "failure": "Pell raises the stamp, pauses over your name, and writes his own beside it. “A witness is not a benefactor.” The cashier cancels any unused token and releases Mara’s oil against both names. Your debt becomes public; Pell’s confidence becomes a signed guarantee. The commission resumes, and he turns his stamp away from you.",
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": -1
+            },
+            {
+              "type": "flag",
+              "id": "pell-ally",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "pell-guarantor",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-daughter-paid",
+              "value": true
+            },
+            {
+              "type": "menace",
+              "id": "scandal",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "flag",
+              "id": "pell-ally",
+              "op": "==",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-honest-debt",
+              "op": "==",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "forgery-fee",
+          "label": "Pay four Obols to validate the forged allowance; admit whose seal it was",
+          "action_cost": 1,
+          "challenge": false,
+          "success": "Pell raises the stamp beside its stolen impression. “An accurate signature of the wrong hand.” The cashier takes four Obols to validate the disputed issue; Mara keeps her oil. Any unused real token is retained. Your admission goes on the public roll, and the commission resumes. The counterfeit saved money, not Pell’s name.",
+          "failure": "Pell raises the stamp beside its stolen impression. “An accurate signature of the wrong hand.” The cashier takes four Obols to validate the disputed issue; Mara keeps her oil. Any unused real token is retained. Your admission goes on the public roll, and the commission resumes. The counterfeit saved money, not Pell’s name.",
+          "successEffects": [
+            {
+              "type": "obols",
+              "amount": -4
+            },
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": -1
+            },
+            {
+              "type": "menace",
+              "id": "scandal",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "quill-daughter-paid",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "pell-forgery-recorded",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "flag",
+              "id": "quill-forged",
+              "op": "==",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "op": "==",
+              "value": true
+            },
+            {
+              "type": "obols",
+              "id": "",
+              "op": ">=",
+              "value": 4
+            }
+          ]
+        },
+        {
+          "id": "paid",
+          "label": "File the paid receipt without opening an inquiry — free",
+          "action_cost": 0,
+          "challenge": false,
+          "success": "Pell raises the stamp over Mara’s paid receipt. “No debt. An unusual state of affairs.” He files it without calling Vane or taking your other evidence. The allowance remains hers; the cupboard’s competing dates remain an unanswered question.",
+          "failure": "Pell raises the stamp over Mara’s paid receipt. “No debt. An unusual state of affairs.” He files it without calling Vane or taking your other evidence. The allowance remains hers; the cupboard’s competing dates remain an unanswered question.",
+          "successEffects": [
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-receipt-filed",
+              "value": true
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "op": "!=",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "placements": {
+    "lantern-quay": [
+      "gloomwing-claims-desk",
+      "gloomwing-price-of-a-claim"
+    ],
+    "duskwater": [
+      "gloomwing-salt-and-wick"
+    ],
+    "black-spire": [
+      "gloomwing-lamp-cupboard"
+    ],
+    "bureau-hall": [
+      "gloomwing-bureau-counterfoil"
+    ]
+  }
+}

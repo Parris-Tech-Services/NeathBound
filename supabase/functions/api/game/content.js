@@ -1,7 +1,7 @@
 import { ambitions, destinies, festivals, qbnStories, qbnCards } from "./qbn-expansion.js";
 export { ambitions, destinies, festivals };
 import { expansionLocations, expansionStories } from "./expansion.js";
-import { gloomwingLocations, gloomwingItems, gloomwingStories } from "./gloomwing-content.js";
+import { gloomwingLocations, gloomwingItems, gloomwingStories, gloomwingEncounterItems, gloomwingEncounterStories, gloomwingEncounterPlacements } from "./gloomwing-content.js";
 import { cmsPublishedStories, cmsPublishedLocations } from "./cms-published.js";
 import { approvedStories, approvedCards, approvedPlacements } from "./approved-storylets.js";
 
@@ -2122,10 +2122,11 @@ for(const [menace,areaId] of Object.entries(menaceAreas)){
 }
 
 // Gloomwing storypack: its storylets are gated by ambition and exact chapter.
-Object.assign(items, gloomwingItems);
-Object.assign(stories, gloomwingStories);
+Object.assign(items, gloomwingItems, gloomwingEncounterItems);
+Object.assign(stories, gloomwingStories, gloomwingEncounterStories);
 Object.assign(locations, gloomwingLocations);
 locations["lantern-quay"].stories.push("gloomwing_hunt_00");
+for(const [locationId,storyIds] of Object.entries(gloomwingEncounterPlacements)) locations[locationId].stories.push(...storyIds);
 
 // The Bureau's Evidence Registry provides a use for every physical relic
 // collected in the 30-part Gloomwing hunt. Entries can be catalogued once;

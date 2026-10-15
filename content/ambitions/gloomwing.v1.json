@@ -271,7 +271,7 @@
         "value": 1
       },
       "once": true,
-      "text": "The Bureau offers four million Lumens for a creature nobody can describe consistently. A clerk presents three contracts, each already signed in handwriting distressingly like yours.",
+      "text": "The Bureau offers four million Lumens for a creature nobody can describe consistently. A clerk presents three contracts, each already signed in handwriting distressingly like yours. Pell’s street counter beside the Lantern Quay infirmary handles supplementary claims; you may return there between stages of the hunt.",
       "requirements": [],
       "choices": [
         {
@@ -2882,7 +2882,14 @@
       },
       "once": true,
       "text": "At dawn the Bureau declares you a danger to public safety. The posters include an excellent portrait of a person who is not quite you.",
-      "requirements": [],
+      "requirements": [
+        {
+          "type": "flag",
+          "id": "quill-account-pending",
+          "op": "!=",
+          "value": true
+        }
+      ],
       "choices": [
         {
           "id": "investigate",

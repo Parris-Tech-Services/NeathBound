@@ -1,4 +1,4 @@
-import { items, equipmentSlots, locations, destinies } from "./content.js?v=20261016-reader1";
+import { items, equipmentSlots, locations, destinies } from "./content.js?v=20261016-gloomwing2";
 
 const operators = {
   "==": (actual, expected) => actual === expected,

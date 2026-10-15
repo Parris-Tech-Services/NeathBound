@@ -25,3 +25,9 @@ test("legacy saves recover visited districts but not menace wards", () => {
   }
   assert.ok(!s.unlockedLocations.includes("the-pale-rooms"));
 });
+
+
+test("Travel map includes the Gloomwing districts for return visits", async () => {
+  const { CITY_ROUTES } = await import("../src/ui/narrative-guide.js");
+  for (const id of ["duskwater", "black-spire", "bureau-hall"]) assert.ok(CITY_ROUTES.some(route=>route.id===id), id);
+});

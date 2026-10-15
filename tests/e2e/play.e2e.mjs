@@ -386,3 +386,19 @@ test("browsing and backing out are free, and bookmarking preserves the open stor
  assert.equal(await readSave(page).then(s=>s.actions),before.actions,"bookmarking is free");
  assert.deepEqual(problems,[]);await context.close();
 });
+
+test('mobile: all three Gloomwing scenes and both consequence scenes are playable and persist',async()=>{
+ const {context,page,problems}=await openGame({completeTutorial:true});await page.setViewportSize({width:390,height:740});
+ await page.evaluate(key=>{
+  const s=JSON.parse(localStorage.getItem(key));s.ambition='gloomwing-hunt';s.ambition_progress={'gloomwing-hunt':1};s.qualities.gloomwing_hunt_progress=1;s.flags['qbn-ambition-chosen']=true;s.locationId='lantern-quay';s.unlockedLocations=[...new Set([...s.unlockedLocations,'lantern-quay','duskwater','black-spire','bureau-hall'])];s.actions=10;s.last_action_tick=Date.now();localStorage.setItem(key,JSON.stringify(s));
+ },SAVE_KEY);await page.reload({waitUntil:'networkidle'});
+ async function choose(id,choice){
+  const panel=page.locator(`details[data-storylet-id="${id}"]`);await panel.waitFor();if(!await panel.evaluate(el=>el.open))await panel.locator('summary').click();
+  const go=panel.locator(`[data-story="${id}"][data-choice="${choice}"]`);assert.equal(await go.isEnabled(),true);await go.click();await page.locator('[data-action="onwards"]').waitFor();await page.locator('[data-action="onwards"]').click();
+ }
+ async function travel(id){await page.locator('.main-tabs [data-action="open-map"]').click();await page.locator(`#travel-map [data-action="travel-to"][data-location="${id}"]`).click();}
+ await choose('gloomwing-claims-desk','leave');await travel('duskwater');await choose('gloomwing-salt-and-wick','supper');await travel('lantern-quay');await choose('gloomwing-price-of-a-claim','borrow');
+ let s=await readSave(page);assert.equal(s.flags['quill-account-pending'],true);assert.equal(s.items['quill-claim-token'],1);
+ await travel('black-spire');await choose('gloomwing-lamp-cupboard','diagram');await travel('bureau-hall');await choose('gloomwing-bureau-counterfoil','admit');
+ await page.reload({waitUntil:'networkidle'});s=await readSave(page);assert.equal(s.flags['quill-account-pending'],false);assert.equal(s.flags['quill-public-debt'],true);assert.equal(s.items['spire-oil-carbon'],1);assert.equal(s.ambition_progress['gloomwing-hunt'],1);assert.equal(s.items['quill-claim-token'],undefined);assert.equal(s.actions,7);assert.deepEqual(problems,[]);await context.close();
+});

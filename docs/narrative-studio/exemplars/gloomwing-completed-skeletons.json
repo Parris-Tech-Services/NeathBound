@@ -1,0 +1,1197 @@
+{
+  "source": "gloomwing-encounters.v1.json",
+  "status": "Structure completed under user authorisation; prose lives in canonical source.",
+  "stories": {
+    "gloomwing-claims-desk": {
+      "pattern": "decoupled",
+      "once": true,
+      "requirements": [
+        {
+          "type": "quality",
+          "id": "gloomwing_hunt_progress",
+          "op": ">=",
+          "value": 1
+        },
+        {
+          "type": "quality",
+          "id": "gloomwing_hunt_progress",
+          "op": "<=",
+          "value": 19
+        }
+      ],
+      "choices": [
+        {
+          "id": "ledger",
+          "action_cost": 1,
+          "challenge": {
+            "quality": "insight",
+            "difficulty": 5,
+            "scaler": 0.6,
+            "mode": "broad",
+            "rareChance": 0
+          },
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "pell-date-copy",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "pell-ledger-read",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "pell-contact",
+              "value": true
+            }
+          ],
+          "failureEffects": [
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "confidence",
+          "action_cost": 1,
+          "challenge": {
+            "quality": "poise",
+            "difficulty": 5,
+            "scaler": 0.6,
+            "mode": "broad",
+            "rareChance": 0
+          },
+          "successEffects": [
+            {
+              "type": "flag",
+              "id": "pell-ally",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "pell-contact",
+              "value": true
+            }
+          ],
+          "failureEffects": [
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "impression",
+          "action_cost": 1,
+          "challenge": {
+            "quality": "shadow",
+            "difficulty": 6,
+            "scaler": 0.6,
+            "mode": "broad",
+            "rareChance": 0
+          },
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "pell-seal-impression",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "pell-seal-stolen",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "pell-contact",
+              "value": true
+            }
+          ],
+          "failureEffects": [
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "leave",
+          "action_cost": 0,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "flag",
+              "id": "pell-declined",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "pell-contact",
+              "value": true
+            }
+          ],
+          "failureEffects": []
+        }
+      ]
+    },
+    "gloomwing-salt-and-wick": {
+      "pattern": "decoupled",
+      "once": true,
+      "requirements": [
+        {
+          "type": "quality",
+          "id": "gloomwing_hunt_progress",
+          "op": ">=",
+          "value": 1
+        },
+        {
+          "type": "flag",
+          "id": "pell-contact",
+          "op": "==",
+          "value": true
+        },
+        {
+          "type": "quality",
+          "id": "gloomwing_hunt_progress",
+          "op": "<=",
+          "value": 19
+        }
+      ],
+      "choices": [
+        {
+          "id": "ledger",
+          "action_cost": 1,
+          "challenge": {
+            "quality": "insight",
+            "difficulty": 5,
+            "scaler": 0.6,
+            "mode": "broad",
+            "rareChance": 0
+          },
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "vane-dated-copy",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "vane-ledger-copied",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "vane-cottage-seen",
+              "value": true
+            },
+            {
+              "type": "menace",
+              "id": "dread",
+              "amount": 1
+            }
+          ],
+          "failureEffects": [
+            {
+              "type": "menace",
+              "id": "dread",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "supper",
+          "action_cost": 1,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "vane-service-diagram",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "vane-supper-eaten",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "vane-cottage-seen",
+              "value": true
+            },
+            {
+              "type": "menace",
+              "id": "wounds",
+              "amount": -1
+            }
+          ],
+          "failureEffects": []
+        },
+        {
+          "id": "tools",
+          "action_cost": 1,
+          "challenge": {
+            "quality": "shadow",
+            "difficulty": 5,
+            "scaler": 0.6,
+            "mode": "broad",
+            "rareChance": 0
+          },
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "vane-trimmer-key",
+              "amount": 1
+            },
+            {
+              "type": "item",
+              "id": "vane-trimmer-knife",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "vane-tools-taken",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "vane-cottage-seen",
+              "value": true
+            }
+          ],
+          "failureEffects": [
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "leave",
+          "action_cost": 0,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "flag",
+              "id": "vane-left-undisturbed",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "vane-cottage-seen",
+              "value": true
+            }
+          ],
+          "failureEffects": []
+        }
+      ]
+    },
+    "gloomwing-price-of-a-claim": {
+      "pattern": "decoupled",
+      "once": true,
+      "requirements": [
+        {
+          "type": "quality",
+          "id": "gloomwing_hunt_progress",
+          "op": ">=",
+          "value": 1
+        },
+        {
+          "type": "flag",
+          "id": "vane-cottage-seen",
+          "op": "==",
+          "value": true
+        },
+        {
+          "type": "quality",
+          "id": "gloomwing_hunt_progress",
+          "op": "<=",
+          "value": 19
+        }
+      ],
+      "choices": [
+        {
+          "id": "deliver",
+          "action_cost": 1,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "quill-household-receipt",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "quill-daughter-paid",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-resolution",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": true
+            }
+          ],
+          "failureEffects": []
+        },
+        {
+          "id": "borrow",
+          "action_cost": 1,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "quill-honest-debt",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-resolution",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": true
+            }
+          ],
+          "failureEffects": []
+        },
+        {
+          "id": "copy",
+          "action_cost": 1,
+          "challenge": {
+            "quality": "poise",
+            "difficulty": 7,
+            "scaler": 0.6,
+            "mode": "broad",
+            "rareChance": 0
+          },
+          "successEffects": [
+            {
+              "type": "obols",
+              "amount": -8
+            },
+            {
+              "type": "item",
+              "id": "quill-copy-permit",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "quill-daughter-paid",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-vane-exposed",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-resolution",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": true
+            }
+          ],
+          "failureEffects": [
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 1
+            }
+          ],
+          "requirements": [
+            {
+              "type": "obols",
+              "id": "",
+              "op": ">=",
+              "value": 8
+            }
+          ]
+        },
+        {
+          "id": "forge",
+          "action_cost": 1,
+          "challenge": {
+            "quality": "shadow",
+            "difficulty": 7,
+            "scaler": 0.6,
+            "mode": "broad",
+            "rareChance": 0
+          },
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "pell-seal-impression",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "quill-forged",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-resolution",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": true
+            }
+          ],
+          "failureEffects": [
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 1
+            }
+          ],
+          "requirements": [
+            {
+              "type": "item",
+              "id": "pell-seal-impression",
+              "op": ">=",
+              "value": 1
+            }
+          ]
+        }
+      ]
+    },
+    "gloomwing-lamp-cupboard": {
+      "pattern": "decoupled",
+      "once": true,
+      "requirements": [
+        {
+          "type": "quality",
+          "id": "gloomwing_hunt_progress",
+          "op": ">=",
+          "value": 1
+        },
+        {
+          "type": "flag",
+          "id": "quill-resolution",
+          "op": "==",
+          "value": true
+        }
+      ],
+      "choices": [
+        {
+          "id": "key",
+          "action_cost": 1,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "vane-trimmer-key",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "spire-cupboard-examined",
+              "value": true
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "item",
+              "id": "vane-trimmer-key",
+              "op": ">=",
+              "value": 1
+            },
+            {
+              "type": "item",
+              "id": "vane-trimmer-knife",
+              "op": ">=",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": "token",
+          "action_cost": 1,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "spire-cupboard-examined",
+              "value": true
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "op": ">=",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": "permit",
+          "action_cost": 1,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "quill-copy-permit",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "spire-cupboard-examined",
+              "value": true
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "item",
+              "id": "quill-copy-permit",
+              "op": ">=",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": "diagram",
+          "action_cost": 1,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "spire-cupboard-examined",
+              "value": true
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "item",
+              "id": "vane-service-diagram",
+              "op": ">=",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": "receipt",
+          "action_cost": 1,
+          "challenge": {
+            "quality": "insight",
+            "difficulty": 6,
+            "scaler": 0.6,
+            "mode": "broad",
+            "rareChance": 0
+          },
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "spire-cupboard-examined",
+              "value": true
+            }
+          ],
+          "failureEffects": [
+            {
+              "type": "menace",
+              "id": "dread",
+              "amount": 1
+            }
+          ],
+          "requirements": [
+            {
+              "type": "item",
+              "id": "quill-household-receipt",
+              "op": ">=",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": "leave",
+          "action_cost": 0,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "flag",
+              "id": "spire-cupboard-declined",
+              "value": true
+            }
+          ],
+          "failureEffects": []
+        }
+      ]
+    },
+    "gloomwing-bureau-counterfoil": {
+      "pattern": "decoupled",
+      "once": true,
+      "requirements": [
+        {
+          "type": "quality",
+          "id": "gloomwing_hunt_progress",
+          "op": ">=",
+          "value": 1
+        },
+        {
+          "type": "flag",
+          "id": "quill-account-review",
+          "op": "==",
+          "value": true
+        }
+      ],
+      "choices": [
+        {
+          "id": "repay",
+          "action_cost": 1,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "obols",
+              "amount": -8
+            },
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": -1
+            },
+            {
+              "type": "flag",
+              "id": "quill-daughter-paid",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-repaid",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "flag",
+              "id": "quill-vane-exposed",
+              "op": "!=",
+              "value": true
+            },
+            {
+              "type": "obols",
+              "id": "",
+              "op": ">=",
+              "value": 8
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "op": "==",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-forged",
+              "op": "!=",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "admit",
+          "action_cost": 0,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": -1
+            },
+            {
+              "type": "flag",
+              "id": "quill-daughter-paid",
+              "value": true
+            },
+            {
+              "type": "menace",
+              "id": "scandal",
+              "amount": 2
+            },
+            {
+              "type": "flag",
+              "id": "quill-public-debt",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "flag",
+              "id": "quill-vane-exposed",
+              "op": "!=",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "op": "==",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "exposure",
+          "action_cost": 0,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "flag",
+              "id": "vane-interview-ordered",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "flag",
+              "id": "quill-vane-exposed",
+              "op": "==",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "op": "==",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "withdraw",
+          "action_cost": 0,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "quill-copy-permit",
+              "amount": -1
+            },
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 2
+            },
+            {
+              "type": "flag",
+              "id": "vane-interview-withdrawn",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "flag",
+              "id": "quill-vane-exposed",
+              "op": "==",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "op": "==",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "date-copy",
+          "action_cost": 0,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "pell-date-copy",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "quill-copy-permit",
+              "amount": -1
+            },
+            {
+              "type": "flag",
+              "id": "quill-daughter-paid",
+              "value": true
+            },
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 2
+            },
+            {
+              "type": "flag",
+              "id": "pell-date-inquiry",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "item",
+              "id": "pell-date-copy",
+              "op": ">=",
+              "value": 1
+            },
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "op": ">=",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": "vane-copy",
+          "action_cost": 0,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "vane-dated-copy",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": -1
+            },
+            {
+              "type": "item",
+              "id": "quill-copy-permit",
+              "amount": -1
+            },
+            {
+              "type": "flag",
+              "id": "quill-daughter-paid",
+              "value": true
+            },
+            {
+              "type": "menace",
+              "id": "suspicion",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "vane-interview-ordered",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "item",
+              "id": "vane-dated-copy",
+              "op": ">=",
+              "value": 1
+            },
+            {
+              "type": "item",
+              "id": "spire-oil-carbon",
+              "op": ">=",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": "pell",
+          "action_cost": 0,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": -1
+            },
+            {
+              "type": "flag",
+              "id": "pell-ally",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "pell-guarantor",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-daughter-paid",
+              "value": true
+            },
+            {
+              "type": "menace",
+              "id": "scandal",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "flag",
+              "id": "pell-ally",
+              "op": "==",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-honest-debt",
+              "op": "==",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "forgery-fee",
+          "action_cost": 1,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "obols",
+              "amount": -4
+            },
+            {
+              "type": "item",
+              "id": "quill-claim-token",
+              "amount": -1
+            },
+            {
+              "type": "menace",
+              "id": "scandal",
+              "amount": 1
+            },
+            {
+              "type": "flag",
+              "id": "quill-daughter-paid",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "pell-forgery-recorded",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "flag",
+              "id": "quill-forged",
+              "op": "==",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "op": "==",
+              "value": true
+            },
+            {
+              "type": "obols",
+              "id": "",
+              "op": ">=",
+              "value": 4
+            }
+          ]
+        },
+        {
+          "id": "paid",
+          "action_cost": 0,
+          "challenge": false,
+          "successEffects": [
+            {
+              "type": "flag",
+              "id": "quill-account-review",
+              "value": false
+            },
+            {
+              "type": "flag",
+              "id": "quill-receipt-filed",
+              "value": true
+            }
+          ],
+          "failureEffects": [],
+          "requirements": [
+            {
+              "type": "flag",
+              "id": "quill-account-pending",
+              "op": "!=",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
