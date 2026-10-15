@@ -35,10 +35,11 @@ export function tickLivingStories(state,now=Date.now()){
  for(const event of next.living_stories){
    if(event.fired||now<Number(event.trigger_time)+Number(event.delay_hours)*3600000)continue;
    event.fired=true;fired++;
+   if(Array.isArray(event.on_arrival) && event.on_arrival.length) applyEffects(next,event.on_arrival);
    next.flags??={};
    next.flags["living-story-fired:"+event.storylet_id]=true;
-   next.messages.unshift({id:event.storylet_id,at:new Date(now).toISOString(),title:"A delayed letter arrives",
-      text:"The city has answered your earlier decision: "+event.storylet_id});
+   next.messages.unshift({id:event.storylet_id,at:new Date(now).toISOString(),title:event.title??"A delayed letter arrives",
+      text:event.text??("The city has answered your earlier decision: "+event.storylet_id)});
  }
  if(fired)bumpRevision(next);
  return {state:next,fired};
