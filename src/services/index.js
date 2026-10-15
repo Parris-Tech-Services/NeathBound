@@ -1,5 +1,5 @@
 import { config } from "../config.js?v=20261015-03";
-import { LocalGameService } from "./local-game-service.js?v=20261015-04";
+import { LocalGameService } from "./local-game-service.js?v=20261015-05";
 import { SupabaseGameService } from "./supabase-game-service.js?v=20261015-03";
 import { CloudflareGameService } from "./cloudflare-game-service.js?v=20261015-03";
 
