@@ -2,6 +2,7 @@ import { ambitions, destinies, festivals, qbnStories, qbnCards } from "./qbn-exp
 export { ambitions, destinies, festivals };
 import { expansionLocations, expansionStories } from "./expansion.js";
 import { gloomwingLocations, gloomwingItems, gloomwingStories } from "./gloomwing-content.js";
+import { cmsPublishedStories, cmsPublishedLocations } from "./cms-published.js";
 import { approvedStories, approvedCards, approvedPlacements } from "./approved-storylets.js";
 
 
@@ -2165,4 +2166,14 @@ for(const [id,card] of Object.entries(approvedCards)){
  if(stories[id]||cards[id])throw new Error("Storylet Foundry duplicate card "+id);
  cards[id]=card;
  decks.whispers.cardIds.push(id);
+}
+
+// QBN Studio: every published JSON draft is independently reviewed and compiled.
+for(const [id,story] of Object.entries(cmsPublishedStories)){
+ if(stories[id]||cards[id])throw new Error("CMS duplicate story ID: "+id);
+ stories[id]=story;
+}
+for(const [district,ids] of Object.entries(cmsPublishedLocations)){
+ if(!locations[district])throw new Error("CMS references unknown district: "+district);
+ for(const id of ids)if(!locations[district].stories.includes(id))locations[district].stories.push(id);
 }
