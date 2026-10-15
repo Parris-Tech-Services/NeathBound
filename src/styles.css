@@ -1269,3 +1269,8 @@ button, select { font: inherit; }
   .quest-travel { min-height: 44px; }
   .route-travel { min-height: 44px; }
 }
+
+/* Locally hosted generated cavern panorama. */
+.city-banner{background:linear-gradient(0deg,#07141655,#07141610),url("../assets/art/neath-hero.webp") center/cover}
+.city-banner > div{display:none}
+.city-banner::after{background:linear-gradient(0deg,#101b1e55,transparent 50%)}

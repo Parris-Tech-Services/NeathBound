@@ -1,8 +1,8 @@
-import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20261015-10";
-import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions, ambitions, destinies } from "../game/content.js?v=20261015-10";
-import { CITY_ROUTES, getQuestGuide } from "./narrative-guide.js?v=20261015-10";
-import { loadPreferences } from "./preferences.js?v=20261015-10";
-import { cmsPublishedStories } from "../game/cms-published.js?v=20261015-10";
+import { availableChoices, availableStories, currentLocation, effectiveChallenge, describeChallenge, effectiveStat } from "../game/engine.js?v=20261015-art1";
+import { locations, cards, decks, refuges, items, equipmentSlots, itemCategories, circles, stories as storyDefinitions, ambitions, destinies } from "../game/content.js?v=20261015-art1";
+import { CITY_ROUTES, getQuestGuide } from "./narrative-guide.js?v=20261015-art1";
+import { loadPreferences } from "./preferences.js?v=20261015-art1";
+import { cmsPublishedStories } from "../game/cms-published.js?v=20261015-art1";
 
 const icon = { nerve: "◉", insight: "◆", poise: "✦", shadow: "◒", dread: "▲" };
 
@@ -689,17 +689,31 @@ possessionCardsHtml,
 
 
 const STORY_IMAGE_ART = {
-  "bell-under-water": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Diving_Bell_(PSF).png",
-  "cartographer-at-dusk": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Portolan_map_by_Battista_Beccario_(1426).jpg",
-  "tea-for-the-tide": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Teacup.png",
-  "index-of-lost-things": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Old_Books_in_the_library.jpg",
-  "the-quiet-librarian": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Old_Books_in_the_library.jpg",
-  "salt-on-the-map": "https://upload.wikimedia.org/wikipedia/commons/4/47/Old_map_1807_plan.jpg"
+  "bell-under-water": "./assets/art/waterway.webp",
+  "cartographer-at-dusk": "./assets/art/market.webp",
+  "tea-for-the-tide": "./assets/art/waterway.webp",
+  "index-of-lost-things": "./assets/art/archive.webp",
+  "the-quiet-librarian": "./assets/art/archive.webp",
+  "salt-on-the-map": "./assets/art/market.webp"
 };
 
 const LOCATION_IMAGE_ART = {
-  "lantern-quay": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Cromer_pier_at_night.jpg",
-  "hollow-archive": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Old_Books_in_the_library.jpg"
+  "ashrail-station": "./assets/art/foundry.webp",
+  "cinder-ward": "./assets/art/foundry.webp",
+  "registry-of-hours": "./assets/art/archive.webp",
+  "the-lair": "./assets/art/chamber.webp",
+  "lantern-quay": "./assets/art/waterway.webp",
+  "velvet-market": "./assets/art/market.webp",
+  "hollow-archive": "./assets/art/archive.webp",
+  "clockwork-gardens": "./assets/art/garden.webp",
+  "glass-observatory": "./assets/art/garden.webp",
+  "the-holding-vaults": "./assets/art/chamber.webp",
+  "the-pale-rooms": "./assets/art/chamber.webp",
+  "the-stitchery": "./assets/art/chamber.webp",
+  "the-whisper-court": "./assets/art/archive.webp",
+  "duskwater": "./assets/art/waterway.webp",
+  "black-spire": "./assets/art/neath-hero.webp",
+  "bureau-hall": "./assets/art/archive.webp"
 };
 
 function pictureMarkup(src, label, priority = false) {
@@ -710,7 +724,7 @@ function pictureMarkup(src, label, priority = false) {
 }
 
 function storyArtMarkup(storyId, locationId) {
-  const picture = STORY_IMAGE_ART[storyId];
+  const picture = STORY_IMAGE_ART[storyId] || LOCATION_IMAGE_ART[locationId];
   return picture ? pictureMarkup(picture, storyId) : storyArtSvg(storyId, locationId);
 }
 
