@@ -2,7 +2,7 @@ import { ambitions, destinies, festivals, qbnStories, qbnCards } from "./qbn-exp
 export { ambitions, destinies, festivals };
 import { expansionLocations, expansionStories } from "./expansion.js?v=20261015-10";
 import { gloomwingLocations, gloomwingItems, gloomwingStories } from "./gloomwing-content.js?v=20261015-10";
-import { cmsPublishedStories, cmsPublishedLocations } from "./cms-published.js?v=20261015-cms";
+import { cmsPublishedStories, cmsPublishedLocations } from "./cms-published.js?v=20261015-10";
 import { approvedStories, approvedCards, approvedPlacements } from "./approved-storylets.js?v=20261015-10";
 
 
