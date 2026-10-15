@@ -21,7 +21,7 @@
     "storylets:approve": "node tools/storylet-generator.mjs approve",
     "storylets:publish": "node tools/storylet-generator.mjs publish",
     "storylets:check": "node tools/storylet-generator.mjs publish --check",
-    "studio:validate": "node tools/narrative-studio/validate.mjs",
+    "studio:validate": "node scripts/validate.mjs",
     "studio:report": "node tools/narrative-studio/validate.mjs report",
     "cms:build": "node tools/cms/build.mjs",
     "cms:check": "node tools/cms/build.mjs --check"
