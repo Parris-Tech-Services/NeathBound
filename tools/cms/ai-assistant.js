@@ -1,3 +1,5 @@
+import {audit} from "./studio-core.js";
+import {repairDraft,fullAutoMerge,summarizeIssues} from "./auto-repair.js";
 /** Groq writing partner for both games' QBN Studio.
  * AI drafts are optional suggestions: no publication, no QA self-approval.
  * The CMS access code remains only in sessionStorage and never enters an export.
@@ -99,6 +101,9 @@ export function mountGroqAssistant({project,getStory,isReference,createStory,upd
   '<input id="groq-access" type="password" autocomplete="off" placeholder="Paste your private Studio access code">'+
   '<label for="groq-focus">Your creative direction</label><textarea id="groq-focus" rows="3" placeholder="Example: Invent a witness with a morally costly choice and a later NPC callback. Keep the established lore."></textarea>'+
   '<label class="check"><input id="groq-context" type="checkbox" checked> Include world bible, style guide and spoiler ledger in the request</label>'+
+  '<div class="panel"><div class="row"><button id="groq-fixall" class="primary">✦ Autofill & Fix All</button>'+ 
+  '<button id="groq-localfix">Fix schema issues offline</button><button id="groq-undo" disabled>Undo autofix</button></div>'+ 
+  '<p class="muted">One tap repairs invalid effects and missing story fields, asks Groq to finish the rest, runs QA again, and keeps an undo backup. No AI-generated human approvals.</p></div>'+ 
   '<div class="row"><button id="groq-generate" class="primary">Generate proposal</button>'+
   '<button id="groq-stage">Assist current stage</button><button id="groq-handoff">Export AI-ready handoff</button></div>'+
   '<div id="groq-feedback" role="status" aria-live="polite"></div>'+
@@ -183,7 +188,8 @@ export function mountGroqAssistant({project,getStory,isReference,createStory,upd
   const result=merge(story,last.result.proposal,last.mode);
   if(!result){feedback("The model did not return a usable story proposal.",true);return}
   if(!confirm("Replace allowed draft fields with the AI proposal? All QA sign-offs will be cleared. Export the draft first if you want a backup."))return;
-  updateStory(story,result);
+  const normalized=repairDraft(result,getContext()).story;
+  updateStory(story,normalized);
   feedback("Applied to draft. All QA sign-offs cleared. Review every mechanic and complete the editorial process before publishing.");
  });
  $("groq-new").addEventListener("click",()=>{
@@ -198,5 +204,118 @@ export function mountGroqAssistant({project,getStory,isReference,createStory,upd
  $("groq-export").addEventListener("click",()=>{if(last)saveBlob(project.game+"-groq-"+last.mode+".json",
   {format:"qbn-ai-proposal",schema_version:1,game:project.game,mode:last.mode,results:last.result,
    warning:"AI-generated proposal only; never interpret as an approved or deployed storylet."})});
+
+ const backupsKey="qbn.studio.autofix-backups."+project.game+".v1";
+ let undoStory=null;
+ function saveBackup(s){
+  undoStory=clone(s);
+  try{const old=JSON.parse(localStorage.getItem(backupsKey)||"[]");
+   const history=Array.isArray(old)?old:[];
+   history.unshift({saved_at:new Date().toISOString(),id:s.id,story:clone(s)});
+   localStorage.setItem(backupsKey,JSON.stringify(history.slice(0,5)));
+  }catch{/* Browser storage may be disabled; in-memory undo still works. */}
+  $("groq-undo").disabled=false;
+ }
+ $("groq-undo").addEventListener("click",()=>{
+  const current=getStory();
+  if(!undoStory||!current||current.id!==undoStory.id||isReference()){feedback("No undo for this draft.",true);return}
+  const restored=clone(undoStory);undoStory=null;
+  updateStory(current,restored);$("groq-undo").disabled=true;
+  feedback("Restored the version before automatic repairs.");
+ });
+ $("groq-localfix").addEventListener("click",()=>{
+  const s=getStory();if(!s||isReference()){feedback("Open a draft first.",true);return}
+  const ctx=getContext(),before=audit(s,ctx),out=repairDraft(s,ctx);
+  if(JSON.stringify(out.story)===JSON.stringify(s)){feedback("No safe structural changes found. "+before.errors.length+" issue(s) remain.");return}
+  saveBackup(s);out.story.qa={content:false,design:false,mechanical:false,continuity:false,peer:false};
+  updateStory(s,out.story);
+  feedback("Fixed "+out.changes.length+" structurally invalid fields. QA: "+before.errors.length+" → "+out.report.errors.length+" issue(s). "+(out.report.errors.length?"Groq can fill the remaining prose and references.":"Ready for human editorial review."));
+ });
+ $("groq-fixall").addEventListener("click",async()=>{
+  const source=getStory();if(!source||isReference()){feedback("Open your editable storylet draft first.",true);return}
+  if(busy)return;
+  const original=clone(source),ctx=getContext();
+  const initial=audit(source,ctx),first=repairDraft(source,ctx);
+  let working=first.story,report=first.report,passes=0,warning="";
+  const access=$("groq-access").value.trim();
+  const changes=[...first.changes];
+  busy=true;$("groq-fixall").disabled=true;$("groq-generate").disabled=true;
+  const beforeFingerprint=JSON.stringify(source);
+  const docs=$("groq-context").checked?getDocs():{};
+  feedback("Checking "+initial.errors.length+" issues and repairing the local schema…");
+  try{
+   if(access){
+    try{sessionStorage.setItem(tokenKey,access)}catch{}
+    const maxPasses=3;
+    for(let pass=0;pass<maxPasses;pass++){
+     // Don't send requests if the whole proposal is already valid and written.
+     if(pass>0&&!report.errors.length)break;
+     passes++;
+     feedback("Groq pass "+passes+"/"+maxPasses+" · "+report.errors.length+" blocking issue(s) …");
+     const context={
+      active_story:working,
+      qa_errors:summarizeIssues(report),
+      exact_schema:{
+       root:["schema_version","game","id","title","description","location","pitch","kicker","choices","author","reviewer","qa","status","requirements","ambition_id","progress","next_storylet","reveal_depth"],
+       choice:{id:"unique-kebab-case",label:"player facing action",stat:"existing primary stat",difficulty:5,mode:"broad",action_cost:1,
+         requirements:[],success:{title:"outcome title",text:"at least twelve original characters",effects:[]},
+         failure:{title:"failure title",text:"at least twelve original characters",effects:[]},rare_success:null},
+       effect:{type:"currency | item | menace | flag | quality | quirk | ambition-progress | living-story",id:"a valid existing target (empty string ONLY for currency or ambition-progress)",amount:1},
+       requirement:{type:"quality | item | menace | flag | quirk",id:"existing item or quality ID",op:">=",value:1}
+      },
+      allowed_ids:{stats:ctx.stats,menaces:ctx.menaces,quirks:ctx.quirks,items:ctx.items.slice(0,170),
+        locations:ctx.locations,known_story_ids:ctx.knownIds.slice(0,170)},
+      game:project.game,
+      reference_docs:{bible:(docs.bible||"").slice(0,7500),style:(docs.style||"").slice(0,3500),
+        secrets:(docs.secrets||"").slice(0,3500)},
+      review_policy:"Keep original story id, writer, reviewer, QA, status and secret depth; never claim human sign-off."
+     };
+     const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),42000);
+     let response;
+     try{response=await fetch(GATEWAY,{method:"POST",headers:{"Content-Type":"application/json","X-Studio-Access":access},
+       body:JSON.stringify({game:project.game,mode:"repair",model:$("groq-model").value,
+       instruction:"Complete all unfinished fields and address EVERY QA error. "+$("groq-focus").value+
+       "\nReturn ONE full canonical storylet object in proposal, not a list of suggestions. All branch effect entries MUST use the exact type/id/amount format. No placeholder or unknown effects. Make each outcome unique, rich and fun. Preserve established facts. Do not invent humans' names or approvals.",context}),
+       signal:abort.signal});}finally{clearTimeout(timer)}
+     const result=await response.json().catch(()=>({error:"No readable response"}));
+     if(!response.ok)throw Error(result.error||"Groq request failed");
+     if(!result.proposal){warning="Groq returned advice without a complete story draft.";break}
+     const candidate=fullAutoMerge(working,result.proposal,ctx);
+     const newScore=candidate.report.errors.length,previous=report.errors.length;
+     const currentJSON=JSON.stringify(working),nextJSON=JSON.stringify(candidate.story);
+     if(newScore>previous){warning="Groq suggested changes that made validation worse; those changes were rejected.";break}
+     if(currentJSON===nextJSON){warning="Groq returned no additional actionable edits.";break}
+     working=candidate.story;report=candidate.report;
+     changes.push(...candidate.changes);
+     if(newScore===0)break;
+     if(pass===maxPasses-1)warning="Some fields still need attention after the AI passes.";
+    }
+   }else warning="No Studio access code supplied; structural fixes ran locally, but creative autofill needs Groq.";
+   const latest=getStory();
+   if(!latest||latest.id!==original.id||JSON.stringify(latest)!==beforeFingerprint){
+    feedback("The draft changed while Groq was working. Nothing was overwritten. Reopen the draft and retry.",true);return;
+   }
+   if(JSON.stringify(working)!==JSON.stringify(original)){
+    working.qa={content:false,design:false,mechanical:false,continuity:false,peer:false};
+    if(original.status==="approved")working.status="pitch";
+    saveBackup(original);updateStory(latest,working);
+   }
+   const message="Autofill & Fix completed: "+initial.errors.length+" → "+report.errors.length+
+    " blocking issue(s); "+passes+" AI pass(es), "+changes.length+
+    " structural adjustment(s). "+(warning||"")+
+    (report.errors.length?" Remaining: "+report.errors.slice(0,3).map(e=>e.path+" — "+e.message).join("; "):
+    " No structural blockers. Human editorial approval is still required.");
+   feedback(message,report.errors.length>0);
+  }catch(err){
+   // Preserve the safe deterministic repairs even when network/API fails.
+   if(JSON.stringify(working)!==JSON.stringify(original)&&
+       getStory()?.id===original.id&&JSON.stringify(getStory())===beforeFingerprint){
+    working.qa={content:false,design:false,mechanical:false,continuity:false,peer:false};
+    if(original.status==="approved")working.status="pitch";
+    saveBackup(original);updateStory(source,working);
+   }
+   feedback("Groq could not finish: "+err.message+". Local fixes were saved where safe; use Undo or retry.",true);
+  }finally{busy=false;$("groq-fixall").disabled=false;$("groq-generate").disabled=false}
+ });
  return {getGateway:()=>GATEWAY};
 }
