@@ -32,7 +32,7 @@ const stages=[["The Candle Census","A lamplighter has counted one more flame tha
 qbnStories["qbn-choose-ambition"] = {
  title:"A Promise of Your Own", pattern:"decoupled",
  kicker:"Choose one personal ambition after escaping the chamber",
- text:"At Lantern Quay, four sealed commissions have been left beneath a public lamp. You may follow only one. Choose carefully: another life is required to make another choice.",
+ text:"At Lantern Quay, five sealed commissions have been left beneath a public lamp. You may follow only one. Choose carefully: another life is required to make another choice.",
  requirements:[{type:"flag",id:"qbn-ambition-chosen",op:"!=",value:true}],
  choices:Object.entries(ambitions).map(([id,entry])=>({
  id:"take-"+id,label:entry.name+" — "+entry.description,
