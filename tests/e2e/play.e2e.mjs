@@ -271,7 +271,7 @@ test("mobile district has concise single-open storylets and a folded evidence re
   await page.locator('[data-storylet-id="cartographer-at-dusk"] > summary').click();
   assert.equal(await page.locator(".storylet-disclosure[open]").count(), 1);
   assert.equal(await page.locator('[data-story="bell-under-water"][data-choice="descend"]').isVisible(), false);
-  assert.ok(await page.locator('[data-story="cartographer-at-dusk"] [data-choice]').first().isVisible());
+  assert.ok(await page.locator('[data-story="cartographer-at-dusk"][data-choice]').first().isVisible());
   // Returning to the main lead requires one tap, not scrolling over a wall of choices.
   await page.locator('[data-storylet-id="bell-under-water"] > summary').click();
   assert.equal(await page.locator(".storylet-disclosure[open]").count(), 1);
