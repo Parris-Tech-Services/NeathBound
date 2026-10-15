@@ -1,5 +1,6 @@
 import {project} from "./game-config.js";
 import {mountGroqAssistant} from "./ai-assistant.js";
+import {repairDraft} from "./auto-repair.js";
 import {PHASES,STAGE_NAMES,EFFECTS,REQUIREMENTS,OPERATORS,slug,copy,freshStory,freshChoice,freshEffect,freshRequirement,audit,advance,exportBundle,importBundle} from "./studio-core.js";
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
@@ -136,8 +137,20 @@ $("clone-story").onclick=()=>{
 };
 $("delete-story").onclick=()=>{if(reference||!selected||!confirm("Delete this locally saved draft? Export it first if you might want it later."))return;drafts=drafts.filter(s=>s.id!==selected);save();selected=null;$("editor").hidden=true;$("welcome").hidden=false;renderList();renderQA()};
 $("go-next").onclick=()=>{
- const s=active();if(!s||reference)return;const stage=PHASES[PHASES.indexOf(s.status)+1];if(!stage){toast("Already approved. Export and submit for review.");return}
- const result=advance(s,stage,context());if(!result.ok){toast(result.reason);return}
+ const s=active();if(!s||reference)return;
+ const stage=PHASES[PHASES.indexOf(s.status)+1];
+ if(!stage){toast("Already approved. Export and submit for review.");return}
+ // A fully described scene should not be trapped in Pitch merely because the
+ // author used Autofill and the separate pitch field was left empty.
+ if(stage==="midflight"&&!String(s.pitch||"").trim()&&String(s.description||"").trim().length>=40){
+  const repaired=repairDraft(s,context());
+  if(String(repaired.story.pitch||"").trim()){
+   s.pitch=repaired.story.pitch;
+   s.qa={content:false,design:false,mechanical:false,continuity:false,peer:false};
+   save();
+  }
+ }
+ const result=advance(s,stage,context());if(!result.ok){toast(result.reason);renderQA();return}
  s.history.push({from:s.status,to:stage,at:new Date().toISOString(),reviewer:s.reviewer||null});s.status=stage;save();openStory(s.id);
 };
 $("fields").addEventListener("input",onField);
