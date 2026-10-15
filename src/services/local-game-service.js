@@ -1,6 +1,6 @@
-import { resolveChoice, resetState, travelBlockedReason, drawCard, discard, setRefuge, equipItem, tickLivingStories, chooseAmbition, chooseDestiny, refreshActions } from "../game/engine.js?v=20261015-07";
-import { loadState, saveState } from "../game/state.js?v=20261015-07";
-import { locations } from "../game/content.js?v=20261015-07";
+import { resolveChoice, resetState, travelBlockedReason, drawCard, discard, setRefuge, equipItem, tickLivingStories, chooseAmbition, chooseDestiny, refreshActions } from "../game/engine.js?v=20261015-08";
+import { loadState, saveState } from "../game/state.js?v=20261015-08";
+import { locations } from "../game/content.js?v=20261015-08";
 
 export class LocalGameService {
   constructor(storage = globalThis.localStorage) {
