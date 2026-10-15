@@ -81,6 +81,7 @@ export function applyEffect(state, effect, qualityDefs) {
       if(state.ambition===effect.id) {
         state.ambition_progress ??= {};
         state.ambition_progress[effect.id]=Math.max(0,(state.ambition_progress[effect.id]??0)+Number(effect.amount??1));
+        if(effect.id==="gloomwing-hunt")state.qualities.gloomwing_hunt_progress=state.ambition_progress[effect.id];
       }
       break;
     case "destiny":
