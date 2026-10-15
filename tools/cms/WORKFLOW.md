@@ -39,8 +39,8 @@ Dedicated roles: Pitch Agent → Structure Agent → Prose Agent → Content QA 
 
 ## Getting an approved storylet into the game
 
-1. In the CMS, press **Export JSON** for the completed storylet. This exports a portable `qbn-studio-export` bundle containing one or more `stories`.
-2. Open the exported JSON, extract each individual `stories[]` object, and commit it as `content/storylets/cms/<storylet-id>.json`. Do not commit the wrapper object. Use a feature branch and GitHub pull request so that changes can be reviewed independently. A future CMS version can offer a direct per-story publish file.
+1. In the CMS, press **Approved file ↓** once the independent review and all QA checks are signed off. That downloads one raw `storylet-id.json` file ready for publication. **Export JSON** remains available for draft backup and produces a portable `qbn-studio-export` wrapper.
+2. Add the approved raw file to `content/storylets/cms/<storylet-id>.json` on a feature branch and request a GitHub review. Do not submit a backup wrapper as a publishable storylet.
 3. Run `npm run cms:build` from the repository root. This generates **NeathBound** `src/game/cms-published.js` or **Undercity** `content/cms-published.js`, using only approved JSON.
 4. Run `npm run cms:check` and the repository's full test suite; for NeathBound use `npm run release:check`, for Undercity use `node scripts/validate-content.mjs && node scripts/content-tracker.mjs --check && npm test`. Rebuild the Undercity content tracker after adding playable scenes.
 5. Review the diff and approve the pull request. Both games load their generated CMS output without replacing existing hand-authored stories or existing saves.
