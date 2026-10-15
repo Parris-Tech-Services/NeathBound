@@ -19,7 +19,7 @@ test("actions never consume a finite action resource", () => {
 });
 
 test("challenge success applies configured effects", () => {
-  const result = resolveChoice(initialState(), "bell-under-water", "descend", () => 0.1);
+  const result = resolveChoice(initialState(), "bell-under-water", "descend", () => 0.9);
   assert.equal(result.success, true);
   assert.equal(result.state.items["black-sand"], 1);
   assert.equal(result.state.locationId, "hollow-archive");
@@ -27,7 +27,7 @@ test("challenge success applies configured effects", () => {
 });
 
 test("challenge failure applies failure effects and still advances the story", () => {
-  const result = resolveChoice(initialState(), "bell-under-water", "descend", () => 0.99);
+  const result = resolveChoice(initialState(), "bell-under-water", "descend", () => 0.1);
   assert.equal(result.success, false);
   assert.equal(result.state.locationId, "hollow-archive");
   assert.equal(result.state.items["black-sand"], 1);
