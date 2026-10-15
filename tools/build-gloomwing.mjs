@@ -14,7 +14,7 @@ for(const [id,entry] of Object.entries(data.stories)){
 }
 for(const [id,entry] of Object.entries(data.items))rows.push(["item",id,entry.name,"","","","",entry.description??""]);
 for(const [id,entry] of Object.entries(data.locations))rows.push(["location",id,entry.name,"","","","",entry.subtitle??""]);
-const csv=rows.map(row=>row.map(csvEscape).join(",")).join("\\n")+"\\n";
+const csv=rows.map(row=>row.map(csvEscape).join(",")).join(String.fromCharCode(10))+String.fromCharCode(10);
 if(process.argv.includes("--check")){if((await readFile(target,"utf8"))!==text)throw new Error("Generated Gloomwing module is stale. Run npm run build:content.");
 if((await readFile(tracker,"utf8"))!==csv)throw new Error("Gloomwing tracker is stale. Run npm run build:content.");console.log("Gloomwing generated module is current.");}
 else{await writeFile(target,text);await writeFile(tracker,csv);console.log("Rebuilt Gloomwing content and catalogue.");}
