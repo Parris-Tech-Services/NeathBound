@@ -116,6 +116,19 @@ export function mountGroqAssistant({project,getStory,isReference,createStory,upd
  const toolbar=editor.querySelector(".toolbar");
  if(toolbar)toolbar.insertAdjacentElement("afterend",ui);else editor.append(ui);
  const $=x=>ui.querySelector("#"+x);
+ const sideQA=document.querySelector("#run-qa");
+ if(sideQA&&!document.querySelector("#groq-qa-fix")){
+  const shortcut=document.createElement("button");
+  shortcut.id="groq-qa-fix";shortcut.className="primary";shortcut.type="button";
+  shortcut.textContent="✦ Fix all QA issues with Groq";
+  sideQA.insertAdjacentElement("afterend",shortcut);
+  shortcut.addEventListener("click",()=>{
+   const selected=getStory();
+   if(!selected||isReference()){notify("Duplicate a published reference or open an editable draft first.");return}
+   document.querySelector("#groq-studio")?.scrollIntoView?.({behavior:"smooth",block:"start"});
+   $("groq-fixall").click();
+  });
+ }
  let last=null,busy=false;
  try{$("groq-access").value=sessionStorage.getItem(tokenKey)||""}catch{}
  const feedback=(text,error=false)=>{$("groq-feedback").textContent=text;$("groq-feedback").style.color=error?"#ffb0a0":""};
