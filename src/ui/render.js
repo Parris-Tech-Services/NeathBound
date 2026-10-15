@@ -727,6 +727,10 @@ function locationArtMarkup(locationId) {
 }
 
 const STORY_ART = {
+  "gloomwing-registry-1": ["♢","evidence registry 1","#25323a","#9db6c0"],
+  "gloomwing-registry-2": ["▤","evidence registry 2","#342c37","#c3a3b4"],
+  "gloomwing-registry-3": ["♧","evidence registry 3","#2e382d","#b6c495"],
+  "gloomwing-registry-4": ["✦","evidence registry 4","#3a3025","#d5ad86"],
   "qbn-choose-ambition": ["✒","four promises","#192c3b","#98bfc9"],
   "qbn-missing-name-1": ["◈","the candle census","#39312b","#d0af83"],
   "qbn-missing-name-2": ["◇","the debt written sideways","#26382f","#99c2a2"],
