@@ -999,7 +999,7 @@ const LOCATION_ART = {
   "the-holding-vaults": ["▥", "⚿", "The Holding Vaults", "#1e272c", "#6b777e"],
   "the-pale-rooms": ["✧", "☾", "The Pale Rooms", "#31383b", "#aab2ad"],
   "the-stitchery": ["✚", "✂", "The Stitchery", "#3a2c2d", "#9f786e"],
-  "the-whisper-court": ["❧", "♢", "The Whisper Court", "#352b38", "#967995"]
+  "the-whisper-court": ["❧", "♢", "The Whisper Court", "#352b38", "#967995"],
   "duskwater": ["♒","◇","Duskwater","#1d3840","#7ca8a8"],
   "black-spire": ["♜","✦","Black Spire","#26293c","#8f9ca9"],
   "bureau-hall": ["▣","▤","Bureau Hall","#32302b","#b59e7a"],
