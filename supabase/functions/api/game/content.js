@@ -323,6 +323,47 @@ export const stories = {
         failureEffects: [
         ]
       }
+
+      ,{
+        id: "bargain",
+        label: "Persuade the night clerk to open the lock (Poise)",
+        challenge: { quality: "poise", difficulty: 1 },
+        success: "The hooded clerk flinches at the bell stamped into your door. You promise to carry the marked key away, and the clerk lets you leave without ringing it. A forwarding slip directs you to Lantern Quay; the clerk presses a pair of silk gloves into your hand as a peculiar farewell.",
+        successEffects: [
+          { type: "location", id: "lantern-quay" },
+          { type: "unlock-location", id: "lantern-quay" },
+          { type: "flag", id: "origin:poise", value: true },
+          { type: "flag", id: "tutorial.story", value: true },
+          { type: "flag", id: "tutorial.myself", value: true },
+          { type: "flag", id: "tutorial.possessions", value: true },
+          { type: "flag", id: "tutorial.travel", value: true },
+          { type: "flag", id: "tutorial.cards", value: true },
+          { type: "item", id: "brass-key", amount: 1 },
+          { type: "item", id: "silk-gloves", amount: 1 }
+        ],
+        failure: "The clerk refuses to help, but a trembling hand lingers on the latch. The next appeal may work.",
+        failureEffects: []
+      },
+      {
+        id: "slip",
+        label: "Slip out during the changing of the watch (Shadow)",
+        challenge: { quality: "shadow", difficulty: 1 },
+        success: "You count the guards' footsteps and step through a gap that exists for scarcely a heartbeat. On an unattended desk lies a bell-marked brass key and a docket forwarding missing prisoners to Lantern Quay. You leave wrapped in an abandoned velvet cloak, unseen by all except the dark.",
+        successEffects: [
+          { type: "location", id: "lantern-quay" },
+          { type: "unlock-location", id: "lantern-quay" },
+          { type: "flag", id: "origin:shadow", value: true },
+          { type: "flag", id: "tutorial.story", value: true },
+          { type: "flag", id: "tutorial.myself", value: true },
+          { type: "flag", id: "tutorial.possessions", value: true },
+          { type: "flag", id: "tutorial.travel", value: true },
+          { type: "flag", id: "tutorial.cards", value: true },
+          { type: "item", id: "brass-key", amount: 1 },
+          { type: "item", id: "velvet-cloak", amount: 1 }
+        ],
+        failure: "One guard turns back unexpectedly. You hold your breath against the wall and prepare for the next exchange.",
+        failureEffects: []
+      }
     ]
   },
   "lair-inspect-door": {
