@@ -570,7 +570,7 @@ export const stories = {
         id: "dusty",
         label: "Choose the dusty shelf",
         requirements: [],
-        success: "You find a route back to the quay and a page with your handwriting.",
+        success: "Beneath the dust is a torn page from the altered registry, written in your own hand. The librarian offers it to you and points out the route back to the quay.",
         successEffects: [
           { type: "obols", amount: 12 },
           { type: "item", id: "unfinished-page", amount: 1 },
@@ -582,7 +582,7 @@ export const stories = {
         id: "future",
         label: "Choose the expected shelf",
         requirements: [],
-        success: "The city applauds politely. You gain a title you did not request.",
+        success: "The future shelf contains an appointment card addressed to you at the Velvet Market. The librarian warns that someone expects you there. You leave with a new lead and a title you did not request.",
         successEffects: [
           { type: "quality", id: "poise", amount: 1 },
           { type: "obols", amount: 3 },
