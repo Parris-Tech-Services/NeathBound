@@ -1,9 +1,8 @@
 name: NeathBound CI
 
 on:
-  push:
-    branches: ["main", "feature/**", "agent/**", "narrative/**"]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read

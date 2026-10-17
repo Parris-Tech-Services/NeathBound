@@ -3,9 +3,6 @@
 # is reachable and still refuses unauthenticated requests.
 name: Live site check
 on:
-  workflow_run:
-    workflows: ["Deploy NeathBound to GitHub Pages"]
-    types: [completed]
   workflow_dispatch:
 permissions:
   contents: read
