@@ -107,7 +107,7 @@ export function render(app, state, handlers, outcome = null) {
       return [
         '<div class="choice-row', canGo ? '' : ' is-locked', '">',
         '<div class="choice-copy"><strong>', escapeHtml(choice.label), '</strong>', challenge, lockedReason, '</div>',
-        '<button class="go-button" data-story="', story.id, '" data-choice="', choice.id, '" ',
+        '<button class="go-button" data-story="', story.id, '" data-choice="', choice.id, '" aria-label="', escapeHtml((!isAvailable ? 'LOCKED' : hasActions ? 'GO' : 'WAIT') + ': ' + choice.label + ' — ' + story.title), '" ',
         canGo ? "" : "disabled",
         '>', !isAvailable ? 'LOCKED' : hasActions ? 'GO' : 'WAIT', '</button></div>'
       ].join("");
@@ -120,7 +120,7 @@ export function render(app, state, handlers, outcome = null) {
       isCard ? '<div class="card-discard-header"><button class="discard-button" data-action="discard" data-card="' + story.id + '" aria-label="Discard">✗</button></div>' : '',
       '<div class="story-art story-art-', escapeClass(story.id), '" aria-hidden="true">', storyArtMarkup(story.id, state.locationId), '</div>',
       '<div class="story-body">',
-      '<button class="bookmark', planned ? ' is-bookmarked' : '', '" type="button" data-action="bookmark" data-story="', story.id, '" aria-label="', planned ? 'Remove from Plans' : 'Add to Plans', '" title="', planned ? 'Remove from Plans' : 'Add to Plans', '" aria-pressed="', planned, '">◆</button>',
+      '<button class="bookmark', planned ? ' is-bookmarked' : '', '" type="button" data-action="bookmark" data-story="', story.id, '" aria-label="', escapeHtml((planned ? 'Remove from Plans: ' : 'Add to Plans: ') + story.title), '" title="', planned ? 'Remove from Plans' : 'Add to Plans', '" aria-pressed="', planned, '">◆</button>',
       mainStory ? '<p class="story-role">◆ MAIN STORY · CURRENT LEAD</p>' : '',
       '<h3>', escapeHtml(story.title), '</h3>',
       '<p>', escapeHtml(story.text), '</p>',
