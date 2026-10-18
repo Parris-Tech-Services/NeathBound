@@ -4,8 +4,8 @@
 # itself stays dependency-free.
 name: Browser tests
 on:
-  pull_request:
   workflow_dispatch:
+
 permissions:
   contents: read
 jobs:
